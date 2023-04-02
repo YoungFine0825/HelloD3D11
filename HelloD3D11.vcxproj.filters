@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{7bc9a008-9a96-4c34-a971-ba66fd76dd60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\d3d">
+      <UniqueIdentifier>{795a45de-8609-429d-bda1-4309aaaf4be1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\math">
+      <UniqueIdentifier>{34f2b676-f4db-4aba-8824-f72dbabf9e64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework">
+      <UniqueIdentifier>{330fb378-6f1e-42e2-bc0f-12605ae76d2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\Mesh">
+      <UniqueIdentifier>{89de819d-00c1-43cd-93b8-9ee6acb2f9a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\Shader">
+      <UniqueIdentifier>{44ebbdd6-aab3-4d74-8ee0-535222122885}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\Model">
+      <UniqueIdentifier>{ec8ad41e-e38f-4fa2-93f5-2de4ef56475c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\Texture">
+      <UniqueIdentifier>{5eb2230e-ac34-4470-952a-2676321f8af1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\Material">
+      <UniqueIdentifier>{236bd7f4-5726-4582-9aff-1fd7c431998b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\Light">
+      <UniqueIdentifier>{3cd534ee-63d8-4cf1-99da-d9b7536264e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\imgui">
+      <UniqueIdentifier>{9d09b964-c81d-4068-bdc0-f64a69cfd407}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\imgui\backends">
+      <UniqueIdentifier>{39544516-a998-4150-83f8-a209694d8a59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\ImGUI">
+      <UniqueIdentifier>{8a479e52-13f3-4585-8f1a-6f5c04fbc438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\Scene">
+      <UniqueIdentifier>{16dfb599-b655-4fcd-9807-e2f037032e71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Framework\RenderTexture">
+      <UniqueIdentifier>{b6bb8678-39c2-4829-9278-28a2cbefa7a4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_Empty.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d\d3dGraphics.cpp">
+      <Filter>src\d3d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_HelloWorld.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d\d3dEffectsUtil.cpp">
+      <Filter>src\d3d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\MathLib.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Resource.cpp">
+      <Filter>src\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Mesh\Mesh.cpp">
+      <Filter>src\Framework\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Mesh\MeshManager.cpp">
+      <Filter>src\Framework\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Graphics.cpp">
+      <Filter>src\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_LoadMeshFronFile.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Shader\Shader.cpp">
+      <Filter>src\Framework\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Shader\ShaderManager.cpp">
+      <Filter>src\Framework\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_Lighting.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d3d\DXInput.cpp">
+      <Filter>src\d3d</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_Texture.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Model\Model.cpp">
+      <Filter>src\Framework\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Model\ModelManager.cpp">
+      <Filter>src\Framework\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Texture\Texture.cpp">
+      <Filter>src\Framework\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Texture\TextureManager.cpp">
+      <Filter>src\Framework\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Light\LightManager.cpp">
+      <Filter>src\Framework\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-1.87\imgui.cpp">
+      <Filter>src\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-1.87\imgui_demo.cpp">
+      <Filter>src\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-1.87\imgui_draw.cpp">
+      <Filter>src\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-1.87\imgui_tables.cpp">
+      <Filter>src\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-1.87\imgui_widgets.cpp">
+      <Filter>src\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-1.87\backends\imgui_impl_dx11.cpp">
+      <Filter>src\imgui\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-1.87\backends\imgui_impl_win32.cpp">
+      <Filter>src\imgui\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\ImGUI\ImGuiHelper.cpp">
+      <Filter>src\Framework\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_Blending.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_SceneManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Material\Material.cpp">
+      <Filter>src\Framework\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Scene\SceneManager.cpp">
+      <Filter>src\Framework\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Scene\Renderer.cpp">
+      <Filter>src\Framework\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Scene\Entity.cpp">
+      <Filter>src\Framework\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Scene\Camera.cpp">
+      <Filter>src\Framework\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_ComputeShader1.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderTexture\RenderTexture.cpp">
+      <Filter>src\Framework\RenderTexture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderTexture\RenderTextureManager.cpp">
+      <Filter>src\Framework\RenderTexture</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_ComputeShaderBlur.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Window.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\App.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d3d\d3dGraphic.h">
+      <Filter>src\d3d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d3d\d3dEffectsUtil.h">
+      <Filter>src\d3d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\MathLib.h">
+      <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Color.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Global.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Resource.h">
+      <Filter>src\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Mesh\Mesh.h">
+      <Filter>src\Framework\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Mesh\MeshManager.h">
+      <Filter>src\Framework\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Graphic.h">
+      <Filter>src\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Shader\Shader.h">
+      <Filter>src\Framework\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Shader\ShaderManager.h">
+      <Filter>src\Framework\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\d3d\DXInput.h">
+      <Filter>src\d3d</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Model\Model.h">
+      <Filter>src\Framework\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Model\ModelManager.h">
+      <Filter>src\Framework\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Texture\Texture.h">
+      <Filter>src\Framework\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Texture\TextureManager.h">
+      <Filter>src\Framework\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Material\Material.h">
+      <Filter>src\Framework\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Light\Light.h">
+      <Filter>src\Framework\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Light\LightManager.h">
+      <Filter>src\Framework\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-1.87\imconfig.h">
+      <Filter>src\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-1.87\imgui.h">
+      <Filter>src\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-1.87\imgui_internal.h">
+      <Filter>src\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-1.87\imstb_rectpack.h">
+      <Filter>src\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-1.87\imstb_textedit.h">
+      <Filter>src\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-1.87\imstb_truetype.h">
+      <Filter>src\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-1.87\backends\imgui_impl_dx11.h">
+      <Filter>src\imgui\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-1.87\backends\imgui_impl_win32.h">
+      <Filter>src\imgui\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\ImGUI\ImGuiHelper.h">
+      <Filter>src\Framework\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Scene\Transform.h">
+      <Filter>src\Framework\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Scene\SceneManager.h">
+      <Filter>src\Framework\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Scene\Renderer.h">
+      <Filter>src\Framework\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Scene\Entity.h">
+      <Filter>src\Framework\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Scene\Camera.h">
+      <Filter>src\Framework\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderTexture\RenderTexture.h">
+      <Filter>src\Framework\RenderTexture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderTexture\RenderTextureManager.h">
+      <Filter>src\Framework\RenderTexture</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
