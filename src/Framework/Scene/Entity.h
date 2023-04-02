@@ -23,10 +23,14 @@ namespace Framework
 		Renderer* GetRenderer(unsigned int index);
 		unsigned int GetRendererCount();
 
+		void DoTick(float dt);
+	protected:
+		void virtual OnTick(float dt);
+		Transform m_tranform;
+		std::vector<Renderer*> m_renderers;
 	private:
 		EntityInstanceId m_id;
 		std::string m_name;
-		Transform m_tranform;
-		std::vector<Renderer*> m_renderers;
+
 	};
 }

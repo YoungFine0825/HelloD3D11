@@ -15,13 +15,6 @@ namespace Framework
 		EntityList m_entities;
 		CameraList m_cameras;
 
-		#define PARALLEL_LIGHT_COUNT 6
-		Framework::ParallelLight m_parallelLights[PARALLEL_LIGHT_COUNT];
-		#define POINT_LIGHT_COUNT 6
-		Framework::PointLight m_pointLights[POINT_LIGHT_COUNT];
-		#define SPOT_LIGHT_COUNT 6
-		Framework::SpotLight m_spotLights[SPOT_LIGHT_COUNT];
-
 		typedef std::vector<Framework::Renderer*> RendererList;
 		RendererList m_renderableRenderers;
 
@@ -91,6 +84,43 @@ namespace Framework
 		bool DestroyEntity(Entity* ent)
 		{
 			return DestroyEntity(ent->GetInstanceId());
+		}
+
+		Entity* FindEntity(EntityInstanceId id) 
+		{
+			size_t entCnt = m_entities.size();
+			for (size_t i = 0; i < entCnt; ++i) 
+			{
+				if (m_entities[i]->GetInstanceId() == id) 
+				{
+					return m_entities[i];
+				}
+			}
+			return nullptr;
+		}
+
+		Entity* FindEntity(const std::string& name) 
+		{
+			size_t entCnt = m_entities.size();
+			for (size_t i = 0; i < entCnt; ++i)
+			{
+				if (m_entities[i]->GetName() == name)
+				{
+					return m_entities[i];
+				}
+			}
+			return nullptr;
+		}
+
+		bool AddEntity(Entity* ent) 
+		{
+			Entity* existed = FindEntity(ent->GetInstanceId());
+			if (existed != nullptr) 
+			{
+				return false;
+			}
+			m_entities.push_back(ent);
+			return true;
 		}
 
 
@@ -342,6 +372,14 @@ namespace Framework
 			for (size_t i = 0; i < m_renderableRenderers.size(); ++i) 
 			{
 				DrawRenderer(m_renderableRenderers[i],cameraPosW,viewMatrix,projectMatrix);
+			}
+		}
+
+		void Tick(float dt) 
+		{
+			for (size_t i = 0; i < m_entities.size(); ++i)
+			{
+				m_entities[i]->DoTick(dt);
 			}
 		}
 	}

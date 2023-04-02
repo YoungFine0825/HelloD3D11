@@ -15,6 +15,9 @@ namespace Framework
 		Entity* CreateEntity(const std::string& name);
 		bool DestroyEntity(Entity* ent);
 		bool DestroyEntity(EntityInstanceId id);
+		Entity* FindEntity(EntityInstanceId id);
+		Entity* FindEntity(const std::string& name);
+		bool AddEntity(Entity* ent);
 
 		Camera* GetCamera(unsigned int index);
 		Camera* GetCamera(const std::string& name);
@@ -32,5 +35,7 @@ namespace Framework
 		void DrawOneFrame();
 		void DrawOneFrame(Camera* camera);
 		void DrawOneFrame(XMMATRIX viewMatrix, XMMATRIX projectMatrix);
+
+		void Tick(float dt);
 	}
 }

@@ -1,6 +1,26 @@
 #include "math/MathLib.h"
 
 
+XMFLOAT3 operator+(const XMFLOAT3& lhs, const XMFLOAT3& rhs) 
+{
+	return { lhs.x + rhs.x,lhs.y + rhs.y,lhs.z + rhs.z };
+}
+
+XMFLOAT3 operator-(const XMFLOAT3& lhs, const XMFLOAT3& rhs) 
+{
+	return { lhs.x - rhs.x,lhs.y - rhs.y,lhs.z - rhs.z };
+}
+
+XMFLOAT3 operator*(const XMFLOAT3& lhs, const float& rhs)
+{
+	return { lhs.x * rhs,lhs.y * rhs,lhs.z * rhs };
+}
+
+XMFLOAT3 operator*(const float& lhs, const XMFLOAT3& rhs) 
+{
+	return { rhs.x * lhs, rhs.y * lhs,rhs.z * lhs };
+}
+
 XMVECTOR XMVectorSet(XMFLOAT3 value)
 {
 	return XMVectorSet(value.x, value.y, value.z, 0.0f);

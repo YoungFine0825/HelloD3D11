@@ -50,6 +50,9 @@
     <Filter Include="src\Framework\RenderTexture">
       <UniqueIdentifier>{b6bb8678-39c2-4829-9278-28a2cbefa7a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Framework\Utils">
+      <UniqueIdentifier>{a9b73bc9-b7ed-46bb-818f-708f6d0a1232}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -172,6 +175,12 @@
     <ClCompile Include="src\AppImpl_ComputeShaderBlur.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\AppImpl_FlyingCamera.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Utils\FlyingCameraEntity.cpp">
+      <Filter>src\Framework\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -284,6 +293,9 @@
     </ClInclude>
     <ClInclude Include="src\Framework\RenderTexture\RenderTextureManager.h">
       <Filter>src\Framework\RenderTexture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Utils\FlyingCameraEntity.h">
+      <Filter>src\Framework\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

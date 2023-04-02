@@ -8,7 +8,8 @@
 //#define AppImpl_Blending
 //#define AppImpl_SceneManager
 //#define  AppImpl_ComputeShader1
-#define  AppImpl_ComputeShaderBlur
+//#define  AppImpl_ComputeShaderBlur
+#define AppImpl_FlyingCamera
 
 void App_PreCreateWindow();
 bool App_Init();

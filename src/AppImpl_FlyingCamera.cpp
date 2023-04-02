@@ -1,7 +1,7 @@
 #include "Global.h"
 #include "App.h"
 
-#ifdef  AppImpl_ComputeShaderBlur
+#ifdef  AppImpl_FlyingCamera
 
 #include "d3d/DXInput.h"
 #include "Window.h"
@@ -22,6 +22,8 @@
 #include "Framework/Scene/SceneManager.h"
 #include "Framework/RenderTexture/RenderTextureManager.h"
 
+#include "Framework/Utils/FlyingCameraEntity.h"
+
 using namespace Framework;
 
 ParallelLight* m_parallelLight;
@@ -40,19 +42,20 @@ bool enableFog = true;
 float fogStart = 500;
 float fogRange = 1000;
 
-
-
 RenderTexture* screenRT;
 RenderTexture* blurRT1;
 RenderTexture* blurRT2;
 Shader* blurShader;
-int blurCount = 2;
+int blurCount = 0;
 ID3D11ShaderResourceView* nullSRV[1] = { 0 };
 ID3D11UnorderedAccessView* nullUAV[1] = { 0 };
 
+FlyingCameraEntity* flyCameraEnt;
+
 void App_PreCreateWindow()
 {
-
+	win_SetWidth(1280);
+	win_SetHeight(720);
 }
 
 Entity* CreateEntitiesFromModel(Resource::ResourceUrl modelUrl, std::string name)
@@ -74,7 +77,7 @@ Entity* CreateEntitiesFromModel(Resource::ResourceUrl modelUrl, std::string name
 
 void BuildScene()
 {
-	Shader* litOpaShader = ShaderManager::LoadFromFxFile("res/effects/LitOpaque.fx");
+	Shader* opaShader = ShaderManager::LoadFromFxFile("res/effects/LitOpaque.fx");
 	Shader* alphaTestShader = ShaderManager::LoadFromFxFile("res/effects/UnlitAlphaTest.fx");
 	Shader* transparentShader = ShaderManager::LoadFromFxFile("res/effects/LitAlpha.fx");
 	//
@@ -83,7 +86,7 @@ void BuildScene()
 	{
 		Texture* terrainTex = TextureManager::LoadDDSFromFile("res/models/grass.dds");
 		Renderer* renderer = terrain->GetRenderer(0);
-		renderer->material = new Material(litOpaShader);
+		renderer->material = new Material(opaShader);
 		renderer->material->SetMainTexture(terrainTex);
 		//
 		terrain->GetTransform()->position = { 0.0f,400.0f,1181.0f };
@@ -97,28 +100,30 @@ void BuildScene()
 		Renderer* renderer = actor->GetRenderer(0);
 		//
 		Texture* actorBodyTex = TextureManager::LoadDDSFromFile("res/models/FoxHowl_Teacher_BODY_BL.dds");
-		renderer->material = new Material(litOpaShader);
-		renderer->material->SetMainTexture(actorBodyTex);
-		//
-		renderer = actor->GetRenderer(1);
 		Texture* actorHeadTex = TextureManager::LoadDDSFromFile("res/models/FoxHowl_Teacher_Face_BL.dds");
-		renderer->material = new Material(litOpaShader);
+		//
+		renderer->material = new Material(opaShader);
 		renderer->material->SetMainTexture(actorHeadTex);
 		//
-		actor->GetTransform()->position = { 0.0f,-21.0f,60.0f };
-		actor->GetTransform()->rotation = { 0.0f,-153.0f,0.0f };
+		renderer = actor->GetRenderer(1);
+		renderer->material = new Material(opaShader);
+		renderer->material->SetMainTexture(actorBodyTex);
+		//
+		actor->GetTransform()->position = { 0.0f,-21.0f,300.0f };
+		actor->GetTransform()->rotation = { 0.0f,0.0f,0.0f };
+		actor->GetTransform()->scale = { 100.0f,100.0f,100.0f };
 	}
 	//
 	Entity* waterQuad = SceneManager::CreateEntity("Water");
 	Transform* waterTrans = waterQuad->GetTransform();
-	waterTrans->position = { 0,-100,150 };
+	waterTrans->position = { 0,-100,1000 };
 	waterTrans->rotation = { 90,0,0 };
-	waterTrans->scale = { 500,500,1 };
+	waterTrans->scale = { 1500,1500,1 };
 	Texture* waterTex = TextureManager::LoadDDSFromFile("res/models/water2.dds");
 	Renderer* waterRenderer = waterQuad->CreateRenderer();
 	waterMaterial = new Material(transparentShader);
 	waterMaterial->SetMainTexture(waterTex);
-	waterMaterial->mainTextureST = { 5,5,0,0 };
+	waterMaterial->mainTextureST = { 25,25,0,0 };
 	waterMaterial->renderQueue = RENDER_QUEUE_TRANSPARENT;
 	waterMaterial->SetFloat("obj_Alpha", 0.6f);
 	waterRenderer->material = waterMaterial;
@@ -142,6 +147,10 @@ void BuildScene()
 		->SetFov(45)
 		;
 	mainCamera->GetTransform()->position = { 0,0,-270 };
+	//
+	flyCameraEnt = new FlyingCameraEntity("FlyingCamera");
+	flyCameraEnt->AttachCamera(mainCamera);
+	SceneManager::AddEntity(flyCameraEnt);
 }
 
 
@@ -195,7 +204,7 @@ void App_Tick(float dt)
 	SceneManager::Tick(dt);
 }
 
-void DrawImGUI() 
+void DrawImGUI()
 {
 	//
 	ImGuiHelper::BeginGUI();
@@ -230,22 +239,29 @@ void DrawImGUI()
 		ImGui::End();
 		//
 		ImGui::Begin(u8"Blur");
-		ImGui::DragInt("Blur Times", &blurCount,1.0f,0,10);
+		ImGui::DragInt("Blur Times", &blurCount, 1.0f, 0, 10);
+		ImGui::End();
+		//
+		ImGui::Begin("Flying Camera", nullptr, ImGuiWindowFlags_NoCollapse);
+		ImGui::SetWindowSize("Flying Camera", { 360,107 });
+		ImGui::Text("Press \"W,A,S,D\" moving !");
+		ImGui::Text("Press \"Left Shift\" moving faster !");
+		ImGui::Text("Press \"Mouse Right Button\" looking around !");
 		ImGui::End();
 	}
 	ImGuiHelper::EndGUI();
 }
 
 
-void DoBlur() 
+void DoBlur()
 {
 	float screenWid = screenRT->GetWidth();
 	float screenHei = screenRT->GetHeight();
 	Graphics::Blit(screenRT, blurRT1);
 	ID3D11DeviceContext* dc = d3dGraphic::GetDeviceContext();
-	for (int i = 0; i < blurCount; ++i) 
+	for (int i = 0; i < blurCount; ++i)
 	{
-		
+
 		blurShader->SetShaderResourceView("g_Input", blurRT1->GetColorTextureSRV());
 		blurShader->SetUnorderredAccessView("g_Output", blurRT2->GetColorTextureUAV());
 		blurShader->ApplyPass(0, dc);
@@ -258,7 +274,7 @@ void DoBlur()
 		// and a resource cannot be both an output and input at the same time.
 		dc->CSSetUnorderedAccessViews(0, 1, nullUAV, 0);
 
-		
+
 		blurShader->SetShaderResourceView("g_Input", blurRT2->GetColorTextureSRV());
 		blurShader->SetUnorderredAccessView("g_Output", blurRT1->GetColorTextureUAV());
 		blurShader->ApplyPass(1, dc);
@@ -272,15 +288,16 @@ void DoBlur()
 
 void App_Draw()
 {
+	//d3dGraphic::EnableBackCulling(false);
 	SceneManager::DrawOneFrame();
 	//
-	if (blurCount > 0) 
+	if (blurCount > 0)
 	{
 		DoBlur();
 		//
 		Graphics::Blit(blurRT1, nullptr);
 	}
-	else 
+	else
 	{
 		Graphics::Blit(screenRT, nullptr);
 	}
@@ -303,4 +320,4 @@ void App_Cleanup()
 	d3dGraphic::Shutdown();
 }
 
-#endif //  AppImpl_ComputeShaderBlur
+#endif //  AppImpl_FlyingCamera

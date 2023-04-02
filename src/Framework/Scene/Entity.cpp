@@ -60,4 +60,14 @@ namespace Framework
 	{
 		return m_renderers.size();
 	}
+
+	void Entity::DoTick(float dt) 
+	{
+		OnTick(dt);
+	}
+
+	void Entity::OnTick(float dt) 
+	{
+
+	}
 }

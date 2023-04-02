@@ -82,9 +82,7 @@ namespace Framework
 							auto nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
 							auto ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
 							auto nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
-							normals[curVertexIdx].x = static_cast<float>(nx);
-							normals[curVertexIdx].y = static_cast<float>(ny);
-							normals[curVertexIdx].z = static_cast<float>(nz);
+							normals[curVertexIdx] = XMVectorNormalize({ static_cast<float>(nx) ,static_cast<float>(ny),static_cast<float>(nz) });
 							hasNormal = true;
 						}
 						// Check if `texcoord_index` is zero or positive. negative = no texcoord data
@@ -106,7 +104,13 @@ namespace Framework
 					}
 					if (!hasNormal)
 					{
-						UINT startVIdx = curVertexIdx - 2;
+						UINT startVIdx = curVertexIdx - 3;
+						XMFLOAT3 v0 = vertices[startVIdx + 1] - vertices[startVIdx];
+						XMFLOAT3 v1 = vertices[startVIdx + 2] - vertices[startVIdx + 1];
+						XMFLOAT3 n = XMVectorNormalize(XMVectorCross(v0, v1));
+						normals[startVIdx] = n;
+						normals[startVIdx + 1] = n;
+						normals[startVIdx + 2] = n;
 					}
 					index_offset += fv;
 				}

@@ -7,6 +7,11 @@ const float PI = 3.1415926535f;
 
 #define Angle2Radin(x) x / 180.0f * PI
 
+XMFLOAT3 operator+(const XMFLOAT3& lhs, const XMFLOAT3& rhs);
+XMFLOAT3 operator-(const XMFLOAT3& lhs, const XMFLOAT3& rhs);
+XMFLOAT3 operator*(const XMFLOAT3& lhs, const float& rhs);
+XMFLOAT3 operator*(const float& lhs, const XMFLOAT3& rhs);
+
 XMVECTOR XMVectorSet(XMFLOAT3 value);
 XMVECTOR XMVectorSet(XMFLOAT4 value);
 XMFLOAT3 XMVectorSubtract(XMFLOAT3 r, XMFLOAT3 l);

@@ -150,6 +150,7 @@
     <ClCompile Include="src\AppImpl_Blending.cpp" />
     <ClCompile Include="src\AppImpl_ComputeShader1.cpp" />
     <ClCompile Include="src\AppImpl_ComputeShaderBlur.cpp" />
+    <ClCompile Include="src\AppImpl_FlyingCamera.cpp" />
     <ClCompile Include="src\AppImpl_SceneManager.cpp" />
     <ClCompile Include="src\AppImpl_Empty.cpp" />
     <ClCompile Include="src\AppImpl_HelloWorld.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="src\Framework\Shader\ShaderManager.cpp" />
     <ClCompile Include="src\Framework\Texture\Texture.cpp" />
     <ClCompile Include="src\Framework\Texture\TextureManager.cpp" />
+    <ClCompile Include="src\Framework\Utils\FlyingCameraEntity.cpp" />
     <ClCompile Include="src\imgui-1.87\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\imgui-1.87\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="src\imgui-1.87\imgui.cpp" />
@@ -215,6 +217,7 @@
     <ClInclude Include="src\Framework\Shader\ShaderManager.h" />
     <ClInclude Include="src\Framework\Texture\Texture.h" />
     <ClInclude Include="src\Framework\Texture\TextureManager.h" />
+    <ClInclude Include="src\Framework\Utils\FlyingCameraEntity.h" />
     <ClInclude Include="src\Global.h" />
     <ClInclude Include="src\imgui-1.87\backends\imgui_impl_dx11.h" />
     <ClInclude Include="src\imgui-1.87\backends\imgui_impl_win32.h" />
