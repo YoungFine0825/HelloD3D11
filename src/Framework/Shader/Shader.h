@@ -37,6 +37,7 @@ namespace Framework
 		Shader* SetShaderResourceView(const char* propName, ID3D11ShaderResourceView* srv);
 		Shader* SetTexture(const char* propName, Texture* tex);
 		Shader* SetUnorderredAccessView(const char* propName, ID3D11UnorderedAccessView* uav);
+		Shader* SetInputLayout(unsigned int layoutIndex);
 	private:
 		ID3DX11Effect* m_pEffect;
 		ID3DX11EffectTechnique* m_pTech;

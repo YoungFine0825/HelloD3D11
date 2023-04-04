@@ -268,4 +268,29 @@ namespace Framework
 		unorderedAccessView->SetUnorderedAccessView(uav);
 		return this;
 	}
+
+	Shader* Shader::SetInputLayout(unsigned int layoutIndex)
+	{
+		if (!m_pTech) 
+		{
+			return this;
+		}
+		//
+		ID3DX11EffectPass* pass = m_pTech->GetPassByIndex(0);
+		//
+		if (pass == nullptr)
+		{
+			return this;
+		}
+		//
+		ID3D11InputLayout* newLayout;
+		if (!d3dGraphic::CreateInputLayout(pass, layoutIndex, &newLayout))
+		{
+			return this;
+		}
+		//
+		ReleaseCOM(m_pInputLayout);
+		m_pInputLayout = newLayout;
+		return this;
+	}
 }

@@ -46,11 +46,20 @@ namespace Framework
 			XMFLOAT3* vertices = new XMFLOAT3[vcount]();
 			XMFLOAT4* colors = new XMFLOAT4[vcount]();
 			XMFLOAT3* normals = new XMFLOAT3[vcount]();
+			XMFLOAT3 bboxMax = { NAGETIVE_INFINITY,NAGETIVE_INFINITY,NAGETIVE_INFINITY };
+			XMFLOAT3 bboxMin = { POSITIVE_INFINITY,POSITIVE_INFINITY,POSITIVE_INFINITY };
 			for (UINT i = 0; i < vcount; ++i)
 			{
 				fin >> vertices[i].x >> vertices[i].y >> vertices[i].z;
 				fin >> normals[i].x >> normals[i].y >> normals[i].z;
 				colors[i] = defaulColor;
+				//
+				bboxMax.x = vertices[i].x > bboxMax.x ? vertices[i].x : bboxMax.x;
+				bboxMax.y = vertices[i].y > bboxMax.y ? vertices[i].y : bboxMax.y;
+				bboxMax.z = vertices[i].z > bboxMax.z ? vertices[i].z : bboxMax.z;
+				bboxMin.x = vertices[i].x < bboxMin.x ? vertices[i].x : bboxMin.x;
+				bboxMin.y = vertices[i].y < bboxMin.y ? vertices[i].y : bboxMin.y;
+				bboxMin.z = vertices[i].z < bboxMin.z ? vertices[i].z : bboxMin.z;
 			}
 
 			fin >> ignore;
@@ -77,6 +86,12 @@ namespace Framework
 			mesh->SetNormalData(normals);
 			mesh->SetColorData(colors);
 			mesh->UpLoad();
+			//
+			XNA::AxisAlignedBox aabb;
+			aabb.Extents = (bboxMax - bboxMin) * 0.5f;
+			aabb.Center = bboxMin + aabb.Extents;
+			mesh->SetBoundingShape(aabb);
+			//
 			return mesh;
 		}
 
@@ -105,6 +120,8 @@ namespace Framework
 			XMFLOAT3* normals = new XMFLOAT3[vcount]();
 			XMFLOAT2* texCoord = new XMFLOAT2[vcount]();
 			UINT* indices = new UINT[indicesNum];
+			XMFLOAT3 bboxMax = { NAGETIVE_INFINITY,NAGETIVE_INFINITY,NAGETIVE_INFINITY };
+			XMFLOAT3 bboxMin = { POSITIVE_INFINITY,POSITIVE_INFINITY,POSITIVE_INFINITY };
 			//
 			UINT curIndicesIdx = 0;
 			UINT curVertexIdx = 0;
@@ -122,12 +139,17 @@ namespace Framework
 						//
 						indices[curIndicesIdx] = curVertexIdx;
 						//
-						auto vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
-						auto vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
-						auto vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
-						vertices[curVertexIdx].x = static_cast<float>(vx);
-						vertices[curVertexIdx].y = static_cast<float>(vy);
-						vertices[curVertexIdx].z = static_cast<float>(vz);
+						float vx = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 0]);
+						float vy = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 1]);
+						float vz = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 2]);
+						vertices[curVertexIdx] = { vx,vy,vz };
+						//
+						bboxMax.x = vx > bboxMax.x ? vx : bboxMax.x;
+						bboxMax.y = vy > bboxMax.y ? vy : bboxMax.y;
+						bboxMax.z = vz > bboxMax.z ? vz : bboxMax.z;
+						bboxMin.x = vx < bboxMin.x ? vx : bboxMin.x;
+						bboxMin.y = vy < bboxMin.y ? vy : bboxMin.y;
+						bboxMin.z = vz < bboxMin.z ? vz : bboxMin.z;
 						// Check if `normal_index` is zero or positive. negative = no normal data
 						if (idx.normal_index >= 0) {
 							auto nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
@@ -174,6 +196,11 @@ namespace Framework
 			mesh->SetNormalData(normals);
 			mesh->SetUVData(texCoord);
 			mesh->UpLoad();
+			//
+			XNA::AxisAlignedBox aabb;
+			aabb.Extents = (bboxMax - bboxMin) * 0.5f;
+			aabb.Center = bboxMin + aabb.Extents;
+			mesh->SetBoundingShape(aabb);
 			//
 			shapes.clear();
 			materials.clear();
@@ -231,6 +258,11 @@ namespace Framework
 			mesh->SetColorData(colors);
 			mesh->SetUVData(uvs);
 			mesh->UpLoad();
+			//
+			XNA::AxisAlignedBox aabb;
+			aabb.Extents = {1,1,0.01};
+			aabb.Center = {0,0,0};
+			mesh->SetBoundingShape(aabb);
 			m_meshResMap["Quad"] = mesh;
 			return mesh;
 		}

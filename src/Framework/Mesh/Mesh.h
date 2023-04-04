@@ -3,6 +3,7 @@
 #include "d3d/d3dGraphic.h"
 #include "../Resource.h"
 #include "../../math/MathLib.h"
+#include "../Collision/xnacollision.h"
 
 namespace Framework 
 {
@@ -26,6 +27,7 @@ namespace Framework
 		Mesh* SetNormalData(XMFLOAT3* normalData);
 		Mesh* SetColorData(XMFLOAT4* colorData);
 		Mesh* SetTangentData(XMFLOAT3* tangentData);
+		Mesh* SetBoundingShape(XNA::AxisAlignedBox aabb);
 		//
 		UINT GetVerticesNumber() { return m_verticesNumber; }
 		UINT GetIndicesNumber() { return m_indicesNumber; }
@@ -36,6 +38,7 @@ namespace Framework
 		D3D_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() { return m_topology; }
 		//
 		bool EnabledCPUReadWrite() { return m_isEnableCPUReadWrite; }
+		XNA::AxisAlignedBox GetAxisAlignedBox();
 	private:
 		UINT m_verticesNumber = 0;
 		UINT m_indicesNumber = 0;
@@ -64,5 +67,7 @@ namespace Framework
 		void DeleteAllData();
 		//
 		D3D_PRIMITIVE_TOPOLOGY m_topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		//
+		XNA::AxisAlignedBox m_aabb;
 	};
 }

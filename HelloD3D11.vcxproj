@@ -151,6 +151,7 @@
     <ClCompile Include="src\AppImpl_ComputeShader1.cpp" />
     <ClCompile Include="src\AppImpl_ComputeShaderBlur.cpp" />
     <ClCompile Include="src\AppImpl_FlyingCamera.cpp" />
+    <ClCompile Include="src\AppImpl_FrustmCulling.cpp" />
     <ClCompile Include="src\AppImpl_SceneManager.cpp" />
     <ClCompile Include="src\AppImpl_Empty.cpp" />
     <ClCompile Include="src\AppImpl_HelloWorld.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="src\d3d\d3dEffectsUtil.cpp" />
     <ClCompile Include="src\d3d\d3dGraphics.cpp" />
     <ClCompile Include="src\d3d\DXInput.cpp" />
+    <ClCompile Include="src\Framework\Collision\xnacollision.cpp" />
     <ClCompile Include="src\Framework\Graphics.cpp" />
     <ClCompile Include="src\Framework\ImGUI\ImGuiHelper.cpp" />
     <ClCompile Include="src\Framework\Light\LightManager.cpp" />
@@ -180,6 +182,7 @@
     <ClCompile Include="src\Framework\Texture\Texture.cpp" />
     <ClCompile Include="src\Framework\Texture\TextureManager.cpp" />
     <ClCompile Include="src\Framework\Utils\FlyingCameraEntity.cpp" />
+    <ClCompile Include="src\Framework\Utils\GizmosHelper.cpp" />
     <ClCompile Include="src\imgui-1.87\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\imgui-1.87\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="src\imgui-1.87\imgui.cpp" />
@@ -196,6 +199,7 @@
     <ClInclude Include="src\d3d\d3dEffectsUtil.h" />
     <ClInclude Include="src\d3d\d3dGraphic.h" />
     <ClInclude Include="src\d3d\DXInput.h" />
+    <ClInclude Include="src\Framework\Collision\xnacollision.h" />
     <ClInclude Include="src\Framework\Graphic.h" />
     <ClInclude Include="src\Framework\ImGUI\ImGuiHelper.h" />
     <ClInclude Include="src\Framework\Light\Light.h" />
@@ -218,6 +222,7 @@
     <ClInclude Include="src\Framework\Texture\Texture.h" />
     <ClInclude Include="src\Framework\Texture\TextureManager.h" />
     <ClInclude Include="src\Framework\Utils\FlyingCameraEntity.h" />
+    <ClInclude Include="src\Framework\Utils\GizmosHelper.h" />
     <ClInclude Include="src\Global.h" />
     <ClInclude Include="src\imgui-1.87\backends\imgui_impl_dx11.h" />
     <ClInclude Include="src\imgui-1.87\backends\imgui_impl_win32.h" />

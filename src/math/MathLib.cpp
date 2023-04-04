@@ -21,6 +21,11 @@ XMFLOAT3 operator*(const float& lhs, const XMFLOAT3& rhs)
 	return { rhs.x * lhs, rhs.y * lhs,rhs.z * lhs };
 }
 
+XMFLOAT3 operator*(const XMFLOAT3& lhs, const XMMATRIX& rhs) 
+{
+	return XMFloat3MultiMatrix(lhs, rhs);
+}
+
 XMVECTOR XMVectorSet(XMFLOAT3 value)
 {
 	return XMVectorSet(value.x, value.y, value.z, 0.0f);
@@ -106,11 +111,16 @@ XMMATRIX XMMatrixTranslationFromFloat3(XMFLOAT3 trans)
 
 
 
-XMFLOAT3 XMFloat3MultiMatrix(XMFLOAT3 vector, XMMATRIX matrix) 
+XMFLOAT3 XMFloat3MultiMatrix(XMFLOAT3 vector, XMMATRIX matrix,float w) 
 {
 	XMFLOAT3 ret;
-	ret.x = vector.x * matrix._11 + vector.y * matrix._21 + vector.z * matrix._31 + 1.0f * matrix._41;
-	ret.y = vector.x * matrix._12 + vector.y * matrix._22 + vector.z * matrix._32 + 1.0f * matrix._42;
-	ret.z = vector.x * matrix._13 + vector.y * matrix._23 + vector.z * matrix._33 + 1.0f * matrix._43;
+	ret.x = vector.x * matrix._11 + vector.y * matrix._21 + vector.z * matrix._31 + w * matrix._41;
+	ret.y = vector.x * matrix._12 + vector.y * matrix._22 + vector.z * matrix._32 + w * matrix._42;
+	ret.z = vector.x * matrix._13 + vector.y * matrix._23 + vector.z * matrix._33 + w * matrix._43;
 	return ret;
+}
+
+float XMFloat3Length(XMFLOAT3 float3) 
+{
+	return sqrtf(float3.x * float3.x + float3.y * float3.y + float3.z * float3.z);
 }

@@ -18,6 +18,8 @@ namespace Framework
 		EntityInstanceId GetInstanceId();
 		std::string GetName();
 		Transform* GetTransform();
+		Entity* SetEnable(bool enabled);
+		bool IsEnabled();
 
 		Renderer* CreateRenderer();
 		Renderer* GetRenderer(unsigned int index);
@@ -31,6 +33,6 @@ namespace Framework
 	private:
 		EntityInstanceId m_id;
 		std::string m_name;
-
+		bool m_isEnabled = true;
 	};
 }

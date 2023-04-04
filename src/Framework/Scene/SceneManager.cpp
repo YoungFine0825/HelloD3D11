@@ -5,6 +5,7 @@
 #include "../Graphic.h"
 #include "../Light/LightManager.h"
 #include "../RenderTexture/RenderTexture.h"
+#include "../../math/MathLib.h"
 
 namespace Framework 
 {
@@ -271,13 +272,58 @@ namespace Framework
 				break;
 			}
 			//
-			DrawOneFrame(view, proj);
+			XNA::Frustum frustm;
+			XNA::ComputeFrustumFromProjection(&frustm, &proj);
+			XNA::Frustum worldSpaceFrustum;
+			// Decompose the matrix into its individual parts.
+			XMVECTOR scale;
+			XMVECTOR rotQuat;
+			XMVECTOR translation;
+			XMMATRIX cameraWorldMatrix = camera->GetTransform()->GetWorldMatrix();
+			XMMatrixDecompose(&scale, &rotQuat, &translation, cameraWorldMatrix);
+			XNA::TransformFrustum(&worldSpaceFrustum, &frustm, 1, rotQuat, translation);
+			DrawOneFrame(worldSpaceFrustum,view, proj);
 		}
 
-		void CollectRenderableRenderers(RendererList* list) 
+		bool isRendererVisible(Renderer* renderer, XNA::Frustum worldSpaceFrustum)
+		{
+			XNA::AxisAlignedBox localAABB = renderer->mesh->GetAxisAlignedBox();
+			Transform* transform = renderer->GetEntity()->GetTransform();
+			XMMATRIX worldMat = transform->GetWorldMatrix();
+			//
+			XMFLOAT3 topPointL = localAABB.Center + localAABB.Extents;
+			XMFLOAT3 bottomPointL = localAABB.Center + (localAABB.Extents * -1);
+			//
+			XMFLOAT3 bboxMaxW = { NAGETIVE_INFINITY,NAGETIVE_INFINITY,NAGETIVE_INFINITY };
+			XMFLOAT3 bboxMinW = { POSITIVE_INFINITY,POSITIVE_INFINITY,POSITIVE_INFINITY };
+			XMFLOAT3 bboxPointsL[2] = { topPointL ,bottomPointL };
+			for (int i = 0; i < 2; ++i) 
+			{
+				XMFLOAT3 pointW = bboxPointsL[i] * worldMat;
+				bboxMaxW.x = pointW.x > bboxMaxW.x ? pointW.x : bboxMaxW.x;
+				bboxMaxW.y = pointW.y > bboxMaxW.y ? pointW.y : bboxMaxW.y;
+				bboxMaxW.z = pointW.z > bboxMaxW.z ? pointW.z : bboxMaxW.z;
+				bboxMinW.x = pointW.x < bboxMinW.x ? pointW.x : bboxMinW.x;
+				bboxMinW.y = pointW.y < bboxMinW.y ? pointW.y : bboxMinW.y;
+				bboxMinW.z = pointW.z < bboxMinW.z ? pointW.z : bboxMinW.z;
+			}
+			XNA::AxisAlignedBox worldSpaceAABB;
+			worldSpaceAABB.Extents = (bboxMaxW - bboxMinW) * 0.5f;
+			worldSpaceAABB.Center = bboxMinW + worldSpaceAABB.Extents;
+			int intersect = IntersectAxisAlignedBoxFrustum(&worldSpaceAABB, &worldSpaceFrustum);
+			//
+			return intersect > 0;
+		}
+
+		void CollectRenderableRenderers(RendererList* list, XNA::Frustum frustm, XMMATRIX viewMatrix, XMMATRIX projectMatrix)
 		{
 			for (size_t i = 0; i < m_entities.size(); ++i) 
 			{
+				if (!m_entities[i]->IsEnabled()) 
+				{
+					continue;
+				}
+				//
 				unsigned int rendererCnt = m_entities[i]->GetRendererCount();
 				if (rendererCnt > 0)
 				{
@@ -286,7 +332,10 @@ namespace Framework
 						Renderer* r = m_entities[i]->GetRenderer(rIdx);
 						if (r->IsEnabled() && r->mesh != nullptr && r->material != nullptr && r->material->GetShader() != nullptr) 
 						{
-							list->push_back(r);
+							if (isRendererVisible(r, frustm))
+							{
+								list->push_back(r);
+							}
 						}
 					}
 				}
@@ -355,11 +404,11 @@ namespace Framework
 			Graphics::DrawMesh(r->mesh, sh);
 		}
 
-		void DrawOneFrame(XMMATRIX viewMatrix, XMMATRIX projectMatrix) 
+		void DrawOneFrame(XNA::Frustum frustm,XMMATRIX viewMatrix, XMMATRIX projectMatrix)
 		{
 			m_renderableRenderers.clear();
 			//
-			CollectRenderableRenderers(&m_renderableRenderers);
+			CollectRenderableRenderers(&m_renderableRenderers, frustm,viewMatrix, projectMatrix);
 			//
 			if (m_renderableRenderers.size() <= 0) 
 			{
@@ -379,7 +428,10 @@ namespace Framework
 		{
 			for (size_t i = 0; i < m_entities.size(); ++i)
 			{
-				m_entities[i]->DoTick(dt);
+				if (m_entities[i]->IsEnabled()) 
+				{
+					m_entities[i]->DoTick(dt);
+				}
 			}
 		}
 	}

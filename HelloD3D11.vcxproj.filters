@@ -53,6 +53,9 @@
     <Filter Include="src\Framework\Utils">
       <UniqueIdentifier>{a9b73bc9-b7ed-46bb-818f-708f6d0a1232}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Framework\Collision">
+      <UniqueIdentifier>{f428640b-332d-4e03-8fdf-29166d6741ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -181,6 +184,15 @@
     <ClCompile Include="src\Framework\Utils\FlyingCameraEntity.cpp">
       <Filter>src\Framework\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\Framework\Collision\xnacollision.cpp">
+      <Filter>src\Framework\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_FrustmCulling.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Utils\GizmosHelper.cpp">
+      <Filter>src\Framework\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -295,6 +307,12 @@
       <Filter>src\Framework\RenderTexture</Filter>
     </ClInclude>
     <ClInclude Include="src\Framework\Utils\FlyingCameraEntity.h">
+      <Filter>src\Framework\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Collision\xnacollision.h">
+      <Filter>src\Framework\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Utils\GizmosHelper.h">
       <Filter>src\Framework\Utils</Filter>
     </ClInclude>
   </ItemGroup>

@@ -80,6 +80,17 @@ namespace Framework
 		return this;
 	}
 
+	Mesh* Mesh::SetBoundingShape(XNA::AxisAlignedBox aabb) 
+	{
+		m_aabb = aabb;
+		return this;
+	}
+
+	XNA::AxisAlignedBox Mesh::GetAxisAlignedBox() 
+	{
+		return m_aabb;
+	}
+
 	void Mesh::SetDataDirty() 
 	{
 		m_isDataDirty = true;

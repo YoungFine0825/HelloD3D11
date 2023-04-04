@@ -70,4 +70,15 @@ namespace Framework
 	{
 
 	}
+
+	Entity* Entity::SetEnable(bool enabled) 
+	{
+		m_isEnabled = enabled;
+		return this;
+	}
+
+	bool Entity::IsEnabled()
+	{
+		return m_isEnabled;
+	}
 }
