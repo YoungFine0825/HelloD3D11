@@ -23,7 +23,7 @@
 #include "Framework/RenderTexture/RenderTextureManager.h"
 
 #include "Framework/Utils/FlyingCameraEntity.h"
-#include "Framework/Collision/xnacollision.h"
+#include "Framework/Collision/CollisionUtils.h"
 #include "Framework/Utils/GizmosHelper.h"
 
 using namespace Framework;
@@ -145,7 +145,8 @@ void BuildScene()
 		->SetFarClipDistance(5000)
 		->SetFov(45)
 		;
-	secondCamera->GetTransform()->position = { 300,300,-270 };
+	secondCamera->GetTransform()->position = { 1436,883,-832 };
+	secondCamera->GetTransform()->rotation = { 20,-46,0 };
 	//
 	flyCameraEnt = new FlyingCameraEntity("FlyingCamera");
 	flyCameraEnt->AttachCamera(mainCamera);
@@ -157,7 +158,7 @@ void BuildScene()
 	SceneManager::AddEntity(flyCameraEnt2);
 	flyCameraEnt2->SetEnable(false);
 	//
-	SceneManager::SetLinearFogStart(500);
+	SceneManager::SetLinearFogStart(1000);
 	SceneManager::SetLinearFogRange(1000);
 }
 
@@ -207,9 +208,9 @@ void App_Tick(float dt)
 		curCameraIndex = 2;
 	}
 	mainCamera->SetEnable(curCameraIndex == 1);
-	flyCameraEnt->SetEnable(curCameraIndex == 1);
+	//flyCameraEnt->SetEnable(curCameraIndex == 1);
 	secondCamera->SetEnable(curCameraIndex == 2);
-	flyCameraEnt2->SetEnable(curCameraIndex == 2);
+	//flyCameraEnt2->SetEnable(curCameraIndex == 2);
 }
 
 void DrawImGUI()
@@ -229,6 +230,8 @@ void DrawImGUI()
 		ImGui::Text("Press \"Left Shift\" moving faster !");
 		ImGui::Text("Press \"Mouse Right Button\" looking around !");
 		ImGui::Text("Press \"1\" and \"2\" switch camera !");
+		//ImGui::InputFloat3("SecondCameraPos", (float*)(&secondCamera->GetTransform()->position));
+		//ImGui::InputFloat3("SecondCameraRot", (float*)(&secondCamera->GetTransform()->rotation));
 		ImGui::End();
 	}
 	ImGuiHelper::EndGUI();
@@ -248,12 +251,13 @@ void DrawEntityAABB(Entity* ent)
 	Camera* renderingCamera = curCameraIndex == 1 ? mainCamera : secondCamera;
 	for (unsigned int r = 0; r < rendererCnt; ++r) 
 	{
-		XNA::AxisAlignedBox bbox = ent->GetRenderer(r)->mesh->GetAxisAlignedBox();
+		AxisAlignedBox bbox = ent->GetRenderer(r)->mesh->GetAxisAlignedBox();
 		Transform* trans = ent->GetTransform();
 		XMMATRIX scalingMat = XMMatrixScaling(bbox.Extents.x, bbox.Extents.y, bbox.Extents.z);
 		XMMATRIX translateMat = XMMatrixTranslationFromFloat3(bbox.Center);
 		XMMATRIX mvp = (scalingMat * translateMat) * trans->GetWorldMatrix() * renderingCamera->GetViewMatrix() * renderingCamera->GetProjectMatrix();
-		GizmosHelper::DrawCube(mvp, Colors::Red);
+		RGBA32 color = CollisionUtils::IntersectRendererCamera(ent->GetRenderer(r), mainCamera) ? Colors::Green : Colors::Red;
+		GizmosHelper::DrawCube(mvp, color);
 	}
 }
 
@@ -264,11 +268,9 @@ void DrawGizmos()
 	DrawEntityAABB(SceneManager::FindEntity("Water"));
 	//
 	Camera* renderingCamera = curCameraIndex == 1 ? mainCamera : secondCamera;
-	XMMATRIX proj = mainCamera->GetProjectMatrix();
-	XNA::Frustum Frustum;
-	ComputeFrustumFromProjection(&Frustum, &proj);
+	Frustum frustumV = mainCamera->GetViewSpaceFrustum();
 	XMMATRIX mvp = mainCamera->GetTransform()->GetWorldMatrix() * renderingCamera->GetViewMatrix() * renderingCamera->GetProjectMatrix();
-	GizmosHelper::DrawFrustum(Frustum, mvp, Colors::Green);
+	GizmosHelper::DrawFrustum(frustumV, mvp, Colors::Blue);
 
 }
 

@@ -126,4 +126,25 @@ namespace Framework
 	{
 		return m_renderTexture;
 	}
+
+	Frustum Camera::GetViewSpaceFrustum()
+	{
+		XMMATRIX proj = GetProjectMatrix();
+		Frustum frustumV;
+		XNA::ComputeFrustumFromProjection(&frustumV, &proj);
+		return frustumV;
+	}
+
+	Frustum Camera::GetWorldSpaceFrustum()
+	{
+		Frustum frustumV = GetViewSpaceFrustum();
+		Frustum frustumW;
+		XMVECTOR scale;
+		XMVECTOR rotQuat;
+		XMVECTOR translation;
+		XMMATRIX cameraWorldMatrix = GetTransform()->GetWorldMatrix();
+		XMMatrixDecompose(&scale, &rotQuat, &translation, cameraWorldMatrix);
+		XNA::TransformFrustum(&frustumW, &frustumV, 1, rotQuat, translation);
+		return frustumW;
+	}
 }

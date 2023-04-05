@@ -161,6 +161,7 @@
     <ClCompile Include="src\d3d\d3dEffectsUtil.cpp" />
     <ClCompile Include="src\d3d\d3dGraphics.cpp" />
     <ClCompile Include="src\d3d\DXInput.cpp" />
+    <ClCompile Include="src\Framework\Collision\CollisionUtils.cpp" />
     <ClCompile Include="src\Framework\Collision\xnacollision.cpp" />
     <ClCompile Include="src\Framework\Graphics.cpp" />
     <ClCompile Include="src\Framework\ImGUI\ImGuiHelper.cpp" />
@@ -199,6 +200,8 @@
     <ClInclude Include="src\d3d\d3dEffectsUtil.h" />
     <ClInclude Include="src\d3d\d3dGraphic.h" />
     <ClInclude Include="src\d3d\DXInput.h" />
+    <ClInclude Include="src\Framework\Collision\Collision.h" />
+    <ClInclude Include="src\Framework\Collision\CollisionUtils.h" />
     <ClInclude Include="src\Framework\Collision\xnacollision.h" />
     <ClInclude Include="src\Framework\Graphic.h" />
     <ClInclude Include="src\Framework\ImGUI\ImGuiHelper.h" />

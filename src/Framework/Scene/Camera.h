@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include <string>
 #include "../RenderTexture/RenderTexture.h"
+#include "../Collision/Collision.h"
 
 namespace Framework 
 {
@@ -48,6 +49,8 @@ namespace Framework
 		XMMATRIX GetViewMatrix();
 		XMMATRIX GetProjectMatrix();
 		RenderTexture* GetRenderTexture();
+		Frustum GetViewSpaceFrustum();
+		Frustum GetWorldSpaceFrustum();
 	private:
 		bool m_isEnabled = true;
 		std::string m_name;

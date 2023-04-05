@@ -6,6 +6,7 @@
 #include "../Light/LightManager.h"
 #include "../RenderTexture/RenderTexture.h"
 #include "../../math/MathLib.h"
+#include "../Collision/CollisionUtils.h"
 
 namespace Framework 
 {
@@ -272,50 +273,19 @@ namespace Framework
 				break;
 			}
 			//
-			XNA::Frustum frustm;
-			XNA::ComputeFrustumFromProjection(&frustm, &proj);
-			XNA::Frustum worldSpaceFrustum;
-			// Decompose the matrix into its individual parts.
-			XMVECTOR scale;
-			XMVECTOR rotQuat;
-			XMVECTOR translation;
-			XMMATRIX cameraWorldMatrix = camera->GetTransform()->GetWorldMatrix();
-			XMMatrixDecompose(&scale, &rotQuat, &translation, cameraWorldMatrix);
-			XNA::TransformFrustum(&worldSpaceFrustum, &frustm, 1, rotQuat, translation);
+			Frustum worldSpaceFrustum = camera->GetWorldSpaceFrustum();
 			DrawOneFrame(worldSpaceFrustum,view, proj);
 		}
 
-		bool isRendererVisible(Renderer* renderer, XNA::Frustum worldSpaceFrustum)
+		bool isRendererVisible(Renderer* renderer,Frustum worldSpaceFrustum)
 		{
-			XNA::AxisAlignedBox localAABB = renderer->mesh->GetAxisAlignedBox();
-			Transform* transform = renderer->GetEntity()->GetTransform();
-			XMMATRIX worldMat = transform->GetWorldMatrix();
-			//
-			XMFLOAT3 topPointL = localAABB.Center + localAABB.Extents;
-			XMFLOAT3 bottomPointL = localAABB.Center + (localAABB.Extents * -1);
-			//
-			XMFLOAT3 bboxMaxW = { NAGETIVE_INFINITY,NAGETIVE_INFINITY,NAGETIVE_INFINITY };
-			XMFLOAT3 bboxMinW = { POSITIVE_INFINITY,POSITIVE_INFINITY,POSITIVE_INFINITY };
-			XMFLOAT3 bboxPointsL[2] = { topPointL ,bottomPointL };
-			for (int i = 0; i < 2; ++i) 
-			{
-				XMFLOAT3 pointW = bboxPointsL[i] * worldMat;
-				bboxMaxW.x = pointW.x > bboxMaxW.x ? pointW.x : bboxMaxW.x;
-				bboxMaxW.y = pointW.y > bboxMaxW.y ? pointW.y : bboxMaxW.y;
-				bboxMaxW.z = pointW.z > bboxMaxW.z ? pointW.z : bboxMaxW.z;
-				bboxMinW.x = pointW.x < bboxMinW.x ? pointW.x : bboxMinW.x;
-				bboxMinW.y = pointW.y < bboxMinW.y ? pointW.y : bboxMinW.y;
-				bboxMinW.z = pointW.z < bboxMinW.z ? pointW.z : bboxMinW.z;
-			}
-			XNA::AxisAlignedBox worldSpaceAABB;
-			worldSpaceAABB.Extents = (bboxMaxW - bboxMinW) * 0.5f;
-			worldSpaceAABB.Center = bboxMinW + worldSpaceAABB.Extents;
-			int intersect = IntersectAxisAlignedBoxFrustum(&worldSpaceAABB, &worldSpaceFrustum);
-			//
+			AxisAlignedBox worldSpaceAABB;
+			CollisionUtils::ComputeRendererWorldSpaceAxisAlignedBox(&worldSpaceAABB, renderer);
+			int intersect = CollisionUtils::IntersectAxisAlignedBoxFrustum(&worldSpaceAABB, &worldSpaceFrustum);
 			return intersect > 0;
 		}
 
-		void CollectRenderableRenderers(RendererList* list, XNA::Frustum frustm, XMMATRIX viewMatrix, XMMATRIX projectMatrix)
+		void CollectRenderableRenderers(RendererList* list, Frustum frustm, XMMATRIX viewMatrix, XMMATRIX projectMatrix)
 		{
 			for (size_t i = 0; i < m_entities.size(); ++i) 
 			{
