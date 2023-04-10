@@ -7,6 +7,7 @@
 #include "../RenderTexture/RenderTexture.h"
 #include "../../math/MathLib.h"
 #include "../Collision/CollisionUtils.h"
+#include "../RenderPipeline/FrameData.h"
 
 namespace Framework 
 {
@@ -20,18 +21,29 @@ namespace Framework
 		typedef std::vector<Framework::Renderer*> RendererList;
 		RendererList m_renderableRenderers;
 
+		typedef std::vector<Framework::Light*> LightList;
+		LightList m_lights;
+
 		bool m_enableFog = true;
 		RGBA32 m_linearFogColor = { 0.5f,0.5f,0.5f,1.0f };
 		float m_linearFogStart = 100;
 		float m_linearFogRange = 2000;
 
-		void Init() 
-		{
+		FrameData* m_frameData = new FrameData();
+		RenderPipeline* m_renderPipeline;
 
+		void Init(RenderPipeline* renderPipeline)
+		{
+			m_renderPipeline = renderPipeline;
 		}
 
 		void Cleanup() 
 		{
+			if (m_renderPipeline) 
+			{
+				delete m_renderPipeline;
+				m_renderPipeline = nullptr;
+			}
 			//
 			for (size_t i = 0; i < m_entities.size(); ++i) 
 			{
@@ -44,6 +56,12 @@ namespace Framework
 				delete m_cameras[i];
 			}
 			m_cameras.clear();
+			//
+			for (size_t i = 0; i < m_lights.size(); ++i)
+			{
+				delete m_lights[i];
+			}
+			m_lights.clear();
 		}
 
 		Entity* CreateEntity() 
@@ -207,6 +225,74 @@ namespace Framework
 		}
 
 
+		Light* FindLight(const std::string name) 
+		{
+			Light* lit = nullptr;
+			for (size_t i = 0; i < m_lights.size(); ++i)
+			{
+				if (m_lights[i]->GetName() == name)
+				{
+					lit = m_lights[i];
+					break;
+				}
+			}
+			return lit;
+		}
+
+		Light* FindLight(const LightInstanceId id) 
+		{
+			Light* lit = nullptr;
+			for (size_t i = 0; i < m_lights.size(); ++i)
+			{
+				if (m_lights[i]->GetId() == id)
+				{
+					lit = m_lights[i];
+					break;
+				}
+			}
+			return lit;
+		}
+
+		Light* CreateLight(LIGHT_TYPE type, const std::string& name) 
+		{
+			Light* lit = new Light(type);
+			lit->SetName(name);
+			m_lights.push_back(lit);
+			return lit;
+		}
+
+		bool DestroyLight(const LightInstanceId id) 
+		{
+			LightList::iterator it = m_lights.begin();
+			LightList::iterator end = m_lights.end();
+			Light* lit = nullptr;
+			for (; it != end; ++it)
+			{
+				if ((*it)->GetId() == id)
+				{
+					lit = *it;
+					break;
+				}
+			}
+			if (lit == nullptr)
+			{
+				return false;
+			}
+			m_lights.erase(it);
+			delete lit;
+			return true;
+		}
+
+		bool DestroyLight(Light* lit) 
+		{
+			if (!lit) 
+			{
+				return false;
+			}
+			return DestroyLight(lit->GetId());
+		}
+
+
 		void EnableLinearFog(bool enable) 
 		{
 			m_enableFog = enable;
@@ -227,6 +313,21 @@ namespace Framework
 			m_linearFogRange = range;
 		}
 
+		void SetRenderPipeline(RenderPipeline* renderPipeline) 
+		{
+			m_renderPipeline = renderPipeline;
+		}
+
+		void ResetFrameData() 
+		{
+			m_frameData->cameras.clear();
+			m_frameData->lights.clear();
+			m_frameData->renderers.clear();
+			m_frameData->sceneSetting.enableFog = m_enableFog;
+			m_frameData->sceneSetting.linearFogColor = m_linearFogColor;
+			m_frameData->sceneSetting.linearFogStart = m_linearFogStart;
+			m_frameData->sceneSetting.linearFogRange = m_linearFogRange;
+		}
 
 		void DrawOneFrame() 
 		{
@@ -235,14 +336,67 @@ namespace Framework
 				return;
 			}
 			//
-			for (size_t i = 0; i < m_cameras.size(); ++i) 
+			if (m_renderPipeline)
 			{
-				if (!m_cameras[i]->IsEnabled()) 
+				ResetFrameData();
+				//收集摄像机
+				for (size_t i = 0; i < m_cameras.size(); ++i)
 				{
-					continue;
+					if (!m_cameras[i]->IsEnabled())
+					{
+						continue;
+					}
+					//
+					m_frameData->cameras.push_back(m_cameras[i]);
+				}
+				//收集光源
+				for (size_t i = 0; i < m_lights.size(); ++i) 
+				{
+					if (m_lights[i]->IsEnabled()) 
+					{
+						m_frameData->lights.push_back(m_lights[i]);
+					}
+				}
+				//收集renderer
+				for (size_t i = 0; i < m_entities.size(); ++i)
+				{
+					if (!m_entities[i]->IsEnabled())
+					{
+						continue;
+					}
+					//
+					unsigned int rendererCnt = m_entities[i]->GetRendererCount();
+					if (rendererCnt > 0)
+					{
+						for (unsigned int rIdx = 0; rIdx < rendererCnt; ++rIdx)
+						{
+							Renderer* r = m_entities[i]->GetRenderer(rIdx);
+							if (r->IsEnabled() && r->mesh != nullptr && r->material != nullptr && r->material->GetShader() != nullptr)
+							{
+								m_frameData->renderers.push_back(r);
+							}
+						}
+					}
 				}
 				//
-				DrawOneFrame(m_cameras[i]);
+				if (m_frameData->cameras.size() <= 0 || m_frameData->renderers.size() <= 0) 
+				{
+					return;
+				}
+				//调用渲染管线
+				m_renderPipeline->DoRender(m_frameData);
+			}
+			else 
+			{
+				for (size_t i = 0; i < m_cameras.size(); ++i)
+				{
+					if (!m_cameras[i]->IsEnabled())
+					{
+						continue;
+					}
+					//
+					DrawOneFrame(m_cameras[i]);
+				}
 			}
 		}
 

@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AppImpl_ForwardRenderPipeline.cpp" />
     <ClCompile Include="src\AppImpl_Blending.cpp" />
     <ClCompile Include="src\AppImpl_ComputeShader1.cpp" />
     <ClCompile Include="src\AppImpl_ComputeShaderBlur.cpp" />
@@ -171,12 +172,16 @@
     <ClCompile Include="src\Framework\Mesh\MeshManager.cpp" />
     <ClCompile Include="src\Framework\Model\Model.cpp" />
     <ClCompile Include="src\Framework\Model\ModelManager.cpp" />
+    <ClCompile Include="src\Framework\RenderPipeline\ForwardRenderPipeline.cpp" />
+    <ClCompile Include="src\Framework\RenderPipeline\FrameData.cpp" />
+    <ClCompile Include="src\Framework\RenderPipeline\RenderPipeline.cpp" />
     <ClCompile Include="src\Framework\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="src\Framework\RenderTexture\RenderTextureManager.cpp" />
     <ClCompile Include="src\Framework\Resource.cpp" />
     <ClCompile Include="src\Framework\Scene\Camera.cpp" />
     <ClCompile Include="src\Framework\Scene\Entity.cpp" />
-    <ClCompile Include="src\Framework\Scene\Renderer.cpp" />
+    <ClCompile Include="src\Framework\RenderPipeline\Renderer.cpp" />
+    <ClCompile Include="src\Framework\Scene\Light.cpp" />
     <ClCompile Include="src\Framework\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Framework\Shader\Shader.cpp" />
     <ClCompile Include="src\Framework\Shader\ShaderManager.cpp" />
@@ -212,12 +217,17 @@
     <ClInclude Include="src\Framework\Mesh\MeshManager.h" />
     <ClInclude Include="src\Framework\Model\Model.h" />
     <ClInclude Include="src\Framework\Model\ModelManager.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\ForwardRenderPipeline.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\FrameData.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\RenderPipeline.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\ShaderStruct.h" />
     <ClInclude Include="src\Framework\RenderTexture\RenderTexture.h" />
     <ClInclude Include="src\Framework\RenderTexture\RenderTextureManager.h" />
     <ClInclude Include="src\Framework\Resource.h" />
     <ClInclude Include="src\Framework\Scene\Camera.h" />
     <ClInclude Include="src\Framework\Scene\Entity.h" />
-    <ClInclude Include="src\Framework\Scene\Renderer.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\Renderer.h" />
+    <ClInclude Include="src\Framework\Scene\Light.h" />
     <ClInclude Include="src\Framework\Scene\SceneManager.h" />
     <ClInclude Include="src\Framework\Scene\Transform.h" />
     <ClInclude Include="src\Framework\Shader\Shader.h" />

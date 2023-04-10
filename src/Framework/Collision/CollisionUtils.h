@@ -1,7 +1,7 @@
 #pragma once
 #include "Collision.h"
 #include "../Scene/Camera.h"
-#include "../Scene/Renderer.h"
+#include "../RenderPipeline/Renderer.h"
 
 namespace Framework 
 {

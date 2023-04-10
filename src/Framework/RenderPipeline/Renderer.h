@@ -2,6 +2,7 @@
 
 #include "../Material/Material.h"
 #include "../Mesh/Mesh.h"
+#include <vector>
 
 namespace Framework 
 {
@@ -22,4 +23,6 @@ namespace Framework
 		bool m_isEnabled = true;
 		Entity* m_ent;
 	};
+
+	typedef std::vector<Renderer*> RendererVector;
 }

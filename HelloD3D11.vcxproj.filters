@@ -56,6 +56,9 @@
     <Filter Include="src\Framework\Collision">
       <UniqueIdentifier>{f428640b-332d-4e03-8fdf-29166d6741ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Framework\RenderPipeline">
+      <UniqueIdentifier>{457180d0-2376-41c7-ad1c-b811ab1a8a14}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -157,9 +160,6 @@
     <ClCompile Include="src\Framework\Scene\SceneManager.cpp">
       <Filter>src\Framework\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\Framework\Scene\Renderer.cpp">
-      <Filter>src\Framework\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Framework\Scene\Entity.cpp">
       <Filter>src\Framework\Scene</Filter>
     </ClCompile>
@@ -195,6 +195,24 @@
     </ClCompile>
     <ClCompile Include="src\Framework\Collision\CollisionUtils.cpp">
       <Filter>src\Framework\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\Renderer.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\RenderPipeline.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Scene\Light.cpp">
+      <Filter>src\Framework\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\FrameData.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\ForwardRenderPipeline.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_ForwardRenderPipeline.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -294,9 +312,6 @@
     <ClInclude Include="src\Framework\Scene\SceneManager.h">
       <Filter>src\Framework\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="src\Framework\Scene\Renderer.h">
-      <Filter>src\Framework\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="src\Framework\Scene\Entity.h">
       <Filter>src\Framework\Scene</Filter>
     </ClInclude>
@@ -323,6 +338,24 @@
     </ClInclude>
     <ClInclude Include="src\Framework\Collision\Collision.h">
       <Filter>src\Framework\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\Renderer.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\RenderPipeline.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\FrameData.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Scene\Light.h">
+      <Filter>src\Framework\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\ForwardRenderPipeline.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\ShaderStruct.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

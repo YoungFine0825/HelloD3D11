@@ -10,7 +10,8 @@
 //#define  AppImpl_ComputeShader1
 //#define  AppImpl_ComputeShaderBlur
 //#define AppImpl_FlyingCamera
-#define  AppImpl_FrustmCulling
+//#define  AppImpl_FrustmCulling
+#define AppImpl_ForwardRenderPipeline
 
 void App_PreCreateWindow();
 bool App_Init();

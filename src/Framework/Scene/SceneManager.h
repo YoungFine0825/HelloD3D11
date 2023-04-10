@@ -1,14 +1,16 @@
 #pragma once
 #include "Entity.h"
 #include "Camera.h"
+#include "Light.h"
 #include "../../math/MathLib.h"
 #include "../../Color.h"
+#include "../RenderPipeline/RenderPipeline.h"
 
 namespace Framework 
 {
 	namespace SceneManager 
 	{
-		void Init();
+		void Init(RenderPipeline* renderPipeline = nullptr);
 		void Cleanup();
 
 		Entity* CreateEntity();
@@ -27,10 +29,18 @@ namespace Framework
 		bool DestroyCamera(Camera* cam);
 		bool DestroyCamera(const std::string& name);
 
+		Light* FindLight(const std::string name);
+		Light* FindLight(const LightInstanceId id);
+		Light* CreateLight(LIGHT_TYPE type,const std::string& name);
+		bool DestroyLight(const LightInstanceId id);
+		bool DestroyLight(Light* lit);
+
 		void EnableLinearFog(bool enable);
 		void SetLinearFogColor(RGBA32 color);
 		void SetLinearFogStart(float start);
 		void SetLinearFogRange(float range);
+
+		void SetRenderPipeline(RenderPipeline* renderPipeline);
 
 		void DrawOneFrame();
 		void DrawOneFrame(Camera* camera);

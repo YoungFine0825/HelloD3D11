@@ -20,4 +20,12 @@ struct Transform
 	{
 		return XMMatrixInverse(GetWorldMatrix());
 	}
+	//
+	XMFLOAT3 GetWorldSpaceForward() 
+	{
+		XMFLOAT3 forward = { 0,0,1 };
+		XMMATRIX rot = XMMatrixRotationFromFloat3(rotation);
+		forward = XMFloat3MultiMatrix(forward, rot, 0);
+		return XMVectorNormalize(forward);
+	}
 };

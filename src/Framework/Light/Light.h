@@ -18,7 +18,7 @@ namespace Framework
 		XMFLOAT3 positionW = { 0,0,0 };
 		float intensity = 0;
 		XMFLOAT3 attenuation = {1,1,1};
-		float range = 0;
+		float range = 1;
 	};
 
 	struct SpotLight
@@ -27,8 +27,8 @@ namespace Framework
 		XMFLOAT3 positionW = { 0,0,0 };
 		float intensity = 0;
 		XMFLOAT3 attenuation = { 1,1,1 };
-		float range = 0;
+		float range = 1;
 		XMFLOAT3 directionW = { 0,0,1 };
-		float spot = 0;
+		float spot = 1;
 	};
 }
