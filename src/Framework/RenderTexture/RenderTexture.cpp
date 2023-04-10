@@ -21,10 +21,19 @@ namespace Framework
 		m_depthStencilBuffer = info.depthStencilBuffer;
 		m_depthStencilSRV = info.depthStencilSRV;
 		m_depthStencilUAV = info.depthStencilUAV;
+		//
+		m_viewPortPtr = new d3dGraphic::ViewPort();
+		m_viewPortPtr->TopLeftX = 0;
+		m_viewPortPtr->TopLeftY = 0;
+		m_viewPortPtr->Width = static_cast<float>(m_width);
+		m_viewPortPtr->Height = static_cast<float>(m_height);
+		m_viewPortPtr->MinDepth = 0.0f;
+		m_viewPortPtr->MaxDepth = 1.0f;
 	}
 
 	RenderTexture::~RenderTexture() 
 	{
+		ReleasePointer(m_viewPortPtr);
 		ReleaseCOM(m_colorUAV);
 		ReleaseCOM(m_depthStencilUAV);
 		ReleaseCOM(m_colorSRV);
@@ -46,4 +55,5 @@ namespace Framework
 	ID3D11UnorderedAccessView* RenderTexture::GetDepthTextureUAV() { return m_depthStencilUAV; }
 	unsigned int RenderTexture::GetWidth() { return m_width; }
 	unsigned int RenderTexture::GetHeight() { return m_height; }
+	d3dGraphic::ViewPort* RenderTexture::GetViewPortPtr() { return m_viewPortPtr; }
 }

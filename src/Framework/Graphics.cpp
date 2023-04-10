@@ -39,6 +39,7 @@ namespace Framework
 			{
 				m_activedRenderTargetView = nullptr;
 				m_activedDepthStencilView = nullptr;
+				d3dGraphic::SetViewPort(nullptr);
 				d3dGraphic::SetRenderTarget(nullptr, nullptr);
 				return;
 			}
@@ -46,6 +47,7 @@ namespace Framework
 			ID3D11DepthStencilView* dsv = rt->GetDSV();
 			m_activedRenderTargetView = rtv;
 			m_activedDepthStencilView = dsv;
+			d3dGraphic::SetViewPort(rt->GetViewPortPtr());
 			d3dGraphic::SetRenderTarget(rtv, dsv);
 		}
 

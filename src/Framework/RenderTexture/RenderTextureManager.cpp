@@ -40,20 +40,33 @@ namespace Framework
 			unsigned int msaaCount
 		) 
 		{
+			RenderTextureDesc desc;
+			desc.width = width;
+			desc.height = height;
+			desc.includeDepthStencil = includeDepthStencil;
+			desc.createColorUAV = createColorUAV;
+			desc.createDepthUAV = createDepthUAV;
+			desc.msaaCount = msaaCount;
+			return CreateRenderTexture(&desc);
+
+		}
+
+		RenderTexture* CreateRenderTexture(RenderTextureDesc* rtDesc)
+		{
 			ID3D11Device* device = d3dGraphic::GetDevice();
 			ID3D11DeviceContext* context = d3dGraphic::GetDeviceContext();
 			//
 			D3D11_TEXTURE2D_DESC texDesc;
 			ZeroMemory(&texDesc, sizeof(texDesc));
-			texDesc.Width = width;
-			texDesc.Height = height;
+			texDesc.Width = rtDesc->width;
+			texDesc.Height = rtDesc->height;
 			texDesc.MipLevels = 1;
 			texDesc.ArraySize = 1;
-			if (msaaCount > 1)// Use 4X MSAA? --must match swap chain MSAA values.
+			if (rtDesc->msaaCount > 1)// Use 4X MSAA? --must match swap chain MSAA values.
 			{
-				msaaCount = min(msaaCount, 8);
-				texDesc.SampleDesc.Count = msaaCount;
-				texDesc.SampleDesc.Quality = msaaCount - 1;
+				rtDesc->msaaCount = min(rtDesc->msaaCount, 8);
+				texDesc.SampleDesc.Count = rtDesc->msaaCount;
+				texDesc.SampleDesc.Quality = rtDesc->msaaCount - 1;
 			}
 			else// No MSAA
 			{
@@ -82,29 +95,32 @@ namespace Framework
 			ID3D11UnorderedAccessView* colorUAV = nullptr;
 			ID3D11UnorderedAccessView* depthStencilUAV = nullptr;
 			//
-			texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-			if (createColorUAV)
+			if (rtDesc->includeColor) 
 			{
-				texDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+				texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+				if (rtDesc->createColorUAV)
+				{
+					texDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+				}
+				DXHR(device->CreateTexture2D(&texDesc, 0, &colorTex2D));
+				DXHR(device->CreateRenderTargetView(colorTex2D, 0, &colorBuffer));
+				//
+				srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				DXHR(device->CreateShaderResourceView(colorTex2D, &srvDesc, &colorSRV));
+				//
+				if (rtDesc->createColorUAV)
+				{
+					uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+					DXHR(device->CreateUnorderedAccessView(colorTex2D, &uavDesc, &colorUAV));
+				}
 			}
-			DXHR(device->CreateTexture2D(&texDesc, 0, &colorTex2D));
-			DXHR(device->CreateRenderTargetView(colorTex2D, 0, &colorBuffer));
 			//
-			srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			DXHR(device->CreateShaderResourceView(colorTex2D, &srvDesc, &colorSRV));
-			//
-			if (createColorUAV)
-			{
-				uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-				DXHR(device->CreateUnorderedAccessView(colorTex2D, &uavDesc, &colorUAV));
-			}
-			//
-			if (includeDepthStencil) 
+			if (rtDesc->includeDepthStencil)
 			{
 				texDesc.Format = DEFAULT_DS_BUFFER_FORMAT;
 				texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL ;
-				if (createDepthUAV)
+				if (rtDesc->createDepthUAV)
 				{
 					texDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
 				}
@@ -117,7 +133,7 @@ namespace Framework
 					DXHR(device->CreateShaderResourceView(depthStencilTex2D, &srvDesc, &depthStencilSRV));
 				}
 				//
-				if (createDepthUAV)
+				if (rtDesc->createDepthUAV)
 				{
 					uavDesc.Format = DEFAULT_DS_BUFFER_FORMAT;
 					DXHR(device->CreateUnorderedAccessView(depthStencilTex2D, &uavDesc, &depthStencilUAV));
@@ -127,8 +143,8 @@ namespace Framework
 			RenderTextureId id = ++g_rtId;
 			RenderTextureInitInfo initInfo;
 			initInfo.id = id;
-			initInfo.width = width;
-			initInfo.height = height;
+			initInfo.width = rtDesc->width;
+			initInfo.height = rtDesc->height;
 			initInfo.colorTex2D = colorTex2D;
 			initInfo.colorBuffer = colorBuffer;
 			initInfo.colorSRV = colorSRV;

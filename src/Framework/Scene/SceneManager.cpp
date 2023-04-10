@@ -39,11 +39,7 @@ namespace Framework
 
 		void Cleanup() 
 		{
-			if (m_renderPipeline) 
-			{
-				delete m_renderPipeline;
-				m_renderPipeline = nullptr;
-			}
+			m_renderPipeline = nullptr;
 			//
 			for (size_t i = 0; i < m_entities.size(); ++i) 
 			{

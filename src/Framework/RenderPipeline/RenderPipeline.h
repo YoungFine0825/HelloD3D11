@@ -6,10 +6,9 @@ namespace Framework
 {
 	class FrameData;
 	class Camera;
-	class Renderer;
 
-	typedef std::function<void()> RenderPipelineDrawGUICallback;
-	typedef std::function<void()> RenderPipelineDrawGizmosCallback;
+	typedef std::function<void(Camera*)> RenderPipelineDrawGUICallback;
+	typedef std::function<void(Camera*)> RenderPipelineDrawGizmosCallback;
 
 	class RenderPipeline 
 	{

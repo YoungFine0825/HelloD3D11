@@ -97,16 +97,18 @@ void BuildScene()
 		Renderer* renderer = actor->GetRenderer(0);
 		//
 		Texture* actorBodyTex = TextureManager::LoadDDSFromFile("res/models/FoxHowl_Teacher_BODY_BL.dds");
-		renderer->material = new Material(litOpaShader);
-		renderer->material->SetMainTexture(actorBodyTex);
-		//
-		renderer = actor->GetRenderer(1);
 		Texture* actorHeadTex = TextureManager::LoadDDSFromFile("res/models/FoxHowl_Teacher_Face_BL.dds");
+		//
 		renderer->material = new Material(litOpaShader);
 		renderer->material->SetMainTexture(actorHeadTex);
 		//
-		actor->GetTransform()->position = { 0.0f,-21.0f,60.0f };
-		actor->GetTransform()->rotation = { 0.0f,-153.0f,0.0f };
+		renderer = actor->GetRenderer(1);
+		renderer->material = new Material(litOpaShader);
+		renderer->material->SetMainTexture(actorBodyTex);
+		//
+		actor->GetTransform()->position = { 0.0f,-21.0f,300.0f };
+		actor->GetTransform()->rotation = { 0.0f,0.0f,0.0f };
+		actor->GetTransform()->scale = { 100.0f,100.0f,100.0f };
 	}
 	//
 	Entity* waterQuad = SceneManager::CreateEntity("Water");

@@ -341,6 +341,19 @@ namespace d3dGraphic
 	}
 
 
+	void SetViewPort(ViewPort* viewPortPtr) 
+	{
+		if (viewPortPtr) 
+		{
+			m_pd3dImmediateContext->RSSetViewports(1, viewPortPtr);
+		}
+		else 
+		{
+			m_pd3dImmediateContext->RSSetViewports(1, &m_defViewPort);
+		}
+	}
+
+
 
 	bool CreateVertexBuffer(ID3D11Buffer** buffer,const void* data, size_t vertexFormatSize, UINT vertexCount, D3D11_USAGE Usage)
 	{

@@ -33,19 +33,22 @@ namespace Framework
 		for (size_t c = 0; c < cameraCnt; ++c) 
 		{
 			m_visibleRenderers.clear();
+			//
 			RenderCamera(m_frameData->cameras[c]);
+			//
+			if (m_drawGizmosCallBack)
+			{
+				m_drawGizmosCallBack(m_frameData->cameras[c]);
+			}
+			//
+			if (m_drawGUICallBack)
+			{
+				m_drawGUICallBack(m_frameData->cameras[c]);
+			}
+			//
 			m_visibleRenderers.clear();
 		}
 		//
-		if (m_drawGizmosCallBack) 
-		{
-			m_drawGizmosCallBack();
-		}
-		//
-		if (m_drawGUICallBack) 
-		{
-			m_drawGUICallBack();
-		}
 		//输出到屏幕
 		Graphics::Present();
 	}
@@ -98,7 +101,7 @@ namespace Framework
 			InteractedLightSet* lightSet = m_lightLists[r];
 			if (lightSet != nullptr)
 			{
-				sh->SetStruct("g_ParallelLight", &(lightSet->parallelLight), sizeof(lightSet->parallelLight));
+				sh->SetStruct("g_ParallelLight", &m_curParallelLight, sizeof(m_curParallelLight));
 				//
 				size_t litCnt = lightSet->pointLights.size();
 				for (size_t i = 0; i < m_pointLightCnt; ++i)
@@ -219,28 +222,34 @@ namespace Framework
 				else if (type == LIGHT_TYPE_SPOT) 
 				{
 					//先忽略位移和旋转，构建一个轴对齐(左手坐标系)的OBB
+					float range = lit->GetRange();//
+					float radius = tan(Angle2Radin(lit->GetSpot())) * range;
+					XMFLOAT3 forwardW = litTransform->GetWorldSpaceForward();
+					XMFLOAT3 rotationW = litTransform->rotation;
+					XMFLOAT3 positionW = litTransform->position;
 					OBB obbAA;
-					obbAA.Center = { 0,0,0 };
+					obbAA.Center = { 0,0,range / 2 };
 					XMVECTOR noneRotation = XMQuaternionRotationRollPitchYaw(0, 0, 0);
 					XMStoreFloat4(&obbAA.Orientation, noneRotation);
-					float range = lit->GetRange();//聚光灯照射的距离
 					XMFLOAT3 endPoint = { 0,0,range };
-					float radius = tan(Angle2Radin(lit->GetSpot())) * range;
 					XMFLOAT3 right = { 1,0,0 };
 					XMFLOAT3 up = { 0,1,0 };
 					XMFLOAT3 max = endPoint + right * radius + up * radius;
-					obbAA.Extents = max;
+					obbAA.Extents = max - obbAA.Center;
 					//然后应用位移和旋转
 					OBB obb;
-					XMFLOAT3 rotationW = litTransform->rotation;
-					XMFLOAT3 positionW = litTransform->position;
-					XNA::TransformOrientedBox(
-						&obb, 
-						&obbAA,
-						1,
-						XMVectorSet({rotationW.x,rotationW.y,rotationW.z,0.0}),
-						XMVectorSet({ positionW.x,positionW.y,positionW.z,1.0 })
-					);
+					obb.Center = positionW + forwardW * (range / 2);
+					XMMATRIX rotationMatrix = XMMatrixRotationFromFloat3(rotationW);
+					obb.Extents = XMFloat3MultiMatrix(obbAA.Extents, rotationMatrix);
+					XMVECTOR rotation = XMQuaternionRotationRollPitchYaw(rotationW.x, rotationW.y, rotationW.z);
+					XMStoreFloat4(&obb.Orientation, rotation);
+					//XNA::TransformOrientedBox(
+					//	&obb, 
+					//	&obbAA,
+					//	1,
+					//	XMQuaternionRotationRollPitchYaw(rotationW.x, rotationW.y, rotationW.z),
+					//	XMVectorSet({ positionW.x,positionW.y,positionW.z,1.0 })
+					//);
 					if (XNA::IntersectAxisAlignedBoxOrientedBox(&aabb, &obb) > 0) 
 					{
 						ShaderStruct::SpotLight spotLit;
@@ -256,7 +265,7 @@ namespace Framework
 				}
 			}
 			//
-			interactedLights->parallelLight = maxInstensityParallelLit;
+			m_curParallelLight = maxInstensityParallelLit;
 		}
 	}
 }

@@ -32,11 +32,18 @@ using namespace Framework;
 Light* m_parallelLight;
 XMFLOAT3 m_parallelLightRot = { 50,-45,0 };
 
+Light* torchLight;
+RGBA32 torchLightColor = Colors::Red;
+float torchLightRange = 1000;
+float torchLIghtSpot = 15;
+float torchLightIntensity = 1.6f;
+
 RGBA32 m_bgColor = Colors::LightSteelBlue;
 
 Entity* terrain;
 Entity* actor;
 float actorSpecularPower = 100.0f;
+Entity* waterSurface;
 
 Camera* mainCamera;
 Camera* secondCamera;
@@ -48,8 +55,8 @@ int curCameraIndex = 1;
 
 ForwardRenderPipeline* forwardRenderPipeline;
 
-void DrawImGUI();
-void DrawGizmos();
+void DrawImGUI(Camera* renderingCamera);
+void DrawGizmos(Camera* renderingCamera);
 
 void App_PreCreateWindow()
 {
@@ -113,13 +120,13 @@ void BuildScene()
 		actor->GetTransform()->scale = { 100.0f,100.0f,100.0f };
 	}
 	//
-	Entity* waterQuad = SceneManager::CreateEntity("Water");
-	Transform* waterTrans = waterQuad->GetTransform();
+	waterSurface = SceneManager::CreateEntity("Water");
+	Transform* waterTrans = waterSurface->GetTransform();
 	waterTrans->position = { 0,-100,1000 };
 	waterTrans->rotation = { 90,0,0 };
 	waterTrans->scale = { 1500,1500,1 };
 	Texture* waterTex = TextureManager::LoadDDSFromFile("res/models/water2.dds");
-	Renderer* waterRenderer = waterQuad->CreateRenderer();
+	Renderer* waterRenderer = waterSurface->CreateRenderer();
 	waterMaterial = new Material(transparentShader);
 	waterMaterial->SetMainTexture(waterTex);
 	waterMaterial->mainTextureST = { 25,25,0,0 };
@@ -127,12 +134,6 @@ void BuildScene()
 	waterMaterial->SetFloat("obj_Alpha", 0.6f);
 	waterRenderer->material = waterMaterial;
 	waterRenderer->mesh = MeshManager::CreateQuad();
-	//
-	m_parallelLight = SceneManager::CreateLight(LIGHT_TYPE_DIRECTIONAL,"Directional");
-	m_parallelLight->SetIntensity(1)
-		->SetColor(Colors::SunLight)
-		;
-	m_parallelLight->GetTransform()->rotation = m_parallelLightRot;
 	//
 	mainCamera = SceneManager::CreateCamera("MainCamera");
 	mainCamera->SetAspectRatio(win_GetAspectRatio())
@@ -165,8 +166,33 @@ void BuildScene()
 	SceneManager::AddEntity(flyCameraEnt2);
 	flyCameraEnt2->SetEnable(false);
 	//
+	SceneManager::EnableLinearFog(false);
 	SceneManager::SetLinearFogStart(1000);
 	SceneManager::SetLinearFogRange(1000);
+}
+
+void BuildLights()
+{
+	//
+	m_parallelLight = SceneManager::CreateLight(LIGHT_TYPE_DIRECTIONAL, "Directional");
+	m_parallelLight->SetIntensity(0)
+		->SetColor(Colors::SunLight)
+		;
+	m_parallelLight->GetTransform()->rotation = m_parallelLightRot;
+	//
+	Light* pointLight = SceneManager::CreateLight(LIGHT_TYPE_POINT, "PointLight");
+	pointLight->SetIntensity(1.6f)
+		->SetColor(Colors::Blue)
+		->SetRange(500);
+	XMFLOAT3 pointLitOffset = { 0,350,0 };
+	Transform* transform = pointLight->GetTransform();
+	transform->position = actor->GetTransform()->position + pointLitOffset;
+	//
+	torchLight = SceneManager::CreateLight(LIGHT_TYPE_SPOT, "Spot");
+	torchLight->SetIntensity(torchLightIntensity)
+		->SetColor(torchLightColor)
+		->SetRange(torchLightRange)
+		->SetSpot(torchLIghtSpot);
 }
 
 
@@ -187,6 +213,8 @@ bool App_Init()
 	dxinput_Init(win_GetInstance(), win_GetHandle());
 	//
 	BuildScene();
+	//
+	BuildLights();
 	//
 	return true;
 }
@@ -219,12 +247,19 @@ void App_Tick(float dt)
 		curCameraIndex = 2;
 	}
 	mainCamera->SetEnable(curCameraIndex == 1);
-	//flyCameraEnt->SetEnable(curCameraIndex == 1);
+	flyCameraEnt->SetEnable(curCameraIndex == 1);
 	secondCamera->SetEnable(curCameraIndex == 2);
-	//flyCameraEnt2->SetEnable(curCameraIndex == 2);
+	flyCameraEnt2->SetEnable(curCameraIndex == 2);
+	//
+	torchLight->SetIntensity(torchLightIntensity)
+		->SetColor(torchLightColor)
+		->SetRange(torchLightRange)
+		->SetSpot(torchLIghtSpot);
+	torchLight->GetTransform()->position = mainCamera->GetTransform()->position;
+	torchLight->GetTransform()->rotation = mainCamera->GetTransform()->rotation;
 }
 
-void DrawImGUI()
+void DrawImGUI(Camera* renderingCamera)
 {
 	//
 	ImGuiHelper::BeginGUI();
@@ -241,11 +276,18 @@ void DrawImGUI()
 		ImGui::Text("Press \"Mouse Right Button\" looking around !");
 		ImGui::Text("Press \"1\" and \"2\" switch camera !");
 		ImGui::End();
+		//
+		ImGui::Begin("Torch Light");
+		ImGui::ColorEdit3("Color", (float*)&torchLightColor);
+		ImGui::DragFloat("Intensity", &torchLightIntensity, 0.1, 0, 10);
+		ImGui::DragFloat("Distance", &torchLightRange, 1, 100);
+		ImGui::DragFloat("Umbra", &torchLIghtSpot, 1, 10,80);
+		ImGui::End();
 	}
 	ImGuiHelper::EndGUI();
 }
 
-void DrawEntityAABB(Entity* ent)
+void DrawEntityAABB(Entity* ent, Camera* renderingCamera)
 {
 	if (!ent)
 	{
@@ -256,7 +298,6 @@ void DrawEntityAABB(Entity* ent)
 	{
 		return;
 	}
-	Camera* renderingCamera = curCameraIndex == 1 ? mainCamera : secondCamera;
 	for (unsigned int r = 0; r < rendererCnt; ++r)
 	{
 		AxisAlignedBox bbox = ent->GetRenderer(r)->mesh->GetAxisAlignedBox();
@@ -269,17 +310,16 @@ void DrawEntityAABB(Entity* ent)
 	}
 }
 
-void DrawGizmos()
-{
-	DrawEntityAABB(terrain);
-	DrawEntityAABB(actor);
-	DrawEntityAABB(SceneManager::FindEntity("Water"));
-	//
-	Camera* renderingCamera = curCameraIndex == 1 ? mainCamera : secondCamera;
-	Frustum frustumV = mainCamera->GetViewSpaceFrustum();
-	XMMATRIX mvp = mainCamera->GetTransform()->GetWorldMatrix() * renderingCamera->GetViewMatrix() * renderingCamera->GetProjectMatrix();
-	GizmosHelper::DrawFrustum(frustumV, mvp, Colors::Blue);
 
+void DrawGizmos(Camera* renderingCamera)
+{
+	//DrawEntityAABB(terrain, renderingCamera);
+	//DrawEntityAABB(actor, renderingCamera);
+	//DrawEntityAABB(waterSurface, renderingCamera);
+	////
+	//Frustum frustumV = mainCamera->GetViewSpaceFrustum();
+	//XMMATRIX mvp = mainCamera->GetTransform()->GetWorldMatrix() * renderingCamera->GetViewMatrix() * renderingCamera->GetProjectMatrix();
+	//GizmosHelper::DrawFrustum(frustumV, mvp, Colors::Blue);
 }
 
 void App_Draw()
@@ -289,6 +329,7 @@ void App_Draw()
 
 void App_Cleanup()
 {
+	ReleasePointer(forwardRenderPipeline);
 	GizmosHelper::Cleanup();
 	ImGuiHelper::Cleanup();
 	SceneManager::Cleanup();

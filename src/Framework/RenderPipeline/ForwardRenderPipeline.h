@@ -23,12 +23,14 @@ namespace Framework
 		struct InteractedLightSet
 		{
 			InteractedLightSet() {};
-			ShaderStruct::ParallelLight parallelLight;
 			PointLightArray pointLights;
 			SpotLightArray spotLights;
 		};
 
 		std::vector<InteractedLightSet*> m_lightLists;
+
+		ShaderStruct::ParallelLight m_curParallelLight;
+
 		RendererVector m_visibleRenderers;
 		//
 		void RenderCamera(Camera* camera);

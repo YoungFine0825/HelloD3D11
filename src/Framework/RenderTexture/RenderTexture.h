@@ -38,6 +38,7 @@ namespace Framework
 		ID3D11UnorderedAccessView* GetDepthTextureUAV();
 		unsigned int GetWidth();
 		unsigned int GetHeight();
+		d3dGraphic::ViewPort* GetViewPortPtr();
 	private:
 		RenderTextureId m_id;
 		unsigned int m_width;
@@ -51,5 +52,7 @@ namespace Framework
 		ID3D11DepthStencilView* m_depthStencilBuffer = nullptr;
 		ID3D11ShaderResourceView* m_depthStencilSRV = nullptr;
 		ID3D11UnorderedAccessView* m_depthStencilUAV = nullptr;
+		//
+		d3dGraphic::ViewPort* m_viewPortPtr;
 	};
 }

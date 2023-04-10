@@ -70,6 +70,8 @@ namespace d3dGraphic
 		XMFLOAT3 tangent;
 	};
 
+	typedef D3D11_VIEWPORT ViewPort;
+
 	bool Init();
 	void Shutdown();
 	ID3D11Device* GetDevice();
@@ -80,6 +82,7 @@ namespace d3dGraphic
 	void ClearRenderTarget(const FLOAT RGBA[4],ID3D11RenderTargetView* renderTarget = nullptr);
 	void ClearDepthStencil(ID3D11DepthStencilView* stencil = nullptr,UINT clearFlag = D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL);
 	void SetRenderTarget(ID3D11RenderTargetView* renderTargetVIew, ID3D11DepthStencilView* depthStencilView);
+	void SetViewPort(ViewPort* viewPortPtr);
 	//
 	bool CreateVertexBuffer(ID3D11Buffer** buffer,const void* data, size_t vertexFormatSize, UINT vertexCount, D3D11_USAGE Usage = D3D11_USAGE_IMMUTABLE);
 	bool CreateIndexBuffer(ID3D11Buffer** buffer, const void* data, size_t indexFormatSize, UINT indexCount, D3D11_USAGE Usage = D3D11_USAGE_IMMUTABLE);
