@@ -28,4 +28,23 @@ struct Transform
 		forward = XMFloat3MultiMatrix(forward, rot, 0);
 		return XMVectorNormalize(forward);
 	}
+	//
+	XMFLOAT3 GetWorldSpaceUp()
+	{
+		XMFLOAT3 up = { 0,1,0 };
+		XMMATRIX rot = XMMatrixRotationFromFloat3(rotation);
+		up = XMFloat3MultiMatrix(up, rot, 0);
+		return XMVectorNormalize(up);
+	}
+	//
+	XMFLOAT3 GetWorldSpaceRight()
+	{
+		XMFLOAT3 forward = { 0,0,1 };
+		XMFLOAT3 up = { 0,1,0 };
+		XMMATRIX rot = XMMatrixRotationFromFloat3(rotation);
+		forward = XMVectorNormalize(XMFloat3MultiMatrix(forward, rot, 0));
+		up = XMVectorNormalize(XMFloat3MultiMatrix(up, rot, 0));
+		XMFLOAT3 right = XMVectorCross(up, forward);
+		return XMVectorNormalize(right);
+	}
 };

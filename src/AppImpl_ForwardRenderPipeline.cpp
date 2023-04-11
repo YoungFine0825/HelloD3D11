@@ -34,9 +34,13 @@ XMFLOAT3 m_parallelLightRot = { 50,-45,0 };
 
 Light* torchLight;
 RGBA32 torchLightColor = Colors::Red;
-float torchLightRange = 1000;
+float torchLightRange = 2000;
 float torchLIghtSpot = 15;
 float torchLightIntensity = 1.6f;
+
+std::vector<Light*> pointLits;
+float pointLitsYaw = 0;
+XMFLOAT3 pointLightOffsetDir = { 0,300,300 };
 
 RGBA32 m_bgColor = Colors::LightSteelBlue;
 
@@ -175,24 +179,26 @@ void BuildLights()
 {
 	//
 	m_parallelLight = SceneManager::CreateLight(LIGHT_TYPE_DIRECTIONAL, "Directional");
-	m_parallelLight->SetIntensity(0)
+	m_parallelLight->SetIntensity(0.3f)
 		->SetColor(Colors::SunLight)
 		;
 	m_parallelLight->GetTransform()->rotation = m_parallelLightRot;
-	//
-	Light* pointLight = SceneManager::CreateLight(LIGHT_TYPE_POINT, "PointLight");
-	pointLight->SetIntensity(1.6f)
-		->SetColor(Colors::Blue)
-		->SetRange(500);
-	XMFLOAT3 pointLitOffset = { 0,350,0 };
-	Transform* transform = pointLight->GetTransform();
-	transform->position = actor->GetTransform()->position + pointLitOffset;
 	//
 	torchLight = SceneManager::CreateLight(LIGHT_TYPE_SPOT, "Spot");
 	torchLight->SetIntensity(torchLightIntensity)
 		->SetColor(torchLightColor)
 		->SetRange(torchLightRange)
 		->SetSpot(torchLIghtSpot);
+	//
+
+	for(int i = 0;i < 3;++i)
+	{
+		Light* pointLight = SceneManager::CreateLight(LIGHT_TYPE_POINT, "PointLight"+i);
+		pointLight->SetIntensity(1.3f)
+			->SetColor(Colors::Blue)
+			->SetRange(500);
+		pointLits.push_back(pointLight);
+	}
 }
 
 
@@ -257,6 +263,16 @@ void App_Tick(float dt)
 		->SetSpot(torchLIghtSpot);
 	torchLight->GetTransform()->position = mainCamera->GetTransform()->position;
 	torchLight->GetTransform()->rotation = mainCamera->GetTransform()->rotation;
+	//
+	pointLitsYaw += 30.0f * dt;
+	for (size_t i = 0; i < pointLits.size(); ++i) 
+	{
+		Light* pointLit = pointLits[i];
+		Transform* trans = pointLit->GetTransform();
+		XMMATRIX rot = XMMatrixRotationFromFloat3({ 0,i * 120.0f + pointLitsYaw,0 });
+		XMFLOAT3 posOffset = XMFloat3MultiMatrix(pointLightOffsetDir, rot);
+		trans->position = actor->GetTransform()->position + posOffset;
+	}
 }
 
 void DrawImGUI(Camera* renderingCamera)
@@ -329,6 +345,7 @@ void App_Draw()
 
 void App_Cleanup()
 {
+	pointLits.clear();
 	ReleasePointer(forwardRenderPipeline);
 	GizmosHelper::Cleanup();
 	ImGuiHelper::Cleanup();

@@ -160,6 +160,7 @@ namespace Framework
 		delete[] spotLights;
 	}
 
+	//为每个可见的renderer搜集它受哪些光源影响
 	void ForwardRenderPipeline::GenLightList()
 	{
 		//
@@ -169,6 +170,10 @@ namespace Framework
 		for (size_t i = 0; i < litCnt; ++i)
 		{
 			Light* lit = m_frameData->lights[i];
+			if (!lit->IsEnabled())
+			{
+				continue;
+			}
 			if (lit->GetType() != LIGHT_TYPE_DIRECTIONAL) { continue; }
 			if (lit->GetIntensity() > maxInstensityParallelLit.intensity)
 			{
@@ -195,12 +200,17 @@ namespace Framework
 			}
 			//
 			Renderer* renderer = m_visibleRenderers[r];
-			AxisAlignedBox aabb;
-			CollisionUtils::ComputeRendererWorldSpaceAxisAlignedBox(&aabb, renderer);
+			//求renderer的世界空间轴对齐包围盒
+			AxisAlignedBox aabbWorldSpace;
+			CollisionUtils::ComputeRendererWorldSpaceAxisAlignedBox(&aabbWorldSpace, renderer);
 			//判断该物体与哪些点光源、聚光灯相交
 			for (size_t litIndex = 1; litIndex < litCnt; ++litIndex)
 			{
 				Light* lit = m_frameData->lights[litIndex];
+				if (!lit->IsEnabled())
+				{ 
+					continue;
+				}
 				LIGHT_TYPE type = lit->GetType();
 				Transform* litTransform = lit->GetTransform();
 				if (type == LIGHT_TYPE_POINT) 
@@ -208,7 +218,7 @@ namespace Framework
 					Sphere sphere;
 					sphere.Center = litTransform->position;
 					sphere.Radius = lit->GetRange();
-					if (XNA::IntersectSphereAxisAlignedBox(&sphere, &aabb) > 0) 
+					if (XNA::IntersectSphereAxisAlignedBox(&sphere, &aabbWorldSpace) > 0)
 					{
 						ShaderStruct::PointLight pointLit;
 						pointLit.color = lit->GetColor();
@@ -221,44 +231,32 @@ namespace Framework
 				}
 				else if (type == LIGHT_TYPE_SPOT) 
 				{
-					//先忽略位移和旋转，构建一个轴对齐(左手坐标系)的OBB
 					float range = lit->GetRange();//
 					float radius = tan(Angle2Radin(lit->GetSpot())) * range;
-					XMFLOAT3 forwardW = litTransform->GetWorldSpaceForward();
-					XMFLOAT3 rotationW = litTransform->rotation;
-					XMFLOAT3 positionW = litTransform->position;
-					OBB obbAA;
-					obbAA.Center = { 0,0,range / 2 };
-					XMVECTOR noneRotation = XMQuaternionRotationRollPitchYaw(0, 0, 0);
-					XMStoreFloat4(&obbAA.Orientation, noneRotation);
-					XMFLOAT3 endPoint = { 0,0,range };
-					XMFLOAT3 right = { 1,0,0 };
-					XMFLOAT3 up = { 0,1,0 };
-					XMFLOAT3 max = endPoint + right * radius + up * radius;
-					obbAA.Extents = max - obbAA.Center;
-					//然后应用位移和旋转
-					OBB obb;
-					obb.Center = positionW + forwardW * (range / 2);
-					XMMATRIX rotationMatrix = XMMatrixRotationFromFloat3(rotationW);
-					obb.Extents = XMFloat3MultiMatrix(obbAA.Extents, rotationMatrix);
-					XMVECTOR rotation = XMQuaternionRotationRollPitchYaw(rotationW.x, rotationW.y, rotationW.z);
-					XMStoreFloat4(&obb.Orientation, rotation);
-					//XNA::TransformOrientedBox(
-					//	&obb, 
-					//	&obbAA,
-					//	1,
-					//	XMQuaternionRotationRollPitchYaw(rotationW.x, rotationW.y, rotationW.z),
-					//	XMVectorSet({ positionW.x,positionW.y,positionW.z,1.0 })
-					//);
-					if (XNA::IntersectAxisAlignedBoxOrientedBox(&aabb, &obb) > 0) 
+					//为SpotLight构建一个朝向包围盒（OBB）,用OBB与renderer的AABB判断两者是否发碰撞
+					OBB obbL;//先构建一个局部空间OBB
+					obbL.Center = { 0,0,range / 2.0f };
+					XMFLOAT3 endPoint = {0,0,range};
+					XMFLOAT3 max = { radius,radius,range };
+					obbL.Extents = max - obbL.Center;
+					obbL.Orientation = { 0,0,0,1 };
+					//再应用光源的旋转和位移，将局部空间OBB转换到世界空间
+					OBB obbW;
+					XMVECTOR scale;
+					XMVECTOR rotQuat;
+					XMVECTOR translation;
+					XMMATRIX litWorldMatrix = litTransform->GetWorldMatrix();
+					XMMatrixDecompose(&scale, &rotQuat, &translation, litWorldMatrix);
+					XNA::TransformOrientedBox(&obbW, &obbL, 1, rotQuat, translation);
+					if (XNA::IntersectAxisAlignedBoxOrientedBox(&aabbWorldSpace, &obbW))
 					{
 						ShaderStruct::SpotLight spotLit;
 						spotLit.intensity = lit->GetIntensity();
 						spotLit.color = lit->GetColor();
-						spotLit.positionW = positionW;
+						spotLit.positionW = litTransform->position;
 						spotLit.directionW = litTransform->GetWorldSpaceForward();
 						spotLit.attenuation = lit->GetAttenuation();
-						spotLit.range = lit->GetRange();
+						spotLit.range = range;
 						spotLit.spot = Angle2Radin(lit->GetSpot());
 						interactedLights->spotLights.push_back(spotLit);
 					}

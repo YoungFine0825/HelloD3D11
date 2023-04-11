@@ -28,7 +28,7 @@ struct SpotLight
 
 float LambertDiffuse(float3 lightDirW,float3 normalW)
 {
-	float NdotL = dot(lightDirW,normalW) * 0.5f + 0.5f;//半兰伯特漫反射系数
+	float NdotL = clamp(dot(lightDirW,normalW),-1,1) * 0.5f + 0.5f;//半兰伯特漫反射系数
 	//float NdotL = max(0,dot(lightDirW,normalW));//兰伯特漫反射系数
 	return NdotL;
 }
@@ -75,7 +75,7 @@ void CalcuParallelLight(ParallelLight light,Material mat,float3 normalW,float3 v
 	diffuseColor = float3(0.0f, 0.0f, 0.0f);
 	specularColor = float3(0.0f, 0.0f, 0.0f);
 	//
-	float3 L = normalize(light.directionW * -1);
+	float3 L = normalize(light.directionW) * -1;
 	float3 lightColor = light.color.rgb * light.intensity;
 	//
 	diffuseColor = (lightColor * mat.Diffuse.rgb) * LambertDiffuse(L,normalW);
