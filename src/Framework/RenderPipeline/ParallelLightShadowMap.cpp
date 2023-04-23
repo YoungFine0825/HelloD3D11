@@ -39,9 +39,9 @@ namespace Framework
 		float sceneHeight = abs(maxLitSpace.y - minLitSpace.y);
 		float sceneWidth = abs(maxLitSpace.x - minLitSpace.x);
 		float sceneDepth = abs(maxLitSpace.z - minLitSpace.z);
-		XMMATRIX proj = XMMatrixOrthographicLH(sceneWidth, sceneHeight, 1.0f, sceneDepth + 2.0f);
+		XMMATRIX proj = XMMatrixOrthographicLH(sceneWidth, sceneHeight, 0.0f, sceneDepth);
 		//
-		XMFLOAT3 litPosW = sceneAABBW->Center + litDirW * -1 * (sceneDepth / 2.0f + 1.0f);
+		XMFLOAT3 litPosW = sceneAABBW->Center + litDirW * -1 * (sceneDepth / 2.0f );
 		litWorldMat = XMMatrixRotationFromFloat3(litRotationW) * XMMatrixTranslationFromFloat3(litPosW);
 		worldToLightSpace = XMMatrixInverse(litWorldMat);
 		ret = worldToLightSpace * proj;

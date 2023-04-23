@@ -31,7 +31,7 @@ cbuffer cdPerFrame
 	float g_linearFogStart;
 	float g_linearFogRange;
 	//ShadowMap
-	float4x4 g_parallelShadowMapVPT;
+	float4x4 g_parallelShadowMapVP;
 	float g_parallelShadowMapSize;
 }
 
@@ -107,15 +107,14 @@ float4 tex2D(Texture2D map,float2 uv)
 
 float2 ndcxy_to_uv(float2 ndcxy) 
 { 
-	float2 uv = ndcxy * float2(0.5, 0.5) + float2(0.5, 0.5);
-	uv.y = 1 - uv.y;
+	float2 uv = ndcxy * float2(0.5, -0.5) + float2(0.5, 0.5);
 	return uv;
 }
 
 
 float CalcParallelShadowFactor(float3 posW)
 {
-	float4 shadowPosH = mul(float4(posW, 1.0f), g_parallelShadowMapVPT);
+	float4 shadowPosH = mul(float4(posW, 1.0f), g_parallelShadowMapVP);
 	
 	// Complete projection by doing division by w.
 	shadowPosH.xyz /= shadowPosH.w;
@@ -166,7 +165,7 @@ void BlinnPhongLightingInWorldSpace(float3 normalW,float3 posW,Material mat,bool
 	ambientColor += A;
 	if(useParallelShadowMap)
 	{
-		float shadowFactor = CalcParallelShadowFactor(posW);
+		float shadowFactor = CalcParallelShadowFactor(posW) * 0.5f + 0.5f;
 		diffuseColor += shadowFactor * D;
 		specularColor += shadowFactor * S;
 	}

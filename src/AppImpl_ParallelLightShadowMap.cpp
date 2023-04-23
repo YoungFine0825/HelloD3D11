@@ -216,7 +216,7 @@ bool App_Init()
 	forwardRenderPipeline = new ForwardRenderPipeline();
 	forwardRenderPipeline->SetDrawGUICallBack(DrawImGUI);
 	forwardRenderPipeline->SetDrawGizmosCallBack(DrawGizmos);
-	forwardRenderPipeline->SetShadowMapSize(1024);
+	forwardRenderPipeline->SetShadowMapSize(2048);
 	//
 	SceneManager::Init(forwardRenderPipeline);
 	GizmosHelper::Init();

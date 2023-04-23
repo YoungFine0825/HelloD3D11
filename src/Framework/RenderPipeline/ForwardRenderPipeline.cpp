@@ -158,11 +158,11 @@ namespace Framework
 			}
 			sh->SetStruct("g_PointLights", pointLights, sizeof(ShaderStruct::PointLight) * m_pointLightCnt);
 			sh->SetStruct("g_SpotLights", spotLights, sizeof(ShaderStruct::SpotLight) * m_spotLightCnt);
-			//
+			//设置ShadowMap参数
 			bool useShadow = renderer->IsReceiveShadow() && m_shadowMap != nullptr;
 			if (useShadow) 
 			{
-				sh->SetMatrix4x4("g_parallelShadowMapVPT", m_shadowMap->GetViewProjectMatrix());
+				sh->SetMatrix4x4("g_parallelShadowMapVP", m_shadowMap->GetViewProjectMatrix());
 				sh->SetShaderResourceView("g_parallelShadowMap", m_shadowMap->GetSRV());
 				sh->SetFloat("g_parallelShadowMapSize",static_cast<float>(m_shadowMap->GetSize()));
 			}
@@ -173,7 +173,7 @@ namespace Framework
 				sh->SetFloat("g_linearFogStart", m_frameData->sceneSetting.linearFogStart);
 				sh->SetFloat("g_linearFogRange", m_frameData->sceneSetting.linearFogRange);
 			}
-			//
+			//设置要使用Technique
 			if (useShadow) 
 			{
 				if (m_frameData->sceneSetting.enableFog)
@@ -350,21 +350,26 @@ namespace Framework
 		XMFLOAT3 min = { POSITIVE_INFINITY,POSITIVE_INFINITY ,POSITIVE_INFINITY };
 		RendererVector* renderers = &m_frameData->renderers;
 		size_t rendererCnt = renderers->size();
+		XMFLOAT3 corners[8];
 		for (size_t r = 0; r < rendererCnt; ++r) 
 		{
 			Renderer* renderer = (*renderers)[r];
 			if (renderer->IsCastShadow()) 
 			{
-				AxisAlignedBox aabbW;
-				CollisionUtils::ComputeRendererWorldSpaceAxisAlignedBox(&aabbW, renderer);
-				XMFLOAT3 aabbWMax = aabbW.Center + aabbW.Extents;
-				XMFLOAT3 aabbWMin = aabbW.Center - aabbW.Extents;
-				max.x = aabbWMax.x > max.x ? aabbWMax.x : max.x;
-				max.y = aabbWMax.y > max.y ? aabbWMax.y : max.y;
-				max.z = aabbWMax.z > max.z ? aabbWMax.z : max.z;
-				min.x = aabbWMin.x < min.x ? aabbWMin.x : min.x;
-				min.y = aabbWMin.y < min.y ? aabbWMin.y : min.y;
-				min.z = aabbWMin.z < min.z ? aabbWMin.z : min.z;
+				XNA::AxisAlignedBox localAABB = renderer->mesh->GetAxisAlignedBox();
+				Transform* transform = renderer->GetEntity()->GetTransform();
+				XMMATRIX worldMat = transform->GetWorldMatrix();
+				CollisionUtils::ComputeAABBCorners(&localAABB, corners);
+				for (int i = 0; i < 8; ++i)
+				{
+					XMFLOAT3 pointW = corners[i] * worldMat;
+					max.x = pointW.x > max.x ? pointW.x : max.x;
+					max.y = pointW.y > max.y ? pointW.y : max.y;
+					max.z = pointW.z > max.z ? pointW.z : max.z;
+					min.x = pointW.x < min.x ? pointW.x : min.x;
+					min.y = pointW.y < min.y ? pointW.y : min.y;
+					min.z = pointW.z < min.z ? pointW.z : min.z;
+				}
 			}
 		}
 		//
@@ -385,7 +390,6 @@ namespace Framework
 		ID3D11RenderTargetView* renderTargets[1] = { 0 };
 		dc->OMSetRenderTargets(1, renderTargets, m_shadowMap->GetDSV());
 		dc->ClearDepthStencilView(m_shadowMap->GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-		//d3dGraphic::EnableBackCulling(false);
 		//DrawScene
 		for (size_t r = 0; r < rendererCnt; ++r)
 		{

@@ -65,7 +65,7 @@ namespace Framework
 			array[4] = min + XMFLOAT3{ width,height,0 };
 			array[5] = min + XMFLOAT3{0, height, 0};
 			array[6] = min;
-			array[7] = min + XMFLOAT3{ 0,width,0 };
+			array[7] = min + XMFLOAT3{ width,0,0 };
 		}
 	}
 }
