@@ -15,7 +15,7 @@ float4 PS(VertexOut_Common pin,uniform bool gUseLinearFog) : SV_Target
 	float3 ambientColor = float3(0,0,0);
 	float3 diffuseColor = float3(0,0,0);
 	float3 speacluarColor = float3(0,0,0);
-	BlinnPhongLightingInWorldSpace(pin.NormalW,pin.PosW,obj_Material,ambientColor,diffuseColor,speacluarColor);
+	BlinnPhongLightingInWorldSpace(pin.NormalW,pin.PosW,obj_Material,false,ambientColor,diffuseColor,speacluarColor);
 	
 	//
 	float4 finalColor;

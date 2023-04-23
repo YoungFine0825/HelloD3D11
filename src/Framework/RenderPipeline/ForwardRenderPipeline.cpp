@@ -162,27 +162,40 @@ namespace Framework
 			bool useShadow = renderer->IsReceiveShadow() && m_shadowMap != nullptr;
 			if (useShadow) 
 			{
-				sh->SetMatrix4x4("g_parallelShadowMapVP", m_shadowMap->GetViewProjectMatrix());
+				sh->SetMatrix4x4("g_parallelShadowMapVPT", m_shadowMap->GetViewProjectMatrix());
 				sh->SetShaderResourceView("g_parallelShadowMap", m_shadowMap->GetSRV());
 				sh->SetFloat("g_parallelShadowMapSize",static_cast<float>(m_shadowMap->GetSize()));
-				sh->SetEnabledTechnique("UseShadow");
+			}
+			//设置雾效参数
+			if (m_frameData->sceneSetting.enableFog)
+			{
+				sh->SetVector4("g_linearFogColor", m_frameData->sceneSetting.linearFogColor);
+				sh->SetFloat("g_linearFogStart", m_frameData->sceneSetting.linearFogStart);
+				sh->SetFloat("g_linearFogRange", m_frameData->sceneSetting.linearFogRange);
+			}
+			//
+			if (useShadow) 
+			{
+				if (m_frameData->sceneSetting.enableFog)
+				{
+					sh->SetEnabledTechnique("UseLinearFogAndShadow");
+				}
+				else
+				{
+					sh->SetEnabledTechnique("UseShadow");
+				}
 			}
 			else 
 			{
-				sh->SetEnabledTechnique("Default");
+				if (m_frameData->sceneSetting.enableFog) 
+				{
+					sh->SetEnabledTechnique("UseLinearFog");
+				}
+				else 
+				{
+					sh->SetEnabledTechnique("Default");
+				}
 			}
-			//设置雾效参数
-			//if (m_frameData->sceneSetting.enableFog)
-			//{
-			//	sh->SetEnabledTechnique("UseLinearFog");
-			//	sh->SetVector4("g_linearFogColor", m_frameData->sceneSetting.linearFogColor);
-			//	sh->SetFloat("g_linearFogStart", m_frameData->sceneSetting.linearFogStart);
-			//	sh->SetFloat("g_linearFogRange", m_frameData->sceneSetting.linearFogRange);
-			//}
-			//else
-			//{
-			//	sh->SetEnabledTechnique("Default");
-			//}
 			//设置Tranform参数
 			Transform* trans = ent->GetTransform();
 			XMMATRIX worldMat = trans->GetWorldMatrix();

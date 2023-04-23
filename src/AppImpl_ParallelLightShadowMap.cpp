@@ -119,7 +119,7 @@ void BuildScene()
 		renderer->material = new Material(opaShader);
 		renderer->material->SetMainTexture(actorBodyTex);
 		//
-		actor->GetTransform()->position = { 0.0f,-21.0f,300.0f };
+		actor->GetTransform()->position = { 0.0f,-80.0f,300.0f };
 		actor->GetTransform()->rotation = { 0.0f,0.0f,0.0f };
 		actor->GetTransform()->scale = { 100.0f,100.0f,100.0f };
 	}
@@ -306,6 +306,12 @@ void DrawImGUI(Camera* renderingCamera)
 		ImGui::DragFloat("Intensity", &torchLightIntensity, 0.1, 0, 10);
 		ImGui::DragFloat("Distance", &torchLightRange, 1, 100);
 		ImGui::DragFloat("Umbra", &torchLIghtSpot, 1, 10, 80);
+		ImGui::End();
+		//
+		ImGui::Begin(u8"Charactor Model");
+		ImGui::DragFloat3("Position", (float*)&(actor->GetTransform()->position), 1.0f);
+		ImGui::DragFloat3("Rotation", (float*)&(actor->GetTransform()->rotation), 1.0f);
+		ImGui::DragFloat("Specular Power", &actorSpecularPower, 10.0f);
 		ImGui::End();
 	}
 	ImGuiHelper::EndGUI();

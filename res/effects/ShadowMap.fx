@@ -19,14 +19,36 @@ float4 PS(VertexOut_GenShadowMap pin) : SV_Target
     return float4(1,1,1,1);
 }
 
+RasterizerState Depth
+{
+	// [From MSDN]
+	// If the depth buffer currently bound to the output-merger stage has a UNORM format or
+	// no depth buffer is bound the bias value is calculated like this: 
+	//
+	// Bias = (float)DepthBias * r + SlopeScaledDepthBias * MaxDepthSlope;
+	//
+	// where r is the minimum representable value > 0 in the depth-buffer format converted to float32.
+	// [/End MSDN]
+	// 
+	// For a 24-bit depth buffer, r = 1 / 2^24.
+	//
+	// Example: DepthBias = 100000 ==> Actual DepthBias = 100000/2^24 = .006
+
+	// You need to experiment with these values for your scene.
+	DepthBias = 35000;
+    DepthBiasClamp = 0.0f;
+	SlopeScaledDepthBias = 1.0f;
+};
 
 technique11 Default
 {
     pass P0
     {
-		SetDepthStencilState(0, 0);
+		
+		//SetDepthStencilState(0, 0);
         SetVertexShader( CompileShader( vs_5_0, VS_ShadowMap() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS() ) );
+        SetPixelShader( NULL );
+		SetRasterizerState(Depth);
     }
 }

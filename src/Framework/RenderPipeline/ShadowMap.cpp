@@ -3,6 +3,7 @@
 
 namespace Framework 
 {
+
 	ShadowMap::ShadowMap() 
 	{
 
@@ -90,6 +91,11 @@ namespace Framework
 	XMMATRIX ShadowMap::GetViewProjectMatrix() 
 	{
 		return m_viewProjectMatrix;
+	}
+
+	XMMATRIX ShadowMap::GetViewProjectTextureMatrix() 
+	{
+		return m_viewProjectTextureMatrix;
 	}
 
 	unsigned int ShadowMap::GetSize() 

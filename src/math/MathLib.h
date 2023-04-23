@@ -10,6 +10,13 @@ const float NAGETIVE_INFINITY = 0x7F800000 * -1;
 
 #define Angle2Radin(x) x / 180.0f * PI
 
+// Transform NDC space [-1,+1]^2 to texture space [0,1]^2
+const XMMATRIX NDC2TEXTURE(
+	0.5f, 0.0f, 0.0f, 0.0f,
+	0.0f, -0.5f, 0.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.5f, 0.5f, 0.0f, 1.0f);
+
 XMFLOAT3 operator+(const XMFLOAT3& lhs, const XMFLOAT3& rhs);
 XMFLOAT3 operator-(const XMFLOAT3& lhs, const XMFLOAT3& rhs);
 XMFLOAT3 operator*(const XMFLOAT3& lhs, const float& rhs);

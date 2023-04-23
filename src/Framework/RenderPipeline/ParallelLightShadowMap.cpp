@@ -18,8 +18,8 @@ namespace Framework
 		XMMATRIX ret = XMMatrixIdentity();
 		//
 		XMFLOAT3 origin = { 0,0,0 };
-		XMMATRIX litPos = XMMatrixTranslationFromFloat3(sceneAABBW->Center);
-		XMMATRIX litWorldMat = XMMatrixRotationFromFloat3(litRotationW) * litPos;
+		XMFLOAT3 litDirW = XMVectorNormalize(XMFloat3MultiMatrix({ 0,0,1 }, XMMatrixRotationFromFloat3(litRotationW)));
+		XMMATRIX litWorldMat = XMMatrixRotationFromFloat3(litRotationW);
 		XMMATRIX worldToLightSpace = XMMatrixInverse(litWorldMat);
 		XMFLOAT3 maxLitSpace = { NAGETIVE_INFINITY ,NAGETIVE_INFINITY ,NAGETIVE_INFINITY };
 		XMFLOAT3 minLitSpace = { POSITIVE_INFINITY ,POSITIVE_INFINITY ,POSITIVE_INFINITY };
@@ -39,12 +39,16 @@ namespace Framework
 		float sceneHeight = abs(maxLitSpace.y - minLitSpace.y);
 		float sceneWidth = abs(maxLitSpace.x - minLitSpace.x);
 		float sceneDepth = abs(maxLitSpace.z - minLitSpace.z);
-		float cameraSize = max(sceneWidth, sceneHeight);
 		XMMATRIX proj = XMMatrixOrthographicLH(sceneWidth, sceneHeight, 1.0f, sceneDepth + 2.0f);
 		//
-		XMMATRIX toCenter = XMMatrixTranslationFromFloat3({ 0,0,sceneDepth / 2.0f + 1.0f });
-		ret = worldToLightSpace * toCenter * proj;
+		XMFLOAT3 litPosW = sceneAABBW->Center + litDirW * -1 * (sceneDepth / 2.0f + 1.0f);
+		litWorldMat = XMMatrixRotationFromFloat3(litRotationW) * XMMatrixTranslationFromFloat3(litPosW);
+		worldToLightSpace = XMMatrixInverse(litWorldMat);
+		ret = worldToLightSpace * proj;
+		//
 		m_viewProjectMatrix = ret;
+		m_viewProjectTextureMatrix = ret * NDC2TEXTURE;
+		//
 		return ret;
 	}
 }

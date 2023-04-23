@@ -15,6 +15,7 @@ namespace Framework
 		ID3D11ShaderResourceView* GetSRV();
 		D3D11_VIEWPORT* GetViewport();
 		XMMATRIX GetViewProjectMatrix();
+		XMMATRIX GetViewProjectTextureMatrix();
 		unsigned int GetSize();
 	protected:
 		unsigned int m_width{0};
@@ -24,5 +25,6 @@ namespace Framework
 		ID3D11DepthStencilView* m_depthMapDSV;
 		D3D11_VIEWPORT m_viewport;
 		XMMATRIX m_viewProjectMatrix;
+		XMMATRIX m_viewProjectTextureMatrix;
 	};
 }

@@ -1,42 +1,15 @@
 #include "Common.fx"
 
-float4 PS(VertexOut_Common pin,uniform bool gUseLinearFog) : SV_Target
+float4 PS(VertexOut_Common pin,uniform bool gUseLinearFog,uniform bool gUseShadow) : SV_Target
 {
 	//BlinnPhong
 	float3 ambientColor = float3(0,0,0);
 	float3 diffuseColor = float3(0,0,0);
 	float3 speacluarColor = float3(0,0,0);
-	BlinnPhongLightingInWorldSpace(pin.NormalW,pin.PosW,obj_Material,ambientColor,diffuseColor,speacluarColor);
+	BlinnPhongLightingInWorldSpace(pin.NormalW,pin.PosW,obj_Material,gUseShadow,ambientColor,diffuseColor,speacluarColor);
 	
 	float4 texColor = float4(1, 1, 1, 1);
 	texColor = tex2D(g_diffuseMap, pin.TexCoord);
-	//
-	float4 finalColor;
-	finalColor.xyz = texColor.rgb * diffuseColor + speacluarColor;
-	finalColor.w = 1.0f;
-	//
-	if(gUseLinearFog)
-	{
-		finalColor.rgb = CalcuLinearFog(pin.PosW,finalColor.rgb);
-	}
-	//
-    return finalColor;
-}
-
-float4 PS_ShadowMap(VertexOut_ShadowMap pin,uniform bool gUseLinearFog) : SV_Target
-{
-	//BlinnPhong
-	float3 ambientColor = float3(0,0,0);
-	float3 diffuseColor = float3(0,0,0);
-	float3 speacluarColor = float3(0,0,0);
-	BlinnPhongLightingInWorldSpace(pin.NormalW,pin.PosW,obj_Material,ambientColor,diffuseColor,speacluarColor);
-	
-	float4 texColor = float4(1, 1, 1, 1);
-	texColor = tex2D(g_diffuseMap, pin.TexCoord);
-	//
-	float shadowFactor = CalcParallelShadowFactor(pin.ShadowPosH);
-	diffuseColor *= shadowFactor;
-	speacluarColor *= shadowFactor;
 	//
 	float4 finalColor;
 	finalColor.xyz = texColor.rgb * diffuseColor + speacluarColor;
@@ -58,7 +31,7 @@ technique11 Default
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VertexShader_Common() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(false) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(false,false) ) );
     }
 }
 
@@ -70,7 +43,7 @@ technique11 UseLinearFog
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VertexShader_Common() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS(true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(true,false) ) );
     }
 }
 
@@ -78,11 +51,12 @@ technique11 UseShadow
 {
     pass P0
     {
+		SetRasterizerState(0);
 		SetDepthStencilState(0, 0);
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
-        SetVertexShader( CompileShader( vs_5_0, VertexShader_ShadowMap() ) );
+        SetVertexShader( CompileShader( vs_5_0, VertexShader_Common() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS_ShadowMap(false) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(false,true) ) );
     }
 }
 
@@ -92,8 +66,8 @@ technique11 UseLinearFogAndShadow
     {
 		SetDepthStencilState(0, 0);
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
-        SetVertexShader( CompileShader( vs_5_0, VertexShader_ShadowMap() ) );
+        SetVertexShader( CompileShader( vs_5_0, VertexShader_Common() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS_ShadowMap(true) ) );
+        SetPixelShader( CompileShader( ps_5_0, PS(true,true) ) );
     }
 }
