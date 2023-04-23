@@ -62,6 +62,12 @@ namespace Framework
 		return this;
 	}
 
+	Light* Light::EnableShadow(bool enabled) 
+	{
+		m_enabledShadow = enabled;
+		return this;
+	}
+
 	LightInstanceId Light::GetId() 
 	{
 		return m_id;
@@ -110,5 +116,10 @@ namespace Framework
 	float Light::GetSpot() 
 	{
 		return m_spot;
+	}
+
+	bool Light::IsEnableShadow() 
+	{
+		return m_enabledShadow;
 	}
 }

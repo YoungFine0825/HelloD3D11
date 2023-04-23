@@ -84,16 +84,16 @@ namespace Framework
 			}
 		}
 
-		void Blit(RenderTexture* src, RenderTexture* dst) 
+		void Blit(ID3D11ShaderResourceView* srv, Framework::RenderTexture* dst) 
 		{
-			if (src->GetColorTextureSRV() == nullptr) 
+			if (srv == nullptr)
 			{
 				return;
 			}
 			if (m_blitShader == nullptr)
 			{
 				m_blitShader = ShaderManager::LoadFromFxFile("res/effects/BlitCopy.fx");
-				if (m_blitShader == nullptr) 
+				if (m_blitShader == nullptr)
 				{
 					return;
 				}
@@ -101,12 +101,12 @@ namespace Framework
 			//
 			unsigned int dstWid = 0;
 			unsigned int dstHei = 0;
-			if (dst != nullptr) 
+			if (dst != nullptr)
 			{
 				dstWid = dst->GetWidth();
 				dstHei = dst->GetHeight();
 			}
-			else 
+			else
 			{
 				dstWid = win_GetWidth();
 				dstHei = win_GetHeight();
@@ -119,18 +119,36 @@ namespace Framework
 			XMMATRIX triangleWorldMat = scaling * translate;
 			XMMATRIX proj = XMMatrixOrthographicLH(aspectRadtio, 1, 1, 3);
 			m_blitShader->SetMatrix4x4("obj_MatMVP", triangleWorldMat * proj);
-			m_blitShader->SetShaderResourceView("g_diffuseMap", src->GetColorTextureSRV());
+			m_blitShader->SetShaderResourceView("g_diffuseMap", srv);
 			bool hasDepth = dst == nullptr || dst->GetDSV() != nullptr;
 			//
 			SetRenderTarget(dst);
 			ClearBackground(Colors::Black);
-			if (hasDepth) 
+			if (hasDepth)
 			{
 				ClearDepthStencil();
 			}
 			DrawMesh(triangle, m_blitShader);
 			//
 			SetRenderTarget(nullptr);
+		}
+
+		void Blit(RenderTexture* src, RenderTexture* dst) 
+		{
+			if (src->GetColorTextureSRV() == nullptr) 
+			{
+				return;
+			}
+			Blit(src->GetColorTextureSRV(), dst);
+		}
+
+		void Blit(Framework::Texture* texture, Framework::RenderTexture* dst) 
+		{
+			if (texture->GetShaderResourceView() == nullptr) 
+			{
+				return;
+			}
+			Blit(texture->GetShaderResourceView(), dst);
 		}
 	}
 }

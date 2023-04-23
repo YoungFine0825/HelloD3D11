@@ -17,9 +17,10 @@ namespace Framework
 		}
 	}
 
-	void Renderer::SetEnable(bool enabled) 
+	Renderer* Renderer::SetEnable(bool enabled) 
 	{
 		m_isEnabled = enabled;
+		return this;
 	}
 
 	bool Renderer::IsEnabled() 
@@ -30,5 +31,27 @@ namespace Framework
 	Entity* Renderer::GetEntity() 
 	{
 		return m_ent;
+	}
+
+	Renderer* Renderer::EnableCastShadow(bool enabled) 
+	{
+		m_isCastShadow = enabled;
+		return this;
+	}
+
+	bool Renderer::IsCastShadow() 
+	{
+		return m_isCastShadow;
+	}
+
+	Renderer* Renderer::EnableReceiveShadow(bool enabled) 
+	{
+		m_isReceiveShadow = enabled;
+		return this;
+	}
+
+	bool Renderer::IsReceiveShadow() 
+	{
+		return m_isReceiveShadow;
 	}
 }

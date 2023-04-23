@@ -30,6 +30,7 @@ namespace Framework
 		Light* SetIntensity(float i);
 		Light* SetRange(float range);
 		Light* SetSpot(float spot);
+		Light* EnableShadow(bool enabled);
 		//
 		LightInstanceId GetId();
 		std::string GetName();
@@ -41,6 +42,7 @@ namespace Framework
 		float GetIntensity();
 		float GetRange();
 		float GetSpot();
+		bool IsEnableShadow();
 	private:
 		LightInstanceId m_id;
 		std::string m_name;
@@ -52,6 +54,7 @@ namespace Framework
 		float m_intensity = 0;
 		float m_range = 1;
 		float m_spot = 1;//聚光灯本影角（umbra angle）。单位：角度
+		bool m_enabledShadow = false;
 	};
 
 	typedef std::vector<Light*> LightVector;

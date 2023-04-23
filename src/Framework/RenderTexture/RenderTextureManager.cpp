@@ -118,24 +118,28 @@ namespace Framework
 			//
 			if (rtDesc->includeDepthStencil)
 			{
-				texDesc.Format = DEFAULT_DS_BUFFER_FORMAT;
-				texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL ;
+				DXGI_FORMAT depthFormat = DXGI_FORMAT_R24G8_TYPELESS;
+				texDesc.Format = depthFormat;
+				texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 				if (rtDesc->createDepthUAV)
 				{
 					texDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
 				}
 				DXHR(device->CreateTexture2D(&texDesc, 0, &depthStencilTex2D));
-				DXHR(device->CreateDepthStencilView(depthStencilTex2D, 0, &depthStencilBuffer));
 				//
-				if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE) 
-				{
-					srvDesc.Format = DEFAULT_DS_BUFFER_FORMAT;
-					DXHR(device->CreateShaderResourceView(depthStencilTex2D, &srvDesc, &depthStencilSRV));
-				}
+				D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+				dsvDesc.Flags = 0;
+				dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+				dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+				dsvDesc.Texture2D.MipSlice = 0;
+				DXHR(device->CreateDepthStencilView(depthStencilTex2D, &dsvDesc, &depthStencilBuffer));
+				//
+				srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+				DXHR(device->CreateShaderResourceView(depthStencilTex2D, &srvDesc, &depthStencilSRV));
 				//
 				if (rtDesc->createDepthUAV)
 				{
-					uavDesc.Format = DEFAULT_DS_BUFFER_FORMAT;
+					uavDesc.Format = depthFormat;
 					DXHR(device->CreateUnorderedAccessView(depthStencilTex2D, &uavDesc, &depthStencilUAV));
 				}
 			}

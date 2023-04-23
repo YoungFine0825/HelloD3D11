@@ -214,6 +214,15 @@
     <ClCompile Include="src\AppImpl_ForwardRenderPipeline.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\ShadowMap.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\ParallelLightShadowMap.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AppImpl_ParallelLightShadowMap.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -355,6 +364,12 @@
       <Filter>src\Framework\RenderPipeline</Filter>
     </ClInclude>
     <ClInclude Include="src\Framework\RenderPipeline\ShaderStruct.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\ShadowMap.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\ParallelLightShadowMap.h">
       <Filter>src\Framework\RenderPipeline</Filter>
     </ClInclude>
   </ItemGroup>

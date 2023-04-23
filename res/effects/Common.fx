@@ -30,6 +30,9 @@ cbuffer cdPerFrame
 	float4 g_linearFogColor;
 	float g_linearFogStart;
 	float g_linearFogRange;
+	//ShadowMap
+	float4x4 g_parallelShadowMapVP;
+	float g_parallelShadowMapSize;
 }
 
 cbuffer cbPerObject
@@ -47,6 +50,9 @@ cbuffer cbPerObject
 // Nonnumeric values cannot be added to a cbuffer.
 Texture2D g_diffuseMap;
 
+//Parallel light shadow map
+Texture2D g_parallelShadowMap;
+
 SamplerState samAnisotropic
 {
 	Filter = ANISOTROPIC;
@@ -54,6 +60,17 @@ SamplerState samAnisotropic
 
 	AddressU = WRAP;
 	AddressV = WRAP;
+};
+
+SamplerComparisonState samShadow
+{
+	Filter   = COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	AddressU = BORDER;
+	AddressV = BORDER;
+	AddressW = BORDER;
+	BorderColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    ComparisonFunc = LESS;
 };
 
 
@@ -128,4 +145,60 @@ float3 CalcuLinearFog(float3 posW,float3 inputColor)
 	float s = saturate( (disToEye - g_linearFogStart) / g_linearFogRange );
 	float3 ret = (1 - s) * inputColor + s * g_linearFogColor.rgb;
 	return ret;
+}
+
+
+struct VertexOut_ShadowMap
+{
+	float4 PosH  : SV_POSITION;
+	float2 TexCoord : TEXCOORD0;
+	float3 PosW : TEXCOORD1;
+	float3 NormalW : TEXCOORD2;
+	float4 ShadowPosH : TEXCOORD3;
+};
+
+VertexOut_ShadowMap VertexShader_ShadowMap(VertexIn_Common vin)
+{
+	VertexOut_ShadowMap vout;
+	// Transform to homogeneous clip space.
+	vout.PosH = mul(float4(vin.PosL, 1.0f), obj_MatMVP);
+    //
+	vout.TexCoord = vin.Tex.xy * obj_Material.DiffuseMapST.xy + obj_Material.DiffuseMapST.zw;
+	//
+	vout.PosW = mul(float4(vin.PosL, 1.0f), obj_MatWorld).xyz;
+	//
+	vout.NormalW = mul(float4(vin.NormalL, 0.0f), obj_MatNormalWorld).xyz;
+	//
+	vout.ShadowPosH = mul(float4(vout.PosW, 1.0f), g_parallelShadowMapVP);
+    return vout;
+}
+
+
+float CalcParallelShadowFactor(float4 shadowPosH)
+{
+	// Complete projection by doing division by w.
+	shadowPosH.xyz /= shadowPosH.w;
+	
+	// Depth in NDC space.
+	float depth = shadowPosH.z;
+
+	// Texel size.
+	const float dx = 1.0f / g_parallelShadowMapSize;
+	
+	float percentLit = 0.0f;
+	const float2 offsets[9] = 
+	{
+		float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
+		float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
+		float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
+	};
+
+	[unroll]
+	for(int i = 0; i < 9; ++i)
+	{
+		percentLit += g_parallelShadowMap.SampleCmpLevelZero(samShadow, 
+			shadowPosH.xy + offsets[i], depth).r;
+	}
+
+	return percentLit /= 9.0f;
 }

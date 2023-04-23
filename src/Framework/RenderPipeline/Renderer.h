@@ -15,12 +15,18 @@ namespace Framework
 
 		Mesh* mesh;
 		Material* material;
-
+		
 		Entity* GetEntity();
-		void SetEnable(bool enabled);
+		Renderer* SetEnable(bool enabled);
 		bool IsEnabled();
+		Renderer* EnableCastShadow(bool enabled);
+		bool IsCastShadow();
+		Renderer* EnableReceiveShadow(bool enabled);
+		bool IsReceiveShadow();
 	private:
 		bool m_isEnabled = true;
+		bool m_isCastShadow = true;
+		bool m_isReceiveShadow = true;
 		Entity* m_ent;
 	};
 

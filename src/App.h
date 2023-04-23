@@ -7,11 +7,12 @@
 //#define AppImpl_Texture
 //#define AppImpl_Blending
 //#define AppImpl_SceneManager
-//#define  AppImpl_ComputeShader1
-//#define  AppImpl_ComputeShaderBlur
+//#define AppImpl_ComputeShader1
+//#define AppImpl_ComputeShaderBlur
 //#define AppImpl_FlyingCamera
-//#define  AppImpl_FrustmCulling
-#define AppImpl_ForwardRenderPipeline
+//#define AppImpl_FrustmCulling
+//#define AppImpl_ForwardRenderPipeline
+#define AppImpl_ParallelLightShadowMap
 
 void App_PreCreateWindow();
 bool App_Init();

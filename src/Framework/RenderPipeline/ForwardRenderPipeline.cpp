@@ -6,8 +6,11 @@
 #include "../Scene/Light.h"
 #include "../Scene/Entity.h"
 #include "../Collision/CollisionUtils.h"
+#include "../Shader/ShaderManager.h"
+#include "../Shader/Shader.h"
 #include "FrameData.h"
 #include "ForwardRenderPipeline.h"
+#include "ParallelLightShadowMap.h"
 
 namespace Framework 
 {
@@ -24,12 +27,37 @@ namespace Framework
 		}
 		m_lightLists.clear();
 		m_visibleRenderers.clear();
+		if (m_shadowMap) 
+		{
+			delete m_shadowMap;
+			m_shadowMap = nullptr;
+		}
 		RenderPipeline::~RenderPipeline();
+	}
+
+	ForwardRenderPipeline* ForwardRenderPipeline::SetShadowMapSize(unsigned int size)
+	{
+		if (!m_shadowMap) 
+		{
+			m_shadowMap = new ParallelLightShadowMap();
+		}
+		m_shadowMap->SetSize(size);
+		return this;
 	}
 
 	void ForwardRenderPipeline::OnRender() 
 	{
 		size_t cameraCnt = m_frameData->cameras.size();
+		//
+		FindMaxIntensityParallelLight();
+		//Draw ShadowMap
+		if (cameraCnt > 0) 
+		{
+			DrawShadowMap();
+			//
+			//Graphics::Blit(m_shadowMap->GetSRV(), nullptr);
+		}
+		//Draw Scene
 		for (size_t c = 0; c < cameraCnt; ++c) 
 		{
 			m_visibleRenderers.clear();
@@ -73,7 +101,7 @@ namespace Framework
 		XMFLOAT3 cameraPosW = XMFloat3MultiMatrix({ 0,0,0 }, XMMatrixInverse(viewMatrix));
 		//
 		ShaderStruct::ParallelLight mainParallelLit;
-		//传递给GPU的光照数据只能用数组，本来想用vector，但发现不行，数据传递不过去。
+		//传递给GPU的光照数据用数组。本来想用vector，但发现不行，数据传递不过去。
 		ShaderStruct::PointLight* pointLights = new ShaderStruct::PointLight[m_pointLightCnt]();
 		ShaderStruct::SpotLight* spotLights = new ShaderStruct::SpotLight[m_spotLightCnt]();
 		//
@@ -83,25 +111,13 @@ namespace Framework
 			Entity* ent = renderer->GetEntity();
 			Material* mat = renderer->material;
 			Shader* sh = mat->GetShader();
-			//设置雾效参数
-			if (m_frameData->sceneSetting.enableFog)
-			{
-				sh->SetEnabledTechnique("UseLinearFog");
-				sh->SetVector4("g_linearFogColor", m_frameData->sceneSetting.linearFogColor);
-				sh->SetFloat("g_linearFogStart", m_frameData->sceneSetting.linearFogStart);
-				sh->SetFloat("g_linearFogRange", m_frameData->sceneSetting.linearFogRange);
-			}
-			else
-			{
-				sh->SetEnabledTechnique("Default");
-			}
 			//
 			sh->SetVector3("g_CameraPosW", cameraPosW);
 			//设置光照参数
 			InteractedLightSet* lightSet = m_lightLists[r];
 			if (lightSet != nullptr)
 			{
-				sh->SetStruct("g_ParallelLight", &m_curParallelLight, sizeof(m_curParallelLight));
+				sh->SetStruct("g_ParallelLight", &m_maxIntensityParallelLight, sizeof(m_maxIntensityParallelLight));
 				//
 				size_t litCnt = lightSet->pointLights.size();
 				for (size_t i = 0; i < m_pointLightCnt; ++i)
@@ -142,6 +158,31 @@ namespace Framework
 			}
 			sh->SetStruct("g_PointLights", pointLights, sizeof(ShaderStruct::PointLight) * m_pointLightCnt);
 			sh->SetStruct("g_SpotLights", spotLights, sizeof(ShaderStruct::SpotLight) * m_spotLightCnt);
+			//
+			bool useShadow = renderer->IsReceiveShadow() && m_shadowMap != nullptr;
+			if (useShadow) 
+			{
+				sh->SetMatrix4x4("g_parallelShadowMapVP", m_shadowMap->GetViewProjectMatrix());
+				sh->SetShaderResourceView("g_parallelShadowMap", m_shadowMap->GetSRV());
+				sh->SetFloat("g_parallelShadowMapSize",static_cast<float>(m_shadowMap->GetSize()));
+				sh->SetEnabledTechnique("UseShadow");
+			}
+			else 
+			{
+				sh->SetEnabledTechnique("Default");
+			}
+			//设置雾效参数
+			//if (m_frameData->sceneSetting.enableFog)
+			//{
+			//	sh->SetEnabledTechnique("UseLinearFog");
+			//	sh->SetVector4("g_linearFogColor", m_frameData->sceneSetting.linearFogColor);
+			//	sh->SetFloat("g_linearFogStart", m_frameData->sceneSetting.linearFogStart);
+			//	sh->SetFloat("g_linearFogRange", m_frameData->sceneSetting.linearFogRange);
+			//}
+			//else
+			//{
+			//	sh->SetEnabledTechnique("Default");
+			//}
 			//设置Tranform参数
 			Transform* trans = ent->GetTransform();
 			XMMATRIX worldMat = trans->GetWorldMatrix();
@@ -160,13 +201,12 @@ namespace Framework
 		delete[] spotLights;
 	}
 
-	//为每个可见的renderer搜集它受哪些光源影响
-	void ForwardRenderPipeline::GenLightList()
+	void ForwardRenderPipeline::FindMaxIntensityParallelLight()
 	{
-		//
 		size_t litCnt = m_frameData->lights.size();
 		//找出强度最大的平行光
-		ShaderStruct::ParallelLight maxInstensityParallelLit;
+		ShaderStruct::ParallelLight parallelLit;
+		Light* maxIntensityLit = nullptr;
 		for (size_t i = 0; i < litCnt; ++i)
 		{
 			Light* lit = m_frameData->lights[i];
@@ -175,14 +215,31 @@ namespace Framework
 				continue;
 			}
 			if (lit->GetType() != LIGHT_TYPE_DIRECTIONAL) { continue; }
-			if (lit->GetIntensity() > maxInstensityParallelLit.intensity)
+			if (lit->GetIntensity() > parallelLit.intensity)
 			{
-				maxInstensityParallelLit.intensity = lit->GetIntensity();
-				maxInstensityParallelLit.color = lit->GetColor();
-				maxInstensityParallelLit.directionW = lit->GetTransform()->GetWorldSpaceForward();
+				parallelLit.intensity = lit->GetIntensity();
+				parallelLit.color = lit->GetColor();
+				parallelLit.directionW = lit->GetTransform()->GetWorldSpaceForward();
+				maxIntensityLit = lit;
 			}
 		}
 		//
+		m_maxIntensityParallelLight = parallelLit;
+		//
+		if (maxIntensityLit != nullptr) 
+		{
+			m_maxIntensityParallelLightRotW = maxIntensityLit->GetTransform()->rotation;
+		}
+		else 
+		{
+			m_maxIntensityParallelLightRotW = { 0,0,0 };
+		}
+	}
+
+	//为每个可见的renderer搜集它受哪些光源影响
+	void ForwardRenderPipeline::GenLightList()
+	{
+		size_t litCnt = m_frameData->lights.size();
 		size_t rendererCnt = m_visibleRenderers.size();
 		for (size_t r = 0; r < rendererCnt; ++r) 
 		{
@@ -262,8 +319,75 @@ namespace Framework
 					}
 				}
 			}
-			//
-			m_curParallelLight = maxInstensityParallelLit;
+
 		}
+	}
+
+	void ForwardRenderPipeline::DrawShadowMap()
+	{
+		if (!m_shadowMap)
+		{
+			return;
+		}
+		if (m_maxIntensityParallelLight.intensity <= 0)
+		{
+			return;
+		}
+		XMFLOAT3 max = { NAGETIVE_INFINITY ,NAGETIVE_INFINITY ,NAGETIVE_INFINITY };
+		XMFLOAT3 min = { POSITIVE_INFINITY,POSITIVE_INFINITY ,POSITIVE_INFINITY };
+		RendererVector* renderers = &m_frameData->renderers;
+		size_t rendererCnt = renderers->size();
+		for (size_t r = 0; r < rendererCnt; ++r) 
+		{
+			Renderer* renderer = (*renderers)[r];
+			if (renderer->IsCastShadow()) 
+			{
+				AxisAlignedBox aabbW;
+				CollisionUtils::ComputeRendererWorldSpaceAxisAlignedBox(&aabbW, renderer);
+				XMFLOAT3 aabbWMax = aabbW.Center + aabbW.Extents;
+				XMFLOAT3 aabbWMin = aabbW.Center - aabbW.Extents;
+				max.x = aabbWMax.x > max.x ? aabbWMax.x : max.x;
+				max.y = aabbWMax.y > max.y ? aabbWMax.y : max.y;
+				max.z = aabbWMax.z > max.z ? aabbWMax.z : max.z;
+				min.x = aabbWMin.x < min.x ? aabbWMin.x : min.x;
+				min.y = aabbWMin.y < min.y ? aabbWMin.y : min.y;
+				min.z = aabbWMin.z < min.z ? aabbWMin.z : min.z;
+			}
+		}
+		//
+		AxisAlignedBox sceneAABBW;
+		sceneAABBW.Extents = (max - min) * 0.5f;
+		sceneAABBW.Center = min + sceneAABBW.Extents;
+		//
+		XMMATRIX viewProjM = m_shadowMap->BuildViewProjectMartrix(m_maxIntensityParallelLightRotW, &sceneAABBW);
+		//
+		Shader* shader = ShaderManager::FindWithUrl("res/effects/ShadowMap.fx");
+		if (!shader)
+		{
+			shader = ShaderManager::LoadFromFxFile("res/effects/ShadowMap.fx");
+		}
+		//set render target with native api
+		ID3D11DeviceContext* dc = d3dGraphic::GetDeviceContext();
+		dc->RSSetViewports(1, m_shadowMap->GetViewport());
+		ID3D11RenderTargetView* renderTargets[1] = { 0 };
+		dc->OMSetRenderTargets(1, renderTargets, m_shadowMap->GetDSV());
+		dc->ClearDepthStencilView(m_shadowMap->GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		//d3dGraphic::EnableBackCulling(false);
+		//DrawScene
+		for (size_t r = 0; r < rendererCnt; ++r)
+		{
+			Renderer* renderer = (*renderers)[r];
+			if (renderer->IsCastShadow())
+			{
+				Entity* ent = renderer->GetEntity();
+				Transform* trans = ent->GetTransform();
+				XMMATRIX worldMat = trans->GetWorldMatrix();
+				XMMATRIX mvp = worldMat * viewProjM;
+				shader->SetMatrix4x4("obj_MatMVP", mvp);
+				Graphics::DrawMesh(renderer->mesh, shader);
+			}
+		}
+		//let screen being render target
+		Graphics::SetRenderTarget(nullptr);
 	}
 }
