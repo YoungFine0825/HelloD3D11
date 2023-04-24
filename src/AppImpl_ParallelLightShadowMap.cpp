@@ -31,6 +31,7 @@ using namespace Framework;
 
 Light* m_parallelLight;
 XMFLOAT3 m_parallelLightRot = { 50,-45,0 };
+float m_parallelLightIntensity = 1.0f;
 
 Light* torchLight;
 RGBA32 torchLightColor = Colors::White;
@@ -182,7 +183,7 @@ void BuildLights()
 {
 	//
 	m_parallelLight = SceneManager::CreateLight(LIGHT_TYPE_DIRECTIONAL, "Directional");
-	m_parallelLight->SetIntensity(1.0f)
+	m_parallelLight->SetIntensity(m_parallelLightIntensity)
 		->SetColor(Colors::SunLight)
 		->EnableShadow(true)
 		;
@@ -234,6 +235,7 @@ void App_Tick(float dt)
 {
 	dxinput_Tick();
 	m_parallelLight->GetTransform()->rotation = m_parallelLightRot;
+	m_parallelLight->SetIntensity(m_parallelLightIntensity);
 	//
 	if (waterMaterial != nullptr)
 	{
@@ -291,6 +293,7 @@ void DrawImGUI(Camera* renderingCamera)
 		ImGui::Begin(u8"Background And Light");
 		ImGui::ColorEdit3("Background Color", (float*)&m_bgColor);
 		ImGui::DragFloat3("Light Direction", (float*)&m_parallelLightRot, 1.0f);
+		ImGui::SliderFloat("Light Intensity", &m_parallelLightIntensity, 0.0f, 2.0f);
 		ImGui::End();
 		//
 		ImGui::Begin("Flying Camera", nullptr, ImGuiWindowFlags_NoCollapse);

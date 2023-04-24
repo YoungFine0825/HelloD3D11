@@ -112,7 +112,7 @@ float2 ndcxy_to_uv(float2 ndcxy)
 }
 
 
-float CalcParallelShadowFactor(float3 posW)
+float CalcParallelShadowFactor(float3 posW,ParallelLight light)
 {
 	float4 shadowPosH = mul(float4(posW, 1.0f), g_parallelShadowMapVP);
 	
@@ -142,7 +142,8 @@ float CalcParallelShadowFactor(float3 posW)
 			shadowMapUV + offsets[i], depth).r;
 	}
 
-	return percentLit /= 9.0f;
+	float ret = percentLit / 9.0f / light.intensity;
+	return ret;
 }
 
 
@@ -165,7 +166,7 @@ void BlinnPhongLightingInWorldSpace(float3 normalW,float3 posW,Material mat,bool
 	ambientColor += A;
 	if(useParallelShadowMap)
 	{
-		float shadowFactor = CalcParallelShadowFactor(posW) * 0.5f + 0.5f;
+		float shadowFactor = CalcParallelShadowFactor(posW,g_ParallelLight) * 0.5f + 0.5f;
 		diffuseColor += shadowFactor * D;
 		specularColor += shadowFactor * S;
 	}
