@@ -1,6 +1,7 @@
 
 #include "MaterialHelper.fx"
 #include "LightHelper.fx"
+#include "ShadowMapping.fx"
 
 struct VertexIn_Common
 {
@@ -30,9 +31,6 @@ cbuffer cdPerFrame
 	float4 g_linearFogColor;
 	float g_linearFogStart;
 	float g_linearFogRange;
-	//ShadowMap
-	float4x4 g_parallelShadowMapVP;
-	float g_parallelShadowMapSize;
 }
 
 cbuffer cbPerObject
@@ -50,9 +48,6 @@ cbuffer cbPerObject
 // Nonnumeric values cannot be added to a cbuffer.
 Texture2D g_diffuseMap;
 
-//Parallel light shadow map
-Texture2D g_parallelShadowMap;
-
 SamplerState samAnisotropic
 {
 	Filter = ANISOTROPIC;
@@ -61,25 +56,6 @@ SamplerState samAnisotropic
 	AddressU = WRAP;
 	AddressV = WRAP;
 };
-
-SamplerComparisonState samShadow
-{
-	Filter   = COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
-	AddressU = BORDER;
-	AddressV = BORDER;
-	AddressW = BORDER;
-	BorderColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-    ComparisonFunc = LESS;
-};
-
-// SamplerState samShadow
-// {
-	// Filter   = MIN_MAG_MIP_LINEAR;
-	// AddressU = BORDER;
-	// AddressV = BORDER;
-	// AddressW = BORDER;
-// };
 
 
 //通用顶点着色器
@@ -105,47 +81,6 @@ float4 tex2D(Texture2D map,float2 uv)
 	return map.Sample(samAnisotropic, uv);
 }
 
-float2 ndcxy_to_uv(float2 ndcxy) 
-{ 
-	float2 uv = ndcxy * float2(0.5, -0.5) + float2(0.5, 0.5);
-	return uv;
-}
-
-
-float CalcParallelShadowFactor(float3 posW)
-{
-	float4 shadowPosH = mul(float4(posW, 1.0f), g_parallelShadowMapVP);
-	
-	// Complete projection by doing division by w.
-	shadowPosH.xyz /= shadowPosH.w;
-	
-	// Depth in NDC space.
-	float depth = shadowPosH.z;
-	
-	float2 shadowMapUV = ndcxy_to_uv(shadowPosH.xy);
-	
-	//Texel size.
-	const float dx = 1.0f / g_parallelShadowMapSize;
-
-	float percentLit = 0.0f;
-	const float2 offsets[9] = 
-	{
-		float2(-dx,  -dx), float2(0.0f,  -dx), float2(dx,  -dx),
-		float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
-		float2(-dx,  +dx), float2(0.0f,  +dx), float2(dx,  +dx)
-	};
-
-	[unroll]
-	for(int i = 0; i < 9; ++i)
-	{
-		percentLit += g_parallelShadowMap.SampleCmpLevelZero(samShadow, 
-			shadowMapUV + offsets[i], depth).r;
-	}
-
-	float ret = percentLit / 9.0f;
-	return ret;
-}
-
 
 //通用世界空间下，BlinnPhong光照计算
 void BlinnPhongLightingInWorldSpace(float3 normalW,float3 posW,Material mat,bool useParallelShadowMap,
@@ -166,7 +101,7 @@ void BlinnPhongLightingInWorldSpace(float3 normalW,float3 posW,Material mat,bool
 	ambientColor += A;
 	if(useParallelShadowMap && g_ParallelLight.intensity > 0)
 	{
-		float shadowFactor = CalcParallelShadowFactor(posW) / g_ParallelLight.intensity;
+		float shadowFactor = CalcShadowFactor_CSM(posW) / g_ParallelLight.intensity;
 		shadowFactor = shadowFactor * 0.5 + 0.5;
 		diffuseColor += shadowFactor * D;
 		specularColor += shadowFactor * S;

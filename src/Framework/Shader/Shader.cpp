@@ -223,6 +223,20 @@ namespace Framework
 		return this;
 	}
 
+	Shader* Shader::SetArray(const char* propName, void* pData, UINT Count, UINT Offset)
+	{
+		if (m_pEffect == nullptr)
+		{
+			return this;
+		}
+		//
+		ID3DX11EffectVariable* var = m_pEffect->GetVariableByName(propName);
+		if (!var) { return this; }
+		//
+		var->SetRawValue(pData, Offset, Count);
+		return this;
+	}
+
 	Shader* Shader::SetShaderResourceView(const char* propName, ID3D11ShaderResourceView* srv) 
 	{
 		if (m_pEffect == nullptr)

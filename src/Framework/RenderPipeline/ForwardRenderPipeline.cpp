@@ -35,14 +35,13 @@ namespace Framework
 		RenderPipeline::~RenderPipeline();
 	}
 
-	ForwardRenderPipeline* ForwardRenderPipeline::SetShadowMapSize(unsigned int size)
+	ParallelLightShadowMap* ForwardRenderPipeline::GetParallelLightShadowMap() 
 	{
-		if (!m_shadowMap) 
+		if (!m_shadowMap)
 		{
 			m_shadowMap = new ParallelLightShadowMap();
 		}
-		m_shadowMap->SetSize(size);
-		return this;
+		return m_shadowMap;
 	}
 
 	void ForwardRenderPipeline::OnRender() 
@@ -50,16 +49,15 @@ namespace Framework
 		size_t cameraCnt = m_frameData->cameras.size();
 		//
 		FindMaxIntensityParallelLight();
-		//Draw ShadowMap
-		if (cameraCnt > 0) 
+		//
+		if (m_shadowMap) 
 		{
-			DrawShadowMap();
-			//
-			//Graphics::Blit(m_shadowMap->GetSRV(), nullptr);
+			m_shadowMap->PreRender(m_frameData);
 		}
 		//Draw Scene
 		for (size_t c = 0; c < cameraCnt; ++c) 
 		{
+			//
 			m_visibleRenderers.clear();
 			//
 			RenderCamera(m_frameData->cameras[c]);
@@ -77,6 +75,11 @@ namespace Framework
 			m_visibleRenderers.clear();
 		}
 		//
+		if (m_shadowMap)
+		{
+			m_shadowMap->PostRender();
+		}
+		//
 		//输出到屏幕
 		Graphics::Present();
 	}
@@ -90,9 +93,14 @@ namespace Framework
 			return;
 		}
 		//
-		SetupCamera(camera);
-		//
 		SortVisibleRenderers(camera, &m_visibleRenderers);
+		//Draw ShadowMap
+		if (m_shadowMap && m_maxIntensityParallelLight.intensity > 0)
+		{
+			m_shadowMap->Update(camera,&m_visibleRenderers, &m_frameData->renderers, m_maxIntensityParallelLightRotW);
+		}
+		//
+		SetupCamera(camera);
 		//
 		GenLightList();
 		//
@@ -162,9 +170,7 @@ namespace Framework
 			bool useShadow = renderer->IsReceiveShadow() && m_shadowMap != nullptr;
 			if (useShadow) 
 			{
-				sh->SetMatrix4x4("g_parallelShadowMapVP", m_shadowMap->GetViewProjectMatrix());
-				sh->SetShaderResourceView("g_parallelShadowMap", m_shadowMap->GetSRV());
-				sh->SetFloat("g_parallelShadowMapSize",static_cast<float>(m_shadowMap->GetSize()));
+				m_shadowMap->SetShaderParamters(sh);
 			}
 			//设置雾效参数
 			if (m_frameData->sceneSetting.enableFog)
@@ -334,77 +340,5 @@ namespace Framework
 			}
 
 		}
-	}
-
-	void ForwardRenderPipeline::DrawShadowMap()
-	{
-		if (!m_shadowMap)
-		{
-			return;
-		}
-		if (m_maxIntensityParallelLight.intensity <= 0)
-		{
-			return;
-		}
-		XMFLOAT3 max = { NAGETIVE_INFINITY ,NAGETIVE_INFINITY ,NAGETIVE_INFINITY };
-		XMFLOAT3 min = { POSITIVE_INFINITY,POSITIVE_INFINITY ,POSITIVE_INFINITY };
-		RendererVector* renderers = &m_frameData->renderers;
-		size_t rendererCnt = renderers->size();
-		XMFLOAT3 corners[8];
-		for (size_t r = 0; r < rendererCnt; ++r) 
-		{
-			Renderer* renderer = (*renderers)[r];
-			if (renderer->IsCastShadow()) 
-			{
-				XNA::AxisAlignedBox localAABB = renderer->mesh->GetAxisAlignedBox();
-				Transform* transform = renderer->GetEntity()->GetTransform();
-				XMMATRIX worldMat = transform->GetWorldMatrix();
-				CollisionUtils::ComputeAABBCorners(&localAABB, corners);
-				for (int i = 0; i < 8; ++i)
-				{
-					XMFLOAT3 pointW = corners[i] * worldMat;
-					max.x = pointW.x > max.x ? pointW.x : max.x;
-					max.y = pointW.y > max.y ? pointW.y : max.y;
-					max.z = pointW.z > max.z ? pointW.z : max.z;
-					min.x = pointW.x < min.x ? pointW.x : min.x;
-					min.y = pointW.y < min.y ? pointW.y : min.y;
-					min.z = pointW.z < min.z ? pointW.z : min.z;
-				}
-			}
-		}
-		//
-		AxisAlignedBox sceneAABBW;
-		sceneAABBW.Extents = (max - min) * 0.5f;
-		sceneAABBW.Center = min + sceneAABBW.Extents;
-		//
-		XMMATRIX viewProjM = m_shadowMap->BuildViewProjectMartrix(m_maxIntensityParallelLightRotW, &sceneAABBW);
-		//
-		Shader* shader = ShaderManager::FindWithUrl("res/effects/ShadowMap.fx");
-		if (!shader)
-		{
-			shader = ShaderManager::LoadFromFxFile("res/effects/ShadowMap.fx");
-		}
-		//set render target with native api
-		ID3D11DeviceContext* dc = d3dGraphic::GetDeviceContext();
-		dc->RSSetViewports(1, m_shadowMap->GetViewport());
-		ID3D11RenderTargetView* renderTargets[1] = { 0 };
-		dc->OMSetRenderTargets(1, renderTargets, m_shadowMap->GetDSV());
-		dc->ClearDepthStencilView(m_shadowMap->GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-		//DrawScene
-		for (size_t r = 0; r < rendererCnt; ++r)
-		{
-			Renderer* renderer = (*renderers)[r];
-			if (renderer->IsCastShadow())
-			{
-				Entity* ent = renderer->GetEntity();
-				Transform* trans = ent->GetTransform();
-				XMMATRIX worldMat = trans->GetWorldMatrix();
-				XMMATRIX mvp = worldMat * viewProjM;
-				shader->SetMatrix4x4("obj_MatMVP", mvp);
-				Graphics::DrawMesh(renderer->mesh, shader);
-			}
-		}
-		//let screen being render target
-		Graphics::SetRenderTarget(nullptr);
 	}
 }

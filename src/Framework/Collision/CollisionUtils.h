@@ -12,5 +12,10 @@ namespace Framework
 		void ComputeRendererWorldSpaceAxisAlignedBox(AxisAlignedBox* axisAlignedBoxW, Renderer* renderer);
 		bool IntersectRendererCamera(Renderer* renderer,Camera* camera);
 		void ComputeAABBCorners(const AxisAlignedBox* aabb, XMFLOAT3 array[8]);
+		void ComputeAABBFromCorners(AxisAlignedBox* aabb, XMFLOAT3 corners[8],XMMATRIX trans = XMMatrixIdentity());
+		void ComputeAABBDismension(const AxisAlignedBox* aabb, float* width, float* height, float* depth);
+		void ComputeWorldSpaceFrustumFromProj(Frustum* pOut, XMMATRIX proj,XMMATRIX worldMatrix);
+		void ComputeFrustumVertices(XMFLOAT3 array[8], float fov, float aspect, float nearDistance, float farDistance);
+		void TransformAABB(const AxisAlignedBox* aabbIn, const XMMATRIX transform, AxisAlignedBox* aabbOut);
 	}
 }

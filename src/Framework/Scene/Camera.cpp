@@ -99,7 +99,7 @@ namespace Framework
 	float Camera::GetAspectRatio() { return m_aspectRatio; }
 	float Camera::GetFov() { return m_fov; }
 	float Camera::GetSize() { return m_size; }
-	float Camera::GetNearClipDistance() { return m_farClipDistance; }
+	float Camera::GetNearClipDistance() { return m_nearClipDistance; }
 	float Camera::GetFarClipDistance() { return m_farClipDistance; }
 
 

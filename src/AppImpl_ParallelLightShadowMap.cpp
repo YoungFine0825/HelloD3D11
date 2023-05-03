@@ -26,6 +26,7 @@
 #include "Framework/Utils/GizmosHelper.h"
 
 #include "Framework/RenderPipeline/ForwardRenderPipeline.h"
+#include "Framework/RenderPipeline/ParallelLightShadowMap.h"
 
 using namespace Framework;
 
@@ -59,6 +60,10 @@ FlyingCameraEntity* flyCameraEnt2;
 int curCameraIndex = 1;
 
 ForwardRenderPipeline* forwardRenderPipeline;
+ParallelLightShadowMap* parallelLightSM;
+
+unsigned int shadowMapSize = 2048;
+float nearestShadowDistance = 500;
 
 void DrawImGUI(Camera* renderingCamera);
 void DrawGizmos(Camera* renderingCamera);
@@ -217,7 +222,10 @@ bool App_Init()
 	forwardRenderPipeline = new ForwardRenderPipeline();
 	forwardRenderPipeline->SetDrawGUICallBack(DrawImGUI);
 	forwardRenderPipeline->SetDrawGizmosCallBack(DrawGizmos);
-	forwardRenderPipeline->SetShadowMapSize(2048);
+	//
+	parallelLightSM = forwardRenderPipeline->GetParallelLightShadowMap();
+	parallelLightSM->SetSize(shadowMapSize);
+	parallelLightSM->SetNearestShadowDistance(nearestShadowDistance);
 	//
 	SceneManager::Init(forwardRenderPipeline);
 	GizmosHelper::Init();
@@ -283,6 +291,11 @@ void App_Tick(float dt)
 		XMFLOAT3 posOffset = XMFloat3MultiMatrix(pointLightOffsetDir, rot);
 		trans->position = actor->GetTransform()->position + posOffset;
 	}
+	//
+	if (parallelLightSM) 
+	{
+		parallelLightSM->SetNearestShadowDistance(nearestShadowDistance);
+	}
 }
 
 void DrawImGUI(Camera* renderingCamera)
@@ -315,6 +328,10 @@ void DrawImGUI(Camera* renderingCamera)
 		ImGui::DragFloat3("Position", (float*)&(actor->GetTransform()->position), 1.0f);
 		ImGui::DragFloat3("Rotation", (float*)&(actor->GetTransform()->rotation), 1.0f);
 		ImGui::DragFloat("Specular Power", &actorSpecularPower, 10.0f);
+		ImGui::End();
+		//
+		ImGui::Begin(u8"Shadow Map");
+		ImGui::DragFloat("Nearest Shadow Distance", &nearestShadowDistance, 10.0f,400.0f,1000.0f);
 		ImGui::End();
 	}
 	ImGuiHelper::EndGUI();

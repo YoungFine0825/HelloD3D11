@@ -67,5 +67,90 @@ namespace Framework
 			array[6] = min;
 			array[7] = min + XMFLOAT3{ width,0,0 };
 		}
+
+		void ComputeAABBFromCorners(AxisAlignedBox* aabb, XMFLOAT3 corners[8], XMMATRIX trans) 
+		{
+			XMFLOAT3 max = { NAGETIVE_INFINITY ,NAGETIVE_INFINITY ,NAGETIVE_INFINITY };
+			XMFLOAT3 min = { POSITIVE_INFINITY,POSITIVE_INFINITY ,POSITIVE_INFINITY };
+			for (int i = 0; i < 8; ++i)
+			{
+				XMFLOAT3 pointW = corners[i] * trans;
+				max.x = pointW.x > max.x ? pointW.x : max.x;
+				max.y = pointW.y > max.y ? pointW.y : max.y;
+				max.z = pointW.z > max.z ? pointW.z : max.z;
+				min.x = pointW.x < min.x ? pointW.x : min.x;
+				min.y = pointW.y < min.y ? pointW.y : min.y;
+				min.z = pointW.z < min.z ? pointW.z : min.z;
+			}
+			aabb->Extents = (max - min) * 0.5f;
+			aabb->Center = min + aabb->Extents;
+		}
+
+		void ComputeAABBDismension(const AxisAlignedBox* aabb, float* width, float* height, float* depth) 
+		{
+			XMFLOAT3 max = aabb->Center + aabb->Extents;
+			XMFLOAT3 min = aabb->Center - aabb->Extents;
+			if (width) 
+			{
+				(*width) = abs(max.x - min.x);
+			}
+			if (height) 
+			{
+				(*height) = abs(max.y - min.y);
+			}
+			if (depth) 
+			{
+				(*depth) = abs(max.z - min.z);
+			}
+		}
+
+		void ComputeWorldSpaceFrustumFromProj(Frustum* pOut, XMMATRIX proj, XMMATRIX worldMatrix)
+		{
+			Frustum frustumV;
+			XNA::ComputeFrustumFromProjection(&frustumV, &proj);
+			XMVECTOR scale;
+			XMVECTOR rotQuat;
+			XMVECTOR translation;
+			XMMatrixDecompose(&scale, &rotQuat, &translation, worldMatrix);
+			XNA::TransformFrustum(pOut, &frustumV, 1, rotQuat, translation);
+		}
+
+		void ComputeFrustumVertices(XMFLOAT3 array[8], float fov, float aspect, float nearDistance, float farDistance) 
+		{
+			float topF = farDistance * tan(Angle2Radin(fov) / 2.0f);
+			float bottomF = topF * -1;
+			float rightF = topF * aspect;
+			float leftF = rightF * -1;
+			//
+			array[0] = { rightF,topF,nearDistance };
+			array[1] = { leftF,topF,nearDistance };
+			array[2] = { rightF,bottomF,nearDistance };
+			array[3] = { leftF,bottomF,nearDistance };
+			//
+			array[4] = { rightF,topF,farDistance };
+			array[5] = { leftF,topF,farDistance };
+			array[6] = { rightF,bottomF,farDistance };
+			array[7] = { leftF,bottomF,farDistance };
+		}
+
+		void TransformAABB(const AxisAlignedBox* aabbIn, const XMMATRIX transform, AxisAlignedBox* aabbOut) 
+		{
+			XMFLOAT3 corners[8];
+			ComputeAABBCorners(aabbIn, corners);
+			XMFLOAT3 max = { NAGETIVE_INFINITY ,NAGETIVE_INFINITY ,NAGETIVE_INFINITY };
+			XMFLOAT3 min = { POSITIVE_INFINITY ,POSITIVE_INFINITY ,POSITIVE_INFINITY };
+			for (int i = 0; i < 8; ++i)
+			{
+				XMFLOAT3 corner = XMFloat3MultiMatrix(corners[i], transform);
+				max.x = corner.x > max.x ? corner.x : max.x;
+				max.y = corner.y > max.y ? corner.y : max.y;
+				max.z = corner.z > max.z ? corner.z : max.z;
+				min.x = corner.x < min.x ? corner.x : min.x;
+				min.y = corner.y < min.y ? corner.y : min.y;
+				min.z = corner.z < min.z ? corner.z : min.z;
+			}
+			aabbOut->Extents = (max - min) * 0.5f;
+			aabbOut->Center = min + aabbOut->Extents;
+		}
 	}
 }

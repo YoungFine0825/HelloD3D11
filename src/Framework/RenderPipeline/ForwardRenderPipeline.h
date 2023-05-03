@@ -13,7 +13,7 @@ namespace Framework
 		ForwardRenderPipeline();
 		~ForwardRenderPipeline();
 		//
-		ForwardRenderPipeline* SetShadowMapSize(unsigned int size);
+		ParallelLightShadowMap* GetParallelLightShadowMap();
 	protected:
 		void OnRender() override;
 	private:
@@ -43,6 +43,5 @@ namespace Framework
 		void GenLightList();
 		//
 		ParallelLightShadowMap* m_shadowMap;
-		void DrawShadowMap();
 	};
 }
