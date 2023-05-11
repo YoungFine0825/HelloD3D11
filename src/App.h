@@ -12,7 +12,8 @@
 //#define AppImpl_FlyingCamera
 //#define AppImpl_FrustmCulling
 //#define AppImpl_ForwardRenderPipeline
-#define AppImpl_ParallelLightShadowMap
+//#define AppImpl_ParallelLightShadowMap
+#define  AppImpl_IdTech4Map
 
 void App_PreCreateWindow();
 bool App_Init();

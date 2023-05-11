@@ -59,6 +59,9 @@
     <Filter Include="src\Framework\RenderPipeline">
       <UniqueIdentifier>{457180d0-2376-41c7-ad1c-b811ab1a8a14}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\IdTech4">
+      <UniqueIdentifier>{7ed49320-aab4-4b4c-bb5e-0325bbd451fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -223,6 +226,24 @@
     <ClCompile Include="src\AppImpl_ParallelLightShadowMap.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\AppImpl_IdTech4Map.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IdTech4\MapFile.cpp">
+      <Filter>src\IdTech4</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IdTech4\MapFileParser.cpp">
+      <Filter>src\IdTech4</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IdTech4\MapModelSurface.cpp">
+      <Filter>src\IdTech4</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IdTech4\MapModel.cpp">
+      <Filter>src\IdTech4</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IdTech4\MapEntity.cpp">
+      <Filter>src\IdTech4</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -371,6 +392,12 @@
     </ClInclude>
     <ClInclude Include="src\Framework\RenderPipeline\ParallelLightShadowMap.h">
       <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IdTech4\MapFile.h">
+      <Filter>src\IdTech4</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IdTech4\MapFileParser.h">
+      <Filter>src\IdTech4</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

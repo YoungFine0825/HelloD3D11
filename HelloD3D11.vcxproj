@@ -153,6 +153,7 @@
     <ClCompile Include="src\AppImpl_ComputeShaderBlur.cpp" />
     <ClCompile Include="src\AppImpl_FlyingCamera.cpp" />
     <ClCompile Include="src\AppImpl_FrustmCulling.cpp" />
+    <ClCompile Include="src\AppImpl_IdTech4Map.cpp" />
     <ClCompile Include="src\AppImpl_SceneManager.cpp" />
     <ClCompile Include="src\AppImpl_Empty.cpp" />
     <ClCompile Include="src\AppImpl_HelloWorld.cpp" />
@@ -192,6 +193,11 @@
     <ClCompile Include="src\Framework\Texture\TextureManager.cpp" />
     <ClCompile Include="src\Framework\Utils\FlyingCameraEntity.cpp" />
     <ClCompile Include="src\Framework\Utils\GizmosHelper.cpp" />
+    <ClCompile Include="src\IdTech4\MapEntity.cpp" />
+    <ClCompile Include="src\IdTech4\MapFile.cpp" />
+    <ClCompile Include="src\IdTech4\MapFileParser.cpp" />
+    <ClCompile Include="src\IdTech4\MapModel.cpp" />
+    <ClCompile Include="src\IdTech4\MapModelSurface.cpp" />
     <ClCompile Include="src\imgui-1.87\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\imgui-1.87\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="src\imgui-1.87\imgui.cpp" />
@@ -242,6 +248,8 @@
     <ClInclude Include="src\Framework\Utils\FlyingCameraEntity.h" />
     <ClInclude Include="src\Framework\Utils\GizmosHelper.h" />
     <ClInclude Include="src\Global.h" />
+    <ClInclude Include="src\IdTech4\MapFile.h" />
+    <ClInclude Include="src\IdTech4\MapFileParser.h" />
     <ClInclude Include="src\imgui-1.87\backends\imgui_impl_dx11.h" />
     <ClInclude Include="src\imgui-1.87\backends\imgui_impl_win32.h" />
     <ClInclude Include="src\imgui-1.87\imconfig.h" />
