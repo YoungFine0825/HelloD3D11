@@ -1,3 +1,4 @@
+#include <sstream>
 #include "MapFile.h"
 
 namespace IdTech4 
@@ -12,24 +13,6 @@ namespace IdTech4
 		m_values.clear();
 	}
 
-	MapEntityPtr MapEntity::SetName(std::string name) 
-	{
-		m_name = name;
-		return this;
-	}
-
-	MapEntityPtr MapEntity::SetClassName(std::string className) 
-	{
-		m_className = className;
-		return this;
-	}
-
-	MapEntityPtr MapEntity::SetOrigin(XMFLOAT3 origin)
-	{
-		m_origin = origin;
-		return this;
-	}
-
 	MapEntityPtr MapEntity::AddKeyValue(std::string key, std::string value) 
 	{
 		m_values[key] = value;
@@ -38,17 +21,25 @@ namespace IdTech4
 
 	std::string MapEntity::GetName() 
 	{
-		return m_name;
+		std::string name;
+		_FindValue("name", name);
+		return name;
 	}
 
 	std::string MapEntity::GetClassName() 
 	{
-		return m_className;
+		std::string className;
+		_FindValue("classname", className);
+		return className;
 	}
 
 	XMFLOAT3 MapEntity::GetOrigin() 
 	{
-		return m_origin;
+		XMFLOAT3 origin = GetFloat3("origin");
+		float y = origin.y;
+		origin.y = origin.z;
+		origin.z = y;
+		return origin;
 	}
 
 	bool MapEntity::_FindValue(const std::string key, std::string& out)
@@ -84,7 +75,7 @@ namespace IdTech4
 			return 0;
 		}
 		int numberCnt = _IsMultiNumbers(value);
-		if (numberCnt > 0) 
+		if (numberCnt > 1) 
 		{
 			return 0;
 		}
@@ -100,7 +91,7 @@ namespace IdTech4
 			return false;
 		}
 		int numberCnt = _IsMultiNumbers(value);
-		if (numberCnt > 0)
+		if (numberCnt > 1)
 		{
 			return false;
 		}
@@ -138,28 +129,16 @@ namespace IdTech4
 		{
 			return { 0,0,0 };
 		}
-		std::vector<size_t> spaceCharPos;
-		for (size_t c = 0; c < value.length(); ++c)
+		std::string token;
+		std::istringstream ss(value);
+		float f3[3] = { 0,0,0 };
+		int fIdx = 0;
+		while (ss >> token) 
 		{
-			if (value[c] == ' ')
-			{
-				spaceCharPos.push_back(c);
-			}
+			f3[fIdx] = std::stof(token);
+			++fIdx;
+			if (fIdx >= 3) { break; }
 		}
-		if (spaceCharPos.size() < 2)
-		{
-			return { 0,0,0 };
-		}
-		spaceCharPos.push_back(value.length());
-		int offset = 0;
-		std::vector<float> numbers;
-		for (size_t p = 0; p < spaceCharPos.size(); ++p)
-		{
-			size_t len = spaceCharPos[p] - offset;
-			std::string number = value.substr(offset, len);
-			numbers.push_back(std::stof(number));
-			offset = spaceCharPos[p];
-		}
-		return { numbers[0],numbers[1],numbers[2] };
+		return { f3[0],f3[1],f3[2] };
 	}
 }

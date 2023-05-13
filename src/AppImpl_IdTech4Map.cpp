@@ -2,7 +2,7 @@
 #include "App.h"
 
 #ifdef  AppImpl_IdTech4Map
-
+#include <iostream>
 #include "d3d/DXInput.h"
 #include "Window.h"
 #include "math/MathLib.h"
@@ -25,6 +25,8 @@
 #include "Framework/Utils/GizmosHelper.h"
 #include "Framework/RenderPipeline/ForwardRenderPipeline.h"
 #include "Framework/RenderPipeline/ParallelLightShadowMap.h"
+#include "Framework/Material/MaterialManager.h"
+#include "Framework/Scene/IdTech4SceneCreator.h"
 
 using namespace Framework;
 
@@ -51,20 +53,12 @@ void App_PreCreateWindow()
 	win_SetHeight(720);
 }
 
-
 void BuildScene()
 {
-	Shader* opaShader = ShaderManager::LoadFromFxFile("res/effects/UnlitOpaque.fx");
+	CreateSceneFromIdTech4MapFile("res/idtech4/maps/test_scene.proc");
 	//
-	mainCamera = SceneManager::CreateCamera("MainCamera");
-	mainCamera->SetAspectRatio(win_GetAspectRatio())
-		->SetBackgroundColor(m_bgColor)
-		->SetClearFlag(CAMERA_CLEAR_SOLID_COLOR)
-		->SetNearClipDistance(1.0f)
-		->SetFarClipDistance(5000)
-		->SetFov(45)
-		;
-	mainCamera->GetTransform()->position = { 0,0,-270 };
+	mainCamera = SceneManager::CreateDefaultMainCamera();
+	mainCamera->SetBackgroundColor(m_bgColor);
 	//
 	flyCameraEnt = new FlyingCameraEntity("FlyingCamera");
 	flyCameraEnt->AttachCamera(mainCamera);
@@ -72,6 +66,7 @@ void BuildScene()
 	flyCameraEnt->SetEnable(true);
 	//
 	SceneManager::EnableLinearFog(false);
+	//
 }
 
 void BuildLights()
@@ -95,6 +90,10 @@ bool App_Init()
 	forwardRenderPipeline = new ForwardRenderPipeline();
 	forwardRenderPipeline->SetDrawGUICallBack(DrawImGUI);
 	forwardRenderPipeline->SetDrawGizmosCallBack(DrawGizmos);
+	//
+	ParallelLightShadowMap*  parallelLightSM = forwardRenderPipeline->GetParallelLightShadowMap();
+	parallelLightSM->SetSize(2048);
+	parallelLightSM->SetNearestShadowDistance(500);
 	//
 	SceneManager::Init(forwardRenderPipeline);
 	GizmosHelper::Init();
@@ -154,7 +153,7 @@ void DrawEntityAABB(Entity* ent, Camera* renderingCamera)
 	}
 	for (unsigned int r = 0; r < rendererCnt; ++r)
 	{
-		AxisAlignedBox bbox = ent->GetRenderer(r)->mesh->GetAxisAlignedBox();
+		AxisAlignedBox bbox = ent->GetRenderer(r)->GetMeshInstance()->GetAxisAlignedBox();
 		Transform* trans = ent->GetTransform();
 		XMMATRIX scalingMat = XMMatrixScaling(bbox.Extents.x, bbox.Extents.y, bbox.Extents.z);
 		XMMATRIX translateMat = XMMatrixTranslationFromFloat3(bbox.Center);

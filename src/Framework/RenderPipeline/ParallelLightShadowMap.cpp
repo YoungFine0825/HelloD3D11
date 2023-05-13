@@ -159,17 +159,21 @@ namespace Framework
 
 	void ParallelLightShadowMap::PreRender(FrameData* frameData) 
 	{
-		XMFLOAT3 max = { NAGETIVE_INFINITY ,NAGETIVE_INFINITY ,NAGETIVE_INFINITY };
-		XMFLOAT3 min = { POSITIVE_INFINITY,POSITIVE_INFINITY ,POSITIVE_INFINITY };
 		RendererVector* renderers = &frameData->renderers;
 		size_t rendererCnt = renderers->size();
+		if (rendererCnt <= 0) 
+		{
+			return;
+		}
+		XMFLOAT3 max = { NAGETIVE_INFINITY ,NAGETIVE_INFINITY ,NAGETIVE_INFINITY };
+		XMFLOAT3 min = { POSITIVE_INFINITY,POSITIVE_INFINITY ,POSITIVE_INFINITY };
 		XMFLOAT3 corners[8];
 		for (size_t r = 0; r < rendererCnt; ++r)
 		{
 			Renderer* renderer = (*renderers)[r];
-			if (renderer->IsCastShadow())
+			if (renderer->GetMaterialInstance()->IsCastShadow())
 			{
-				XNA::AxisAlignedBox localAABB = renderer->mesh->GetAxisAlignedBox();
+				XNA::AxisAlignedBox localAABB = renderer->GetMeshInstance()->GetAxisAlignedBox();
 				Transform* transform = renderer->GetEntity()->GetTransform();
 				XMMATRIX worldMat = transform->GetWorldMatrix();
 				CollisionUtils::ComputeAABBCorners(&localAABB, corners);
@@ -214,14 +218,14 @@ namespace Framework
 			for (size_t r = 0; r < rendererCnt; ++r)
 			{
 				Renderer* renderer = (*allRenderers)[r];
-				if (renderer->IsCastShadow())
+				if (renderer->GetMaterialInstance()->IsCastShadow())
 				{
 					Entity* ent = renderer->GetEntity();
 					Transform* trans = ent->GetTransform();
 					XMMATRIX worldMat = trans->GetWorldMatrix();
 					XMMATRIX mvp = worldMat * m_cascadeParts[i].m_viewProjectMatrix;
 					shader->SetMatrix4x4("obj_MatMVP", mvp);
-					Graphics::DrawMesh(renderer->mesh, shader);
+					Graphics::DrawMesh(renderer->GetMeshInstance(), shader);
 				}
 			}
 		}

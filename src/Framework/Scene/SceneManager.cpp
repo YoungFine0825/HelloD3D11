@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "SceneManager.h"
 #include "../../Global.h"
+#include "../../Window.h"
 #include "../Graphic.h"
 #include "../Light/LightManager.h"
 #include "../RenderTexture/RenderTexture.h"
@@ -220,6 +221,23 @@ namespace Framework
 			return true;
 		}
 
+		Camera* CreateDefaultMainCamera() 
+		{
+			Camera* mainCamera = GetCamera("MainCamera");
+			if (mainCamera)
+			{
+				return mainCamera;
+			}
+			mainCamera = SceneManager::CreateCamera("MainCamera");
+			mainCamera->SetAspectRatio(win_GetAspectRatio())
+				->SetClearFlag(CAMERA_CLEAR_SOLID_COLOR)
+				->SetNearClipDistance(1.0f)
+				->SetFarClipDistance(5000)
+				->SetFov(45)
+				;
+			return mainCamera;
+		}
+
 
 		Light* FindLight(const std::string name) 
 		{
@@ -325,6 +343,12 @@ namespace Framework
 			m_frameData->sceneSetting.linearFogRange = m_linearFogRange;
 		}
 
+		bool isRenderValid(Renderer* r) 
+		{
+			bool ret = (r->IsEnabled() && r->GetMeshInstance() != nullptr && r->GetMaterialInstance() != nullptr && r->GetMaterialInstance()->GetShader() != nullptr);
+			return ret;
+		}
+
 		void DrawOneFrame() 
 		{
 			if (m_cameras.size() <= 0) 
@@ -367,7 +391,7 @@ namespace Framework
 						for (unsigned int rIdx = 0; rIdx < rendererCnt; ++rIdx)
 						{
 							Renderer* r = m_entities[i]->GetRenderer(rIdx);
-							if (r->IsEnabled() && r->mesh != nullptr && r->material != nullptr && r->material->GetShader() != nullptr)
+							if (isRenderValid(r))
 							{
 								m_frameData->renderers.push_back(r);
 							}
@@ -375,7 +399,7 @@ namespace Framework
 					}
 				}
 				//
-				if (m_frameData->cameras.size() <= 0 || m_frameData->renderers.size() <= 0) 
+				if (m_frameData->cameras.size() <= 0) 
 				{
 					return;
 				}
@@ -429,6 +453,10 @@ namespace Framework
 
 		bool isRendererVisible(Renderer* renderer,Frustum worldSpaceFrustum)
 		{
+			if (renderer->GetMaterialInstance()->GetRenderQueue() == RENDER_QUEUE_BACKGROUND)
+			{
+				return true;
+			}
 			AxisAlignedBox worldSpaceAABB;
 			CollisionUtils::ComputeRendererWorldSpaceAxisAlignedBox(&worldSpaceAABB, renderer);
 			int intersect = CollisionUtils::IntersectAxisAlignedBoxFrustum(&worldSpaceAABB, &worldSpaceFrustum);
@@ -450,7 +478,7 @@ namespace Framework
 					for (unsigned int rIdx = 0; rIdx < rendererCnt; ++rIdx)
 					{
 						Renderer* r = m_entities[i]->GetRenderer(rIdx);
-						if (r->IsEnabled() && r->mesh != nullptr && r->material != nullptr && r->material->GetShader() != nullptr) 
+						if (isRenderValid(r)) 
 						{
 							if (isRendererVisible(r, frustm))
 							{
@@ -467,9 +495,11 @@ namespace Framework
 			sort(list->begin(), list->end(), 
 				[viewMatrix](Renderer* a, Renderer* b)
 				{
-					if (a->material->renderQueue == b->material->renderQueue)
+					MaterialRenderQueue queueA = a->GetMaterialInstance()->GetRenderQueue();
+					MaterialRenderQueue queueB = b->GetMaterialInstance()->GetRenderQueue();
+					if (queueA == queueB)
 					{
-						if (a->material->renderQueue == RENDER_QUEUE_TRANSPARENT)
+						if (queueA == RENDER_QUEUE_TRANSPARENT)
 						{
 							XMFLOAT3 entPos = a->GetEntity()->GetTransform()->position;
 							XMFLOAT3 posA = XMFloat3MultiMatrix(entPos, viewMatrix);
@@ -484,7 +514,7 @@ namespace Framework
 							return a->GetEntity()->GetInstanceId() < b->GetEntity()->GetInstanceId();
 						}
 					}
-					return a->material->renderQueue <= b->material->renderQueue;
+					return queueA <= queueB;
 				}
 			);
 		}
@@ -492,7 +522,7 @@ namespace Framework
 		void DrawRenderer(Renderer* r, XMFLOAT3 cameraPosW, XMMATRIX viewMatrix, XMMATRIX projectMatrix)
 		{
 			Entity* ent = r->GetEntity();
-			Material* mat = r->material;
+			Material* mat = r->GetMaterialInstance();
 			Shader* sh = mat->GetShader();
 			//
 			if (m_enableFog)
@@ -521,7 +551,7 @@ namespace Framework
 			//
 			mat->Apply();
 			//
-			Graphics::DrawMesh(r->mesh, sh);
+			Graphics::DrawMesh(r->GetMeshInstance(), sh);
 		}
 
 		void DrawOneFrame(XNA::Frustum frustm,XMMATRIX viewMatrix, XMMATRIX projectMatrix)

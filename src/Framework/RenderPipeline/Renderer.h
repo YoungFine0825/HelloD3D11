@@ -13,21 +13,20 @@ namespace Framework
 		Renderer(Entity* ent);
 		~Renderer();
 
-		Mesh* mesh;
-		Material* material;
-		
 		Entity* GetEntity();
 		Renderer* SetEnable(bool enabled);
 		bool IsEnabled();
-		Renderer* EnableCastShadow(bool enabled);
-		bool IsCastShadow();
-		Renderer* EnableReceiveShadow(bool enabled);
-		bool IsReceiveShadow();
+
+		Material* GetMaterialInstance();
+		Renderer* SetMaterialInstance(Material* inst);
+
+		Mesh* GetMeshInstance();
+		Renderer* SetMeshInstance(Mesh* inst);
 	private:
 		bool m_isEnabled = true;
-		bool m_isCastShadow = true;
-		bool m_isReceiveShadow = true;
 		Entity* m_ent;
+		Material* m_material;
+		Mesh* m_mesh;
 	};
 
 	typedef std::vector<Renderer*> RendererVector;

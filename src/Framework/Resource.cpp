@@ -30,7 +30,7 @@ namespace Framework
 			ResourcesMap::iterator it = m_resMap.find(m_id);
 			if (it != m_resMap.end()) 
 			{
-				m_resMap.erase(m_resMap.find(m_id));
+				m_resMap.erase(it);
 			}
 		}
 

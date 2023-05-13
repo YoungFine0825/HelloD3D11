@@ -52,6 +52,7 @@ technique11 Default
 {
     pass P0
     {
+		SetRasterizerState(0);
 		SetDepthStencilState(DSS, 0);
 		SetBlendState(blend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VertexShader_Common() ) );
@@ -64,6 +65,7 @@ technique11 UseLinearFog
 {
     pass P0
     {
+		SetRasterizerState(0);
 		SetDepthStencilState(DSS, 0);
 		SetBlendState(blend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VertexShader_Common() ) );

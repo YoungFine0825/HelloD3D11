@@ -10,10 +10,10 @@ namespace Framework
 	Renderer::~Renderer() 
 	{
 		m_ent = nullptr;
-		mesh = nullptr;
-		if (material != nullptr) 
+		m_mesh = nullptr;
+		if (m_material != nullptr) 
 		{
-			delete material;
+			delete m_material;
 		}
 	}
 
@@ -33,25 +33,29 @@ namespace Framework
 		return m_ent;
 	}
 
-	Renderer* Renderer::EnableCastShadow(bool enabled) 
+	Material* Renderer::GetMaterialInstance() 
 	{
-		m_isCastShadow = enabled;
+		return m_material;
+	}
+
+	Renderer* Renderer::SetMaterialInstance(Material* inst) 
+	{
+		if (m_material) 
+		{
+			delete m_material;
+		}
+		m_material = inst;
 		return this;
 	}
 
-	bool Renderer::IsCastShadow() 
+	Mesh* Renderer::GetMeshInstance() 
 	{
-		return m_isCastShadow;
+		return m_mesh;
 	}
 
-	Renderer* Renderer::EnableReceiveShadow(bool enabled) 
+	Renderer* Renderer::SetMeshInstance(Mesh* inst)
 	{
-		m_isReceiveShadow = enabled;
+		m_mesh = inst;
 		return this;
-	}
-
-	bool Renderer::IsReceiveShadow() 
-	{
-		return m_isReceiveShadow;
 	}
 }

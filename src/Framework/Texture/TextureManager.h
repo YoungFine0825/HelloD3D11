@@ -11,5 +11,6 @@ namespace Framework
 		void Cleanup();
 		//
 		Texture* LoadDDSFromFile(Resource::ResourceUrl url);
+		Texture* LoadFromFile(Resource::ResourceUrl url);
 	}
 }

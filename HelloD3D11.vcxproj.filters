@@ -244,6 +244,12 @@
     <ClCompile Include="src\IdTech4\MapEntity.cpp">
       <Filter>src\IdTech4</Filter>
     </ClCompile>
+    <ClCompile Include="src\Framework\Material\MaterialManager.cpp">
+      <Filter>src\Framework\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Scene\IdTech4SceneCreator.cpp">
+      <Filter>src\Framework\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -398,6 +404,15 @@
     </ClInclude>
     <ClInclude Include="src\IdTech4\MapFileParser.h">
       <Filter>src\IdTech4</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Texture\stb_image.h">
+      <Filter>src\Framework\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Material\MaterialManager.h">
+      <Filter>src\Framework\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Scene\IdTech4SceneCreator.h">
+      <Filter>src\Framework\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

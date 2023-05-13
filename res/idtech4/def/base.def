@@ -1,0 +1,98 @@
+entityDef info_player_start
+{
+	"spawnclass"				"idPlayerStart"
+
+	"editor_color"				"1 0 0"
+	"editor_mins"				"-16 -16 0"
+	"editor_maxs"				"16 16 64"
+	"editor_showangle"			"1"
+
+	"editor_usage"				"The spawning position for the player."
+	"editor_var skin"			"Skin to use for player model."
+}
+
+
+entityDef light {
+	"inherit" "atdm:entity_base"
+	"editor_color"				"0 1 0"
+	"editor_mins"				"-8 -8 -8"
+	"editor_maxs"				"8 8 8"
+	"editor_rotatable"			"1"
+
+	"editor_displayFolder"		"Lights/Sources"
+	"editor_usage"				"Generic light source.  If health is set, light becomes breakable and turns off when shot."
+	
+	"editor_material texture"	"Light shader to use."
+	"editor_color _color"		"The color of the emitted light, in RGB."
+	"editor_var shaderParm3"	"shaderParm 3"
+	"editor_var shaderParm4"	"shaderParm 4"
+	"editor_var shaderParm5"	"shaderParm 5"
+	"editor_var shaderParm6"	"shaderParm 6"
+	"editor_var shaderParm7"	"shaderParm 7"
+	"editor_var count"			"How many times light must be triggered to toggle."
+	"editor_bool break"			"If set to true, this light breaks when triggered."
+	"editor_model model"			"model to use."
+	"editor_model broken"			"model to use when the light is broken (defaults to model name with '_broken' appended to name)"
+	"editor_bool hideModelOnBreak" "Hides the model when broken."
+	"editor_var health"			"Amount of damage to receive before becoming broken.  0 is nonbreakable."
+	"editor_var target"			"Entities to trigger if shot."
+	"editor_int levels"			"The number of times a light must be triggered until it turns off.  Each time it's triggered, it's dimmed to a lower level."
+	"editor_bool start_off"		"Causes the light to be off when the level starts."
+	"editor_snd snd_broken"		"Sound shader to use when broken."
+	"editor_material mtr_broken"	"Material to use when broken."
+	"editor_color color_demonic"	"Demonic color to use if in demonic mode."
+	"editor_material mat_demonic"	"Demonic shader to use if in demonic mode."
+	"editor_var leave_demonic_mat"	"Leaves the demonic shader when the effect expires.  Color is still reverted back."
+
+	"editor_bool editor_light"	"If set to true, tells the editor this entity is a light source."
+	"editor_int shouldBeOn"		"When light is off, 0 = AI comments; 1 = AI comments and relights; 2 = AI comments, relights, and raises alert."
+	"editor_bool nodiffuse"		"If true, the light does not render a diffuse pass, only specular and shadows."
+	"editor_bool noshadows"		"If true, the light does not cast shadows.  This improves performance, but might look wrong.  Useful for very small point lights."
+	"editor_bool nospecular"	"If true, the light does not render a specular pass.  This improves performance, but might look wrong."
+	"editor_bool parallel"		"If true, the light is parallel instead of a point light."
+	"editor_var light_radius"	"The size of the light in X, Y and Z direction in units."
+	"editor_bool falloff"		"Whether the light has a falloff, or not."
+	"editor_skin skin_unlit"	"When the light is turned off, it will try to set the skin to this material on the object the light is bound to."
+	"editor_skin skin_lit"		"When the light is turned on, it will try to set the skin to this material on the object the light is bound to."
+
+	"spawnclass"				"idLight"
+	"health"					"0"
+	"levels"					"1"
+	"start_off"					"0"
+	"count"						"1"
+	"break"						"0"
+	
+	// SteveL: For fog lights #3664
+	"noFogBoundary"				"0"
+	"editor_bool noFogBoundary"	"If set to true, stops a fog light drawing fog on its bounding box. Only surfaces will be fogged. Use case: stops fogs drawing over caulk skies."
+    
+    // Affects lightgem? -- SteveL #4128
+    "ai_see"                    "1"
+    "editor_bool ai_see"	    "Whether the light affects the player's light gem and AI ability to see other things."
+}
+
+entityDef func_static {
+	"inherit" "atdm:entity_base"
+	"editor_color"				"0 .5 .8"
+	"editor_mins"				"?"
+	"editor_maxs"				"?"
+	"inline"					"0"
+
+	"editor_displayFolder"			"Func"
+	"editor_usage"				"A brush model that just sits there, doing nothing.  Can be used for conditional walls and models."
+	"editor_usage1"				"When triggered, toggles between visible and hidden (must add 'hide' value to entity manually).  Entity is non-solid when hidden."
+
+	"editor_bool solid"					"Whether the object should be solid or not."
+	"editor_bool hide"					"Whether the object should be visible when spawned. you need to set a value for triggering on/off to work"
+	"editor_gui gui"					"GUI attached to this static, gui2 and gui3 also work"
+	"editor_gui gui_demonic"			"Demonic gui attached to this statit, gui_demonic2 and gui_demonic3 also work"
+	"editor_bool gui_noninteractive"	"Any gui attached will not be interactive."
+	"editor_bool noclipmodel"			"0 by default. Sets whether or not to generate a collision model for an ASE/LWO func_static at level load. (Set to 1 for stuff the player can't interact with. This will save memory.)"
+	"editor_bool inline"				"If true, turns an FS model into map geometry at dmap time, saving entity count. The entity will be non-solid and inlining won't preserve texture blending on a single mesh so check your model looks ok in game before doing 100 of them."
+	"editor_bool is_mantleable"			"Whether this entity can be mantled."	
+
+	"spawnclass"						"idStaticEntity"
+
+	"solid"								"1"
+	"noclipmodel"						"0"
+}

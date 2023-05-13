@@ -263,8 +263,15 @@ namespace Framework
 		if (!var) { return this; }
 		//
 		ID3DX11EffectShaderResourceVariable* shaderResourceView = var->AsShaderResource();
-		ID3D11ShaderResourceView* srv = tex->GetShaderResourceView();
-		shaderResourceView->SetResource(srv);
+		if (tex) 
+		{
+			ID3D11ShaderResourceView* srv = tex->GetShaderResourceView();
+			shaderResourceView->SetResource(srv);
+		}
+		else 
+		{
+			shaderResourceView->SetResource(nullptr);
+		}
 		return this;
 	}
 

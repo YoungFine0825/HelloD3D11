@@ -169,6 +169,7 @@
     <ClCompile Include="src\Framework\ImGUI\ImGuiHelper.cpp" />
     <ClCompile Include="src\Framework\Light\LightManager.cpp" />
     <ClCompile Include="src\Framework\Material\Material.cpp" />
+    <ClCompile Include="src\Framework\Material\MaterialManager.cpp" />
     <ClCompile Include="src\Framework\Mesh\Mesh.cpp" />
     <ClCompile Include="src\Framework\Mesh\MeshManager.cpp" />
     <ClCompile Include="src\Framework\Model\Model.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="src\Framework\Scene\Camera.cpp" />
     <ClCompile Include="src\Framework\Scene\Entity.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\Renderer.cpp" />
+    <ClCompile Include="src\Framework\Scene\IdTech4SceneCreator.cpp" />
     <ClCompile Include="src\Framework\Scene\Light.cpp" />
     <ClCompile Include="src\Framework\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Framework\Shader\Shader.cpp" />
@@ -222,6 +224,7 @@
     <ClInclude Include="src\Framework\Light\Light.h" />
     <ClInclude Include="src\Framework\Light\LightManager.h" />
     <ClInclude Include="src\Framework\Material\Material.h" />
+    <ClInclude Include="src\Framework\Material\MaterialManager.h" />
     <ClInclude Include="src\Framework\Mesh\Mesh.h" />
     <ClInclude Include="src\Framework\Mesh\MeshManager.h" />
     <ClInclude Include="src\Framework\Model\Model.h" />
@@ -238,11 +241,13 @@
     <ClInclude Include="src\Framework\Scene\Camera.h" />
     <ClInclude Include="src\Framework\Scene\Entity.h" />
     <ClInclude Include="src\Framework\RenderPipeline\Renderer.h" />
+    <ClInclude Include="src\Framework\Scene\IdTech4SceneCreator.h" />
     <ClInclude Include="src\Framework\Scene\Light.h" />
     <ClInclude Include="src\Framework\Scene\SceneManager.h" />
     <ClInclude Include="src\Framework\Scene\Transform.h" />
     <ClInclude Include="src\Framework\Shader\Shader.h" />
     <ClInclude Include="src\Framework\Shader\ShaderManager.h" />
+    <ClInclude Include="src\Framework\Texture\stb_image.h" />
     <ClInclude Include="src\Framework\Texture\Texture.h" />
     <ClInclude Include="src\Framework\Texture\TextureManager.h" />
     <ClInclude Include="src\Framework\Utils\FlyingCameraEntity.h" />

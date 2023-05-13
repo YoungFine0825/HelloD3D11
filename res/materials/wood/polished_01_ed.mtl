@@ -1,0 +1,12 @@
+Name base_wall/lfwall13f3
+Shader effects/LitOpaque.fx
+Properties {
+	Color diffuseColor (1.0 1.0 1.0 1.0)
+	Texture mainTexture textures/wood/polished_01_ed.jpg
+	Vector mainTextureST (1.0 1.0 0.0 0.0)
+}
+Tags {
+	RenderType Opaque
+	CastShadow 1
+	ReceiveShadow 1
+}

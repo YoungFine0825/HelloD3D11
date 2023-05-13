@@ -1,0 +1,12 @@
+Name skies/cubeSky
+Shader effects/UnlitOpaque.fx
+Properties {
+	Color diffuseColor (1.0 1.0 1.0 1.0)
+	Texture mainTexture textures\skies\cubesky_right.tga
+	Vector mainTextureST (1.0 1.0 0.0 0.0)
+}
+Tags {
+	RenderType Background
+	CastShadow 0
+	ReceiveShadow 0
+}

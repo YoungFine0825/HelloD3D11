@@ -28,6 +28,7 @@ namespace Framework
 		std::vector<Camera*> GetCameras();
 		bool DestroyCamera(Camera* cam);
 		bool DestroyCamera(const std::string& name);
+		Camera* CreateDefaultMainCamera();
 
 		Light* FindLight(const std::string name);
 		Light* FindLight(const LightInstanceId id);

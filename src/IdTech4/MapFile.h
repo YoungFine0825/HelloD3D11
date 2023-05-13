@@ -15,7 +15,7 @@ namespace IdTech4
 		float v{ 0 };
 		float nx{ 0 };
 		float ny{ 0 };
-		float uz{ 0 };
+		float nz{ 0 };
 	};
 
 	typedef std::vector<MapModelSurfaceVertex> MapModelSurfaceVertexVec;
@@ -51,6 +51,7 @@ namespace IdTech4
 		~MapModel();
 		//
 		void SetName(std::string name);
+		std::string GetName();
 		MapModelSurfacePtr CreateSurface();
 		MapModelSurfacePtr CreateSurface(std::string materialUrl, int numVerts, int numIndices);
 		void AddSurface(MapModelSurfacePtr surface);
@@ -70,10 +71,7 @@ namespace IdTech4
 		MapEntity();
 		~MapEntity();
 		//
-		MapEntityPtr SetName(std::string name);
-		MapEntityPtr SetClassName(std::string className);
-		MapEntityPtr SetOrigin(XMFLOAT3 origin);
-		MapEntityPtr AddKeyValue(std::string key, std::string value);
+		MapEntity* AddKeyValue(std::string key, std::string value);
 		//
 		std::string GetName();
 		std::string GetClassName();
@@ -87,9 +85,6 @@ namespace IdTech4
 	private:
 		bool _FindValue(const std::string key,std::string& out);
 		int _IsMultiNumbers(const std::string value);
-		std::string m_name;
-		std::string m_className;
-		XMFLOAT3 m_origin;
 		MapEntityValuePairs m_values;
 	};
 
@@ -111,4 +106,6 @@ namespace IdTech4
 		MapModelPtrVec m_models;
 		MapEntityPtrVec m_entities;
 	};
+
+	typedef MapFile* MapFilePtr;
 }

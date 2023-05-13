@@ -14,3 +14,5 @@
 
 #define ReleasePointer(x) { if(x != nullptr){ delete x; x = 0;} }
 #define ReleaseArrayPointer(x) { if(x != nullptr){ delete[] x; x = 0;} }
+
+#define ASSETS_BASE_PATH "res/"

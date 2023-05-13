@@ -77,6 +77,11 @@ namespace Framework
 		for (size_t i = 0; i < rendererCnt; ++i)
 		{
 			Renderer* renderer = (*enabledRenderers)[i];
+			if (renderer->GetMaterialInstance()->GetRenderQueue() == RENDER_QUEUE_BACKGROUND) 
+			{
+				visibleRenderers->push_back(renderer);
+				continue;
+			}
 			AxisAlignedBox worldSpaceAABB;
 			CollisionUtils::ComputeRendererWorldSpaceAxisAlignedBox(&worldSpaceAABB, renderer);
 			int intersect = CollisionUtils::IntersectAxisAlignedBoxFrustum(&worldSpaceAABB, &worldSpaceFrustum);
@@ -93,9 +98,11 @@ namespace Framework
 		sort(visibleRenderers->begin(), visibleRenderers->end(),
 			[viewMatrix](Renderer* a, Renderer* b)
 			{
-				if (a->material->renderQueue == b->material->renderQueue)
+				MaterialRenderQueue queueA = a->GetMaterialInstance()->GetRenderQueue();
+				MaterialRenderQueue queueB = b->GetMaterialInstance()->GetRenderQueue();
+				if (queueA == queueB)
 				{
-					if (a->material->renderQueue == RENDER_QUEUE_TRANSPARENT)
+					if (queueA == RENDER_QUEUE_TRANSPARENT)
 					{
 						XMFLOAT3 entPos = a->GetEntity()->GetTransform()->position;
 						XMFLOAT3 posA = XMFloat3MultiMatrix(entPos, viewMatrix);
@@ -110,7 +117,7 @@ namespace Framework
 						return a->GetEntity()->GetInstanceId() < b->GetEntity()->GetInstanceId();
 					}
 				}
-				return a->material->renderQueue <= b->material->renderQueue;
+				return queueA <= queueB;
 			}
 		);
 	}

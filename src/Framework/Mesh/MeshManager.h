@@ -14,5 +14,8 @@ namespace Framework
 		//
 		Mesh* CreateQuad();
 		Mesh* CreateFullScreenTriangle();
+		Mesh* CreateMeshInstance();
+		void DestroyMeshInstance(Mesh* meshInstance);
+		void DestroyMeshInstance(Resource::ResourceGUID guid);
 	}
 }

@@ -17,7 +17,7 @@ namespace Framework
 
 		void ComputeRendererWorldSpaceAxisAlignedBox(AxisAlignedBox* axisAlignedBoxW, Renderer* renderer)
 		{
-			XNA::AxisAlignedBox localAABB = renderer->mesh->GetAxisAlignedBox();
+			XNA::AxisAlignedBox localAABB = renderer->GetMeshInstance()->GetAxisAlignedBox();
 			Transform* transform = renderer->GetEntity()->GetTransform();
 			XMMATRIX worldMat = transform->GetWorldMatrix();
 			//

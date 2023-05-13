@@ -28,6 +28,11 @@ namespace IdTech4
 		m_name = name;
 	}
 
+	std::string MapModel::GetName() 
+	{
+		return m_name;
+	}
+
 	MapModelSurfacePtr MapModel::CreateSurface() 
 	{
 		MapModelSurfacePtr s = new MapModelSurface();

@@ -15,6 +15,9 @@ namespace Framework
 		typedef std::unordered_map<Resource::ResourceUrl, Mesh*> MeshResMap;
 		MeshResMap m_meshResMap;
 
+		typedef std::unordered_map<Resource::ResourceGUID, Mesh*> MeshInstanceMap;
+		MeshInstanceMap m_meshInstanceMap;
+
 		Mesh* FindWithUrl(Resource::ResourceUrl url)
 		{
 			MeshResMap::iterator it = m_meshResMap.find(url);
@@ -215,6 +218,13 @@ namespace Framework
 				Resource::ReleaseWithGUID(it->second->GetGUID());
 			}
 			m_meshResMap.clear();
+			//
+			MeshInstanceMap::iterator it2;
+			for (it2 = m_meshInstanceMap.begin(); it2 != m_meshInstanceMap.end(); ++it2)
+			{
+				Resource::ReleaseWithGUID(it2->second->GetGUID());
+			}
+			m_meshInstanceMap.clear();
 		}
 
 		Mesh* CreateQuad() 
@@ -305,6 +315,34 @@ namespace Framework
 			mesh->UpLoad();
 			m_meshResMap[url] = mesh;
 			return mesh;
+		}
+
+		Mesh* CreateMeshInstance() 
+		{
+			Mesh* m = new Mesh();
+			Resource::ResourceGUID guid = m->GetGUID();
+			m_meshInstanceMap[guid] = m;
+			return m;
+		}
+
+		void DestroyMeshInstance(Mesh* meshInstance) 
+		{
+			if (!meshInstance) 
+			{
+				return;
+			}
+			DestroyMeshInstance(meshInstance->GetGUID());
+		}
+
+		void DestroyMeshInstance(Resource::ResourceGUID guid) 
+		{
+			MeshInstanceMap::iterator it = m_meshInstanceMap.find(guid);
+			if (it == m_meshInstanceMap.end())
+			{
+				return;
+			}
+			m_meshInstanceMap.erase(it);
+			Resource::ReleaseWithGUID(guid);
 		}
 	}
 }

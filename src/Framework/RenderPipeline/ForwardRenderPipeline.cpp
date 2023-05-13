@@ -86,6 +86,9 @@ namespace Framework
 
 	void ForwardRenderPipeline::RenderCamera(Camera* camera) 
 	{
+		//
+		SetupCamera(camera);
+		//
 		CollectVisibleRenderers(camera,&m_visibleRenderers);
 		size_t rendererCnt = m_visibleRenderers.size();
 		if (rendererCnt <= 0)
@@ -99,8 +102,6 @@ namespace Framework
 		{
 			m_shadowMap->Update(camera,&m_visibleRenderers, &m_frameData->renderers, m_maxIntensityParallelLightRotW);
 		}
-		//
-		SetupCamera(camera);
 		//
 		GenLightList();
 		//
@@ -117,7 +118,7 @@ namespace Framework
 		{
 			Renderer* renderer = m_visibleRenderers[r];
 			Entity* ent = renderer->GetEntity();
-			Material* mat = renderer->material;
+			Material* mat = renderer->GetMaterialInstance();
 			Shader* sh = mat->GetShader();
 			//
 			sh->SetVector3("g_CameraPosW", cameraPosW);
@@ -167,7 +168,7 @@ namespace Framework
 			sh->SetStruct("g_PointLights", pointLights, sizeof(ShaderStruct::PointLight) * m_pointLightCnt);
 			sh->SetStruct("g_SpotLights", spotLights, sizeof(ShaderStruct::SpotLight) * m_spotLightCnt);
 			//设置ShadowMap参数
-			bool useShadow = renderer->IsReceiveShadow() && m_shadowMap != nullptr;
+			bool useShadow = mat->IsReceiveShadow() && m_shadowMap != nullptr;
 			if (useShadow) 
 			{
 				m_shadowMap->SetShaderParamters(sh);
@@ -213,7 +214,7 @@ namespace Framework
 			//
 			mat->Apply();
 			//绘制
-			Graphics::DrawMesh(renderer->mesh, sh);
+			Graphics::DrawMesh(renderer->GetMeshInstance(), sh);
 		}
 		//
 		delete[] pointLights;
@@ -280,7 +281,7 @@ namespace Framework
 			AxisAlignedBox aabbWorldSpace;
 			CollisionUtils::ComputeRendererWorldSpaceAxisAlignedBox(&aabbWorldSpace, renderer);
 			//判断该物体与哪些点光源、聚光灯相交
-			for (size_t litIndex = 1; litIndex < litCnt; ++litIndex)
+			for (size_t litIndex = 0; litIndex < litCnt; ++litIndex)
 			{
 				Light* lit = m_frameData->lights[litIndex];
 				if (!lit->IsEnabled())

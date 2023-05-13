@@ -442,6 +442,7 @@ namespace d3dGraphic
 			return false;
 		}
 		D3DX11_PASS_DESC passDesc;
+		ZeroMemory(&passDesc, sizeof(passDesc));
 		effPass->GetDesc(&passDesc);
 		if (passDesc.pIAInputSignature == nullptr && passDesc.IAInputSignatureSize <= 0) 
 		{

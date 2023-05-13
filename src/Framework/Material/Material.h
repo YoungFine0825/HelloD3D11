@@ -51,7 +51,9 @@ namespace Framework
 		Material* SetShader(Shader* sh);
 		Shader* GetShader();
 
-		MaterialRenderQueue renderQueue = RENDER_QUEUE_OPAQUE;
+
+		Material* SetRenderQueue(MaterialRenderQueue queue);
+		MaterialRenderQueue GetRenderQueue();
 
 		Material* SetFloat(std::string key, float value);
 		Material* SetFloat2(std::string key, XMFLOAT2 value);
@@ -61,10 +63,15 @@ namespace Framework
 		Material* SetTexture(std::string key, Texture* value);
 		Material* Apply();
 
+		Material* EnableCastShadow(bool enable);
+		bool IsCastShadow();
+		Material* EnableReceiveShadow(bool enable);
+		bool IsReceiveShadow();
 	private:
 
 		Shader* m_shader;
 		Texture* m_mainTexture;
+		MaterialRenderQueue m_renderQueue = RENDER_QUEUE_OPAQUE;
 
 		typedef std::unordered_map<std::string, float> FloatMap;
 		FloatMap m_paramFloat;
@@ -83,5 +90,8 @@ namespace Framework
 
 		typedef std::unordered_map<std::string, Texture*> TextureMap;
 		TextureMap m_paramTex;
+
+		bool m_castShadow{ false };
+		bool m_receiveShadow{ false };
 	};
 }

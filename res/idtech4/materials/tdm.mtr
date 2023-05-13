@@ -1,0 +1,64 @@
+materials/skies/cubeSky
+{	
+	noFragment
+	noshadows
+	noimpact
+	forceOpaque		
+	qer_editorimage		../textures/skies/cubesky_up.tga
+	{
+		blend			add	
+		cameraCubeMap	../textures/skies/cubesky
+		texgen			skybox
+	}
+}
+
+materials/tdm_skywindow_frame_dim
+{
+    qer_editorimage ../textures/wood/polished_01_ed.jpg
+	diffusemap ../textures/wood/polished_01_ed.jpg
+    bumpmap         ../textures/wood/polished_01_local.tga
+}
+
+materials/wood/polished_01_ed
+{
+    qer_editorimage ../textures/wood/polished_01_ed.jpg
+	diffusemap ../textures/wood/polished_01_ed.jpg
+    bumpmap         ../textures/wood/polished_01_local.tga
+}
+
+
+materials/skies/cubesky_up
+{
+    qer_editorimage ../textures/skies/cubesky_up.tga
+	diffusemap ../textures/skies/cubesky_up.tga
+}
+
+materials/skies/cubesky_down
+{
+    qer_editorimage ../textures/skies/cubesky_down.tga
+	diffusemap ../textures/skies/cubesky_down.tga
+}
+
+materials/skies/cubesky_forward
+{
+    qer_editorimage ../textures/skies/cubesky_forward.tga
+	diffusemap ../textures/skies/cubesky_forward.tga
+}
+
+materials/skies/cubesky_back
+{
+    qer_editorimage ../textures/skies/cubesky_back.tga
+	diffusemap ../textures/skies/cubesky_back.tga
+}
+
+materials/skies/cubesky_left
+{
+    qer_editorimage ../textures/skies/cubesky_left.tga
+	diffusemap ../textures/skies/cubesky_left.tga
+}
+
+materials/skies/cubesky_right
+{
+    qer_editorimage ../textures/skies/cubesky_right.tga
+	diffusemap ../textures/skies/cubesky_right.tga
+}

@@ -12,7 +12,11 @@ namespace Framework
 
 	Material::Material(std::string shaderPath)
 	{
-		Shader* shader = ShaderManager::LoadFromFxFile(shaderPath);
+		Shader* shader = ShaderManager::FindWithUrl(shaderPath);
+		if (!shader) 
+		{
+			shader = ShaderManager::LoadFromFxFile(shaderPath);
+		}
 		m_shader = shader;
 	}
 
@@ -64,6 +68,9 @@ namespace Framework
 		m_shader = mat.m_shader;
 		m_mainTexture = mat.m_mainTexture;
 		mainTextureST = mat.mainTextureST;
+		m_castShadow = mat.m_castShadow;
+		m_receiveShadow = mat.m_receiveShadow;
+		m_renderQueue = mat.m_renderQueue;
 		//
 		m_paramFloat = mat.m_paramFloat;
 		m_paramFloat2 = mat.m_paramFloat2;
@@ -152,6 +159,10 @@ namespace Framework
 		{
 			m_shader->SetTexture("g_diffuseMap", m_mainTexture);
 		}
+		else 
+		{
+			m_shader->SetTexture("g_diffuseMap", nullptr);
+		}
 		//
 		for (FloatMap::iterator it = m_paramFloat.begin(); it != m_paramFloat.end(); ++it) 
 		{
@@ -184,5 +195,38 @@ namespace Framework
 		}
 		//
 		return this;
+	}
+
+	Material* Material::EnableCastShadow(bool enable) 
+	{
+		m_castShadow = enable;
+		return this;
+	}
+
+	bool Material::IsCastShadow() 
+	{
+		return m_castShadow;
+	}
+
+	Material* Material::EnableReceiveShadow(bool enable) 
+	{
+		m_receiveShadow = enable;
+		return this;
+	}
+
+	bool Material::IsReceiveShadow() 
+	{
+		return m_receiveShadow;
+	}
+
+	Material* Material::SetRenderQueue(MaterialRenderQueue queue) 
+	{
+		m_renderQueue = queue;
+		return this;
+	}
+
+	MaterialRenderQueue Material::GetRenderQueue() 
+	{
+		return m_renderQueue;
 	}
 }
