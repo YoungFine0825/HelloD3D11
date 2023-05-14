@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "../../Global.h"
 #include "../../Window.h"
+#include "../../App.h"
 #include "../Graphic.h"
 #include "../Light/LightManager.h"
 #include "../RenderTexture/RenderTexture.h"
@@ -536,7 +537,8 @@ namespace Framework
 			{
 				sh->SetEnabledTechnique("Default");
 			}
-			//
+			//Per Frame
+			sh->SetFloat("g_timeDelta", App_GetTimeDelta());
 			sh->SetVector3("g_CameraPosW", cameraPosW);
 			//
 			LightManager::PackLightParamtersToShader(sh);
@@ -548,6 +550,8 @@ namespace Framework
 			sh->SetMatrix4x4("obj_MatNormalWorld", normalWorldMat);
 			XMMATRIX mvp = worldMat * viewMatrix * projectMatrix;
 			sh->SetMatrix4x4("obj_MatMVP", mvp);
+			sh->SetMatrix4x4("obj_MatView", viewMatrix);
+			sh->SetMatrix4x4("obj_MatProj", projectMatrix);
 			//
 			mat->Apply();
 			//

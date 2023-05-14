@@ -2,7 +2,7 @@ Name skies/cubeSky
 Shader effects/SkyBoxPlane.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
-	Texture mainTexture textures\skies\cubesky_down.tga
+	Texture mainTexture textures\skies\daysky_up.tga
 	Vector mainTextureST (1.0 1.0 0.0 0.0)
 }
 Tags {

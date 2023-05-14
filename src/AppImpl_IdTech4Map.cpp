@@ -71,12 +71,12 @@ void BuildScene()
 
 void BuildLights()
 {
-	m_parallelLight = SceneManager::CreateLight(LIGHT_TYPE_DIRECTIONAL, "Directional");
-	m_parallelLight->SetIntensity(m_parallelLightIntensity)
-		->SetColor(Colors::SunLight)
-		->EnableShadow(true)
-		;
-	m_parallelLight->GetTransform()->rotation = m_parallelLightRot;
+	m_parallelLight = SceneManager::FindLight("MainDirectionalLight");
+	if (m_parallelLight) 
+	{
+		m_parallelLight->EnableShadow(true);
+		m_parallelLightRot = m_parallelLight->GetTransform()->rotation;
+	}
 }
 
 
@@ -110,8 +110,12 @@ bool App_Init()
 void App_Tick(float dt)
 {
 	dxinput_Tick();
-	m_parallelLight->GetTransform()->rotation = m_parallelLightRot;
-	m_parallelLight->SetIntensity(m_parallelLightIntensity);
+	//
+	if (m_parallelLight) 
+	{
+		m_parallelLight->GetTransform()->rotation = m_parallelLightRot;
+		m_parallelLight->SetIntensity(m_parallelLightIntensity);
+	}
 	//
 	mainCamera->SetBackgroundColor(m_bgColor);
 	//

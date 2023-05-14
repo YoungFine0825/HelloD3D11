@@ -62,3 +62,39 @@ materials/skies/cubesky_right
     qer_editorimage ../textures/skies/cubesky_right.tga
 	diffusemap ../textures/skies/cubesky_right.tga
 }
+
+materials/skies/daysky_up
+{
+    qer_editorimage ../textures/skies/daysky_up.tga
+	diffusemap ../textures/skies/daysky_up.tga
+}
+
+materials/skies/daysky_down
+{
+    qer_editorimage ../textures/skies/daysky_down.tga
+	diffusemap ../textures/skies/daysky_down.tga
+}
+
+materials/skies/daysky_forward
+{
+    qer_editorimage ../textures/skies/daysky_forward.tga
+	diffusemap ../textures/skies/daysky_forward.tga
+}
+
+materials/skies/daysky_back
+{
+    qer_editorimage ../textures/skies/daysky_back.tga
+	diffusemap ../textures/skies/daysky_back.tga
+}
+
+materials/skies/daysky_left
+{
+    qer_editorimage ../textures/skies/daysky_left.tga
+	diffusemap ../textures/skies/daysky_left.tga
+}
+
+materials/skies/daysky_right
+{
+    qer_editorimage ../textures/skies/daysky_right.tga
+	diffusemap ../textures/skies/daysky_right.tga
+}

@@ -1,5 +1,5 @@
 Name skies/cubeSky
-Shader effects/UnlitOpaque.fx
+Shader effects/SkyBoxPlane.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
 	Texture mainTexture textures\skies\cubesky_back.tga

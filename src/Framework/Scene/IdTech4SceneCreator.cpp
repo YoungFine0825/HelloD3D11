@@ -79,6 +79,105 @@ namespace Framework
 		}
 	}
 
+	XMFLOAT3 MatrixToEulerAngle(XMMATRIX* matrix)
+	{
+		XMFLOAT3 ret = { 0,0,0 };
+		float h, p, b = 0;
+		float sp = -matrix->_32;
+		if (sp <= -1.0f)
+		{
+			p = -1.570796f;
+		}
+		else if (sp >= 1.0f)
+		{
+			p = 1.570796f;
+		}
+		else
+		{
+			p = asin(sp);
+		}
+		if (fabs(sp) > 0.9999f)
+		{
+			b = 0.0f;
+			h = atan2(-matrix->_13, -matrix->_11);
+		}
+		else
+		{
+			h = atan2(matrix->_31, matrix->_33);
+			b = atan2(matrix->_12, matrix->_22);
+		}
+		ret.x = Radin2Angle(p);
+		ret.y = Radin2Angle(h);
+		ret.z = Radin2Angle(b);
+		return ret;
+	}
+
+	LIGHT_TYPE DetermineLightType(IdTech4::MapEntityPtr ent) 
+	{
+		if (ent->haveKey("light_radius")) 
+		{
+			return LIGHT_TYPE_POINT;
+		}
+		bool isParallel = ent->GetBool("parallel");
+		return isParallel ? LIGHT_TYPE_DIRECTIONAL : LIGHT_TYPE_SPOT;
+	}
+
+	void ComputeLightRotationW(IdTech4::MapEntityPtr ent,XMFLOAT3 litTarget, XMFLOAT3 litRight, XMFLOAT3 litUp, XMFLOAT3* angleEuler)
+	{
+		XMMATRIX rot = XMMatrixIdentity();
+		ent->GetMatrix("rotation", &rot);
+		float t = 0;
+		t = litTarget.y;	litTarget.y = litTarget.z;	litTarget.z = t;
+		t = litRight.y;		litRight.y = litRight.z;	litRight.z = t;
+		t = litUp.y;		litUp.y = litUp.z;			litUp.z = t;
+		XMMATRIX defaultOri = XMMatrixIdentity();
+		defaultOri._11 = litRight.x;	defaultOri._12 = litRight.y;	defaultOri._13 = litRight.z;
+		defaultOri._21 = litUp.x;		defaultOri._22 = litUp.y;		defaultOri._23 = litUp.z;
+		defaultOri._31 = litTarget.x;	defaultOri._32 = litTarget.y;	defaultOri._33 = litTarget.z;
+		XMFLOAT3 defaultLitTarget = XMFloat3MultiMatrix({ 0,0,1 }, defaultOri);
+		XMFLOAT3 litOrient = XMFloat3MultiMatrix(XMVectorNormalize(defaultLitTarget), rot);
+		XMFLOAT3 right = XMVectorNormalize(XMVectorCross({ 0,1,0 }, litOrient));
+		XMFLOAT3 up = XMVectorNormalize(XMVectorCross(litOrient, right));
+		XMMATRIX orient = XMMatrixIdentity();
+		orient._11 = right.x;		orient._12 = right.y;		orient._13 = right.z;
+		orient._21 = up.x;			orient._22 = up.y;			orient._23 = up.z;
+		orient._31 = litOrient.x;	orient._32 = litOrient.y;	orient._33 = litOrient.z;
+		(*angleEuler) = MatrixToEulerAngle(&orient);
+	}
+
+	void CreateLight(IdTech4::MapEntityPtr ent) 
+	{
+		XMFLOAT3 pos = ent->GetOrigin();
+		XMFLOAT3 color = ent->GetFloat3("_color");
+		XMFLOAT3 radius = ent->GetFloat3("light_radius");
+
+		bool isParallel = ent->GetBool("parallel");
+		LIGHT_TYPE litType = DetermineLightType(ent);
+		Light* lit = SceneManager::CreateLight(litType, ent->GetName());
+		lit->SetIntensity(1)
+			->SetColor(RGBA32{ color.x,color.y,color.z,1 })
+			->SetRange(max(radius.x, max(radius.y, radius.z)))
+			;
+		lit->GetTransform()->position = pos;
+		//
+		if (litType != LIGHT_TYPE_POINT) 
+		{
+			XMFLOAT3 light_target = ent->GetFloat3("light_target");
+			XMFLOAT3 light_right = ent->GetFloat3("light_right");
+			XMFLOAT3 light_up = ent->GetFloat3("light_up");
+			float range = XMFloat3Length(light_target);
+			lit->SetRange(range);
+			float radius = min(light_right.x, light_up.y);
+			float slope = sqrtf(range * range + radius * radius);
+			float spot = Radin2Angle(asin(radius / slope));
+			lit->SetSpot(spot);
+			//
+			XMFLOAT3 rotEuler = {0,0,0};
+			ComputeLightRotationW(ent, light_target, light_right, light_up, &rotEuler);
+			lit->GetTransform()->rotation = rotEuler;
+		}
+	}
+
 	void CreateEntitiesWithMapFile(IdTech4::MapFile* mapFile)
 	{
 		IdTech4::MapEntityPtrVec* entites = mapFile->GetEntities();
@@ -94,19 +193,11 @@ namespace Framework
 				Camera* mainCamera = SceneManager::CreateDefaultMainCamera();
 				mainCamera->GetTransform()->position = pos;
 				float angle = ent->GetFloat("angle");
-				mainCamera->GetTransform()->rotation = { 0,angle,0 };
+				//mainCamera->GetTransform()->rotation = { 0,angle,0 };
 			}
 			else if (entClassName == ENT_NAME_LIGHT)
 			{
-				XMFLOAT3 pos = ent->GetOrigin();
-				XMFLOAT3 color = ent->GetFloat3("_color");
-				XMFLOAT3 radius = ent->GetFloat3("light_radius");
-				Light* pointLit = SceneManager::CreateLight(LIGHT_TYPE_POINT, ent->GetName());
-				pointLit->SetIntensity(1)
-					->SetColor(RGBA32{ color.x,color.y,color.z,1 })
-					->SetRange(max(radius.x, max(radius.y, radius.z)))
-					;
-				pointLit->GetTransform()->position = pos;
+				CreateLight(ent);
 			}
 		}
 	}

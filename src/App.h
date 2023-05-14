@@ -20,3 +20,6 @@ bool App_Init();
 void App_Tick(float dt);
 void App_Draw();
 void App_Cleanup();
+
+//Utils
+float App_GetTimeDelta();

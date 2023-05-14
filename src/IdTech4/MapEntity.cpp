@@ -129,16 +129,73 @@ namespace IdTech4
 		{
 			return { 0,0,0 };
 		}
+		std::vector<float> values;
+		_SplitValueToMultiFloats(value, values);
+		if (values.size() < 3) 
+		{
+			return { 0,0,0 };
+		}
+		return { values[0],values[1],values[2] };
+	}
+
+	bool MapEntity::GetMatrix(const std::string& key, XMMATRIX* matrix)
+	{
+		std::string value;
+		if (!_FindValue(key, value))
+		{
+			return false;
+		}
+		std::vector<float> values;
+		if (!_SplitValueToMultiFloats(value, values)) 
+		{
+			return false;
+		}
+		size_t valueCount = values.size();
+		bool success = true;
+		//注意：MapFile里按行优先保存的列矩阵，并且需要交换Y轴和Z轴
+		if (valueCount == 4)
+		{
+			matrix->_11 = values[0]; matrix->_12 = values[1];
+			matrix->_21 = values[2]; matrix->_22 = values[3];
+		}
+		else if (valueCount == 9) 
+		{
+			matrix->_11 = values[0]; matrix->_12 = values[2]; matrix->_13 = values[1];
+			matrix->_21 = values[6]; matrix->_22 = values[8]; matrix->_23 = values[7];
+			matrix->_31 = values[3]; matrix->_32 = values[5]; matrix->_33 = values[4];
+		}
+		else if (valueCount == 16) 
+		{
+			matrix->_11 = values[0]; matrix->_12 = values[2]; matrix->_13 = values[1]; matrix->_13 = values[3];
+			matrix->_21 = values[8]; matrix->_22 = values[10]; matrix->_23 = values[9]; matrix->_13 = values[7];
+			matrix->_31 = values[4]; matrix->_32 = values[6]; matrix->_33 = values[5]; matrix->_13 = values[11];
+			matrix->_41 = values[12]; matrix->_32 = values[13]; matrix->_33 = values[14]; matrix->_13 = values[15];
+		}
+		else 
+		{
+			success = false;
+		}
+		return success;
+	}
+
+	bool MapEntity::_SplitValueToMultiFloats(const std::string& value, std::vector<float>& floats) 
+	{
 		std::string token;
 		std::istringstream ss(value);
-		float f3[3] = { 0,0,0 };
-		int fIdx = 0;
-		while (ss >> token) 
+		if (!ss) 
 		{
-			f3[fIdx] = std::stof(token);
-			++fIdx;
-			if (fIdx >= 3) { break; }
+			return false;
 		}
-		return { f3[0],f3[1],f3[2] };
+		while (ss >> token)
+		{
+			floats.push_back(std::stof(token));
+		}
+		return true;
+	}
+
+	bool MapEntity::haveKey(const std::string& key) 
+	{
+		std::string value;
+		return _FindValue(key, value);
 	}
 }

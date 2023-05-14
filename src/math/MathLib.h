@@ -9,6 +9,7 @@ const float POSITIVE_INFINITY = 0x7F800000;
 const float NAGETIVE_INFINITY = 0x7F800000 * -1;
 
 #define Angle2Radin(x) x / 180.0f * PI
+#define Radin2Angle(x) x / PI * 180.0f
 
 // Transform NDC space [-1,+1]^2 to texture space [0,1]^2
 const XMMATRIX NDC2TEXTURE(

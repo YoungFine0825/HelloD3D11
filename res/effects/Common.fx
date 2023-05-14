@@ -31,6 +31,7 @@ cbuffer cdPerFrame
 	float4 g_linearFogColor;
 	float g_linearFogStart;
 	float g_linearFogRange;
+	float g_timeDelta;
 }
 
 cbuffer cbPerObject

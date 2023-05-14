@@ -20,6 +20,7 @@ DWORD m_winStyle = WS_OVERLAPPEDWINDOW;
 
 int m_timeNow = 0;
 int m_timePre = 0;
+float m_timeDelta = 0;
 
 #define WND_CLASS_NAME L"HelloD3D11"
 
@@ -101,12 +102,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			int timeDelta = m_timeNow - m_timePre;
 			m_timePre = m_timeNow;
 			//
-			App_Tick((float)timeDelta / 1000.0f);
+			m_timeDelta = (float)timeDelta / 1000.0f;
 			//
-			if (timeDelta >= 16) 
-			{
-				App_Draw();
-			}
+			App_Tick(m_timeDelta);
+			//
+			App_Draw();
 		}
 	}
 	//
@@ -163,4 +163,9 @@ bool win_IsFullScreen()
 float win_GetAspectRatio() 
 {
 	return (float)m_winWid / (float)m_winHei;
+}
+
+float App_GetTimeDelta() 
+{
+	return m_timeDelta;
 }

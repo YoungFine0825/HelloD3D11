@@ -1,4 +1,5 @@
 #include <algorithm>
+#include "../../App.h"
 #include "../Graphic.h"
 #include "../Material/Material.h"
 #include "../Shader/Shader.h"
@@ -120,7 +121,8 @@ namespace Framework
 			Entity* ent = renderer->GetEntity();
 			Material* mat = renderer->GetMaterialInstance();
 			Shader* sh = mat->GetShader();
-			//
+			//Per Frame
+			sh->SetFloat("g_timeDelta", App_GetTimeDelta());
 			sh->SetVector3("g_CameraPosW", cameraPosW);
 			//设置光照参数
 			InteractedLightSet* lightSet = m_lightLists[r];
@@ -211,6 +213,8 @@ namespace Framework
 			sh->SetMatrix4x4("obj_MatNormalWorld", normalWorldMat);
 			XMMATRIX mvp = worldMat * viewMatrix * projMatrix;
 			sh->SetMatrix4x4("obj_MatMVP", mvp);
+			sh->SetMatrix4x4("obj_MatView", viewMatrix);
+			sh->SetMatrix4x4("obj_MatProj", projMatrix);
 			//
 			mat->Apply();
 			//绘制
@@ -308,8 +312,9 @@ namespace Framework
 				}
 				else if (type == LIGHT_TYPE_SPOT) 
 				{
-					float range = lit->GetRange();//
-					float radius = tan(Angle2Radin(lit->GetSpot())) * range;
+					float range = lit->GetRange();
+					float radin = Angle2Radin(lit->GetSpot());
+					float radius = tan(radin) * range;
 					//为SpotLight构建一个朝向包围盒（OBB）,用OBB与renderer的AABB判断两者是否发碰撞
 					OBB obbL;//先构建一个局部空间OBB
 					obbL.Center = { 0,0,range / 2.0f };

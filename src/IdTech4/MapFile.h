@@ -82,9 +82,13 @@ namespace IdTech4
 		int GetInt(const std::string& key);
 		std::string GetString(const std::string& key);
 		XMFLOAT3 GetFloat3(const std::string& key);
+		bool GetMatrix(const std::string& key,XMMATRIX* matrix);
+		//
+		bool haveKey(const std::string& key);
 	private:
 		bool _FindValue(const std::string key,std::string& out);
 		int _IsMultiNumbers(const std::string value);
+		bool _SplitValueToMultiFloats(const std::string& value, std::vector<float>& floats);
 		MapEntityValuePairs m_values;
 	};
 
