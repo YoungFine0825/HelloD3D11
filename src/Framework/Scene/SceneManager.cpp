@@ -34,6 +34,13 @@ namespace Framework
 		FrameData* m_frameData = new FrameData();
 		RenderPipeline* m_renderPipeline;
 
+
+		void CollectRenderableRenderers(RendererList* list, Frustum frustm, XMMATRIX viewMatrix, XMMATRIX projectMatrix);
+		void SortingRenderers(RendererList* list, XMMATRIX viewMatrix);
+		void DrawRenderer(Renderer* r, XMFLOAT3 cameraPosW, XMMATRIX viewMatrix, XMMATRIX projectMatrix);
+
+
+
 		void Init(RenderPipeline* renderPipeline)
 		{
 			m_renderPipeline = renderPipeline;
@@ -449,7 +456,23 @@ namespace Framework
 			}
 			//
 			Frustum worldSpaceFrustum = camera->GetWorldSpaceFrustum();
-			DrawOneFrame(worldSpaceFrustum,view, proj);
+			//
+			m_renderableRenderers.clear();
+			//
+			CollectRenderableRenderers(&m_renderableRenderers, worldSpaceFrustum, view, proj);
+			//
+			if (m_renderableRenderers.size() <= 0)
+			{
+				return;
+			}
+			//
+			SortingRenderers(&m_renderableRenderers, view);
+			//
+			XMFLOAT3 cameraPosW = camera->GetTransform()->position;
+			for (size_t i = 0; i < m_renderableRenderers.size(); ++i)
+			{
+				DrawRenderer(m_renderableRenderers[i], cameraPosW, view, proj);
+			}
 		}
 
 		bool isRendererVisible(Renderer* renderer,Frustum worldSpaceFrustum)
@@ -556,26 +579,6 @@ namespace Framework
 			mat->Apply();
 			//
 			Graphics::DrawMesh(r->GetMeshInstance(), sh);
-		}
-
-		void DrawOneFrame(XNA::Frustum frustm,XMMATRIX viewMatrix, XMMATRIX projectMatrix)
-		{
-			m_renderableRenderers.clear();
-			//
-			CollectRenderableRenderers(&m_renderableRenderers, frustm,viewMatrix, projectMatrix);
-			//
-			if (m_renderableRenderers.size() <= 0) 
-			{
-				return;
-			}
-			//
-			SortingRenderers(&m_renderableRenderers, viewMatrix);
-			//
-			XMFLOAT3 cameraPosW = XMFloat3MultiMatrix({ 0,0,0 }, XMMatrixInverse(viewMatrix));
-			for (size_t i = 0; i < m_renderableRenderers.size(); ++i) 
-			{
-				DrawRenderer(m_renderableRenderers[i],cameraPosW,viewMatrix,projectMatrix);
-			}
 		}
 
 		void Tick(float dt) 

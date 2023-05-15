@@ -108,7 +108,7 @@ namespace Framework
 		//
 		XMMATRIX viewMatrix = camera->GetViewMatrix();
 		XMMATRIX projMatrix = camera->GetProjectMatrix();
-		XMFLOAT3 cameraPosW = XMFloat3MultiMatrix({ 0,0,0 }, XMMatrixInverse(viewMatrix));
+		XMFLOAT3 cameraPosW = camera->GetTransform()->position;
 		//
 		ShaderStruct::ParallelLight mainParallelLit;
 		//传递给GPU的光照数据用数组。本来想用vector，但发现不行，数据传递不过去。

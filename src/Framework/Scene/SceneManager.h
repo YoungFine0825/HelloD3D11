@@ -45,7 +45,6 @@ namespace Framework
 
 		void DrawOneFrame();
 		void DrawOneFrame(Camera* camera);
-		void DrawOneFrame(XNA::Frustum frustm, XMMATRIX viewMatrix, XMMATRIX projectMatrix);
 
 		void Tick(float dt);
 	}
