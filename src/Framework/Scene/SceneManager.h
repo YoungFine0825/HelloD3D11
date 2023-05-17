@@ -8,6 +8,8 @@
 
 namespace Framework 
 {
+	class FrameData;
+
 	namespace SceneManager 
 	{
 		void Init(RenderPipeline* renderPipeline = nullptr);
@@ -41,8 +43,8 @@ namespace Framework
 		void SetLinearFogStart(float start);
 		void SetLinearFogRange(float range);
 
+		void CollectFrameData(FrameData* frameData);
 		void SetRenderPipeline(RenderPipeline* renderPipeline);
-
 		void DrawOneFrame();
 		void DrawOneFrame(Camera* camera);
 

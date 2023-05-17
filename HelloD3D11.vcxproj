@@ -179,10 +179,12 @@
     <ClCompile Include="src\Framework\RenderPipeline\FrameData.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\ParallelLightShadowMap.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\RenderPipeline.cpp" />
+    <ClCompile Include="src\Framework\RenderPipeline\RenderSystem.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\ShadowMap.cpp" />
     <ClCompile Include="src\Framework\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="src\Framework\RenderTexture\RenderTextureManager.cpp" />
     <ClCompile Include="src\Framework\Resource.cpp" />
+    <ClCompile Include="src\Framework\Root.cpp" />
     <ClCompile Include="src\Framework\Scene\Camera.cpp" />
     <ClCompile Include="src\Framework\Scene\Entity.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\Renderer.cpp" />
@@ -233,11 +235,13 @@
     <ClInclude Include="src\Framework\RenderPipeline\FrameData.h" />
     <ClInclude Include="src\Framework\RenderPipeline\ParallelLightShadowMap.h" />
     <ClInclude Include="src\Framework\RenderPipeline\RenderPipeline.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\RenderSystem.h" />
     <ClInclude Include="src\Framework\RenderPipeline\ShaderStruct.h" />
     <ClInclude Include="src\Framework\RenderPipeline\ShadowMap.h" />
     <ClInclude Include="src\Framework\RenderTexture\RenderTexture.h" />
     <ClInclude Include="src\Framework\RenderTexture\RenderTextureManager.h" />
     <ClInclude Include="src\Framework\Resource.h" />
+    <ClInclude Include="src\Framework\Root.h" />
     <ClInclude Include="src\Framework\Scene\Camera.h" />
     <ClInclude Include="src\Framework\Scene\Entity.h" />
     <ClInclude Include="src\Framework\RenderPipeline\Renderer.h" />

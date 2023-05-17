@@ -250,6 +250,12 @@
     <ClCompile Include="src\Framework\Scene\IdTech4SceneCreator.cpp">
       <Filter>src\Framework\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\RenderSystem.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\Root.cpp">
+      <Filter>src\Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -413,6 +419,12 @@
     </ClInclude>
     <ClInclude Include="src\Framework\Scene\IdTech4SceneCreator.h">
       <Filter>src\Framework\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\RenderSystem.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Root.h">
+      <Filter>src\Framework</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

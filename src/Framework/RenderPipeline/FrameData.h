@@ -27,5 +27,6 @@ namespace Framework
 		LightVector lights;
 		//
 		SceneSettingData sceneSetting;
+		void Reset();
 	};
 }

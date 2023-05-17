@@ -11,4 +11,11 @@ namespace Framework
 	{
 
 	}
+
+	void FrameData::Reset() 
+	{
+		cameras.clear();
+		renderers.clear();
+		lights.clear();
+	}
 }
