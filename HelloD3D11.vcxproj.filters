@@ -256,6 +256,9 @@
     <ClCompile Include="src\Framework\Root.cpp">
       <Filter>src\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="src\Framework\Mesh\MeshUtil.cpp">
+      <Filter>src\Framework\Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -425,6 +428,9 @@
     </ClInclude>
     <ClInclude Include="src\Framework\Root.h">
       <Filter>src\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\Mesh\MeshUtil.h">
+      <Filter>src\Framework\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

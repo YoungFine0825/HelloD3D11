@@ -5,8 +5,10 @@
 
 #include "Mesh.h"
 #include "MeshManager.h"
-
+#include "MeshManager.h"
 #include "tiny_obj_loader.h"
+
+#include "MeshUtil.h"
 
 namespace Framework 
 {
@@ -198,6 +200,11 @@ namespace Framework
 			mesh->SetIndexData(indicesNum, indices);
 			mesh->SetNormalData(normals);
 			mesh->SetUVData(texCoord);
+			//¼ÆËãÇÐÏß
+			XMFLOAT4* tangents = new XMFLOAT4[vcount]();
+			Framework::MeshUtil::ComputeTangents(tangents, vertices, normals, texCoord, vcount, indices, indicesNum);
+			mesh->SetTangentData(tangents);
+			//
 			mesh->UpLoad();
 			//
 			XNA::AxisAlignedBox aabb;

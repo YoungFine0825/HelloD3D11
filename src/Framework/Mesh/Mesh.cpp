@@ -71,7 +71,7 @@ namespace Framework
 		SetDataDirty();
 		return this;
 	}
-	Mesh* Mesh::SetTangentData(XMFLOAT3* tangentData) 
+	Mesh* Mesh::SetTangentData(XMFLOAT4* tangentData)
 	{
 		ReleaseArrayPointer(m_tangents);
 		//

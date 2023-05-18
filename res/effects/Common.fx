@@ -9,7 +9,7 @@ struct VertexIn_Common
 	float3 NormalL : NORMAL;
 	float2 Tex     : TEXCOORD;
 	float4 Color : COLOR;
-	float3 TangentL : TANGENT;
+	float4 TangentL : TANGENT;
 };
 
 struct VertexOut_Common

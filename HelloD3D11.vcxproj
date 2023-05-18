@@ -172,6 +172,7 @@
     <ClCompile Include="src\Framework\Material\MaterialManager.cpp" />
     <ClCompile Include="src\Framework\Mesh\Mesh.cpp" />
     <ClCompile Include="src\Framework\Mesh\MeshManager.cpp" />
+    <ClCompile Include="src\Framework\Mesh\MeshUtil.cpp" />
     <ClCompile Include="src\Framework\Model\Model.cpp" />
     <ClCompile Include="src\Framework\Model\ModelManager.cpp" />
     <ClCompile Include="src\AppImpl_ParallelLightShadowMap.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="src\Framework\Material\MaterialManager.h" />
     <ClInclude Include="src\Framework\Mesh\Mesh.h" />
     <ClInclude Include="src\Framework\Mesh\MeshManager.h" />
+    <ClInclude Include="src\Framework\Mesh\MeshUtil.h" />
     <ClInclude Include="src\Framework\Model\Model.h" />
     <ClInclude Include="src\Framework\Model\ModelManager.h" />
     <ClInclude Include="src\Framework\RenderPipeline\ForwardRenderPipeline.h" />

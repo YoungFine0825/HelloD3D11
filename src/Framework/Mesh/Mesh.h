@@ -26,7 +26,7 @@ namespace Framework
 		Mesh* SetUVData(XMFLOAT2* uvData);
 		Mesh* SetNormalData(XMFLOAT3* normalData);
 		Mesh* SetColorData(XMFLOAT4* colorData);
-		Mesh* SetTangentData(XMFLOAT3* tangentData);
+		Mesh* SetTangentData(XMFLOAT4* tangentData);
 		Mesh* SetBoundingShape(XNA::AxisAlignedBox aabb);
 		//
 		UINT GetVerticesNumber() { return m_verticesNumber; }
@@ -49,7 +49,7 @@ namespace Framework
 		XMFLOAT2* m_uvs;
 		XMFLOAT3* m_normals;
 		XMFLOAT4* m_colors;
-		XMFLOAT3* m_tangents;
+		XMFLOAT4* m_tangents;
 		//
 		bool m_isDataDirty;
 		void SetDataDirty();

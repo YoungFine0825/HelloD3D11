@@ -61,13 +61,13 @@ namespace d3dGraphic
 	struct VertexFormat_Common :VertexFormat_Base
 	{
 		VertexFormat_Common() : VertexFormat_Base() {};
-		VertexFormat_Common(XMFLOAT3 pos, XMFLOAT3 nor, XMFLOAT2 uv, XMFLOAT4 col, XMFLOAT3 tan) :
+		VertexFormat_Common(XMFLOAT3 pos, XMFLOAT3 nor, XMFLOAT2 uv, XMFLOAT4 col, XMFLOAT4 tan) :
 			VertexFormat_Base(pos), normal(nor), textureCoord0(uv),color(col),tangent(tan)
 		{};
 		XMFLOAT3 normal;
 		XMFLOAT2 textureCoord0;
 		XMFLOAT4 color;
-		XMFLOAT3 tangent;
+		XMFLOAT4 tangent;
 	};
 
 	typedef D3D11_VIEWPORT ViewPort;

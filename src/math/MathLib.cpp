@@ -83,6 +83,16 @@ XMFLOAT3 XMVectorNormalize(XMFLOAT3 v)
 	return ret;
 }
 
+float XMVectorDot(XMFLOAT3 a, XMFLOAT3 b) 
+{
+	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+}
+
+XMFLOAT3 XMVectorReject(XMFLOAT3 a, XMFLOAT3 b) 
+{
+	return a - b * (XMVectorDot(a, b) / XMVectorDot(b, b));
+}
+
 XMMATRIX XMMatrixInverse(XMMATRIX M) 
 {
 	XMVECTOR det;

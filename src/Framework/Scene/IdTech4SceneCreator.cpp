@@ -5,6 +5,7 @@
 #include "../RenderPipeline/Renderer.h"
 #include "../Material/MaterialManager.h"
 #include "../Mesh/MeshManager.h"
+#include "../Mesh/MeshUtil.h"
 #include "../../IdTech4/MapFileParser.h"
 #include "../../Global.h"
 #include "../../Window.h"
@@ -73,6 +74,11 @@ namespace Framework
 				mesh->SetNormalData(meshNormals);
 				mesh->SetUVData(meshTexUV);
 				mesh->SetBoundingShape(aabb);
+				//¼ÆËãÇÐÏß
+				XMFLOAT4* tangents = new XMFLOAT4[numVertices]();
+				Framework::MeshUtil::ComputeTangents(tangents, meshVertices, meshNormals, meshTexUV, numVertices, meshIndices, numIndices);
+				mesh->SetTangentData(tangents);
+				//
 				mesh->UpLoad();
 				renderer->SetMeshInstance(mesh);
 			}

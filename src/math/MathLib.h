@@ -30,7 +30,8 @@ XMFLOAT3 XMVectorSubtract(XMFLOAT3 r, XMFLOAT3 l);
 XMFLOAT3 XMVectorRotationFromFloat3(XMFLOAT3 vec3, XMFLOAT3 rotation);
 XMFLOAT3 XMVectorCross(XMFLOAT3 a, XMFLOAT3 b);
 XMFLOAT3 XMVectorNormalize(XMFLOAT3 v);
-
+float XMVectorDot(XMFLOAT3 a, XMFLOAT3 b);
+XMFLOAT3 XMVectorReject(XMFLOAT3 a,XMFLOAT3 b);
 
 XMMATRIX XMMatrixRotationFromFloat3(XMFLOAT3 angle3);
 XMMATRIX XMMatrixInverse(XMMATRIX M);
