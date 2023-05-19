@@ -19,6 +19,9 @@ materials/tdm_skywindow_frame_dim
     bumpmap         ../textures/wood/polished_01_local.tga
 }
 
+
+
+
 materials/wood/polished_01_ed
 {
     qer_editorimage ../textures/wood/polished_01_ed.jpg
@@ -26,42 +29,39 @@ materials/wood/polished_01_ed
     bumpmap         ../textures/wood/polished_01_local.tga
 }
 
-
-materials/skies/cubesky_up
+materials/wood/metal_decorated_ed
 {
-    qer_editorimage ../textures/skies/cubesky_up.tga
-	diffusemap ../textures/skies/cubesky_up.tga
+    qer_editorimage ../textures/wood/metal_decorated_ed.jpg
+	diffusemap ../textures/wood/metal_decorated_ed.jpg
+    bumpmap         ../textures/wood/polished_01_local.tga
 }
 
-materials/skies/cubesky_down
+
+materials/wood/wood_rot_planks02_ed
 {
-    qer_editorimage ../textures/skies/cubesky_down.tga
-	diffusemap ../textures/skies/cubesky_down.tga
+    qer_editorimage ../textures/wood/wood_rot_planks02_ed.jpg
+	diffusemap ../textures/wood/wood_rot_planks02_ed.jpg
+    bumpmap         ../textures/wood/wood_rot_planks02_local.tga
 }
 
-materials/skies/cubesky_forward
+
+
+
+
+materials/metal/threadplate_large_dirty_ed
 {
-    qer_editorimage ../textures/skies/cubesky_forward.tga
-	diffusemap ../textures/skies/cubesky_forward.tga
+    qer_editorimage ../textures/metal/threadplate_large_dirty_ed.jpg
+	diffusemap ../textures/metal/threadplate_large_dirty_ed.jpg
+    bumpmap         ../textures/metal/threadplate_large_dirty_local.tga
 }
 
-materials/skies/cubesky_back
+materials/dirt/dry_earth_stones02_ed
 {
-    qer_editorimage ../textures/skies/cubesky_back.tga
-	diffusemap ../textures/skies/cubesky_back.tga
+    qer_editorimage ../textures/dirt/dry_earth_stones02_ed.jpg
+	diffusemap ../textures/dirt/dry_earth_stones02_ed.jpg
+    bumpmap         ../textures/dirt/dry_earth_stones02_local.tga
 }
 
-materials/skies/cubesky_left
-{
-    qer_editorimage ../textures/skies/cubesky_left.tga
-	diffusemap ../textures/skies/cubesky_left.tga
-}
-
-materials/skies/cubesky_right
-{
-    qer_editorimage ../textures/skies/cubesky_right.tga
-	diffusemap ../textures/skies/cubesky_right.tga
-}
 
 materials/skies/daysky_up
 {

@@ -1,10 +1,11 @@
-Name wood/polished_01_ed
+Name wood/wood_rot_planks02_ed
 Shader effects/LitOpaqueNormal.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
-	Texture mainTexture textures/wood/polished_01_ed.jpg
+	Texture mainTexture textures/wood/wood_rot_planks02_ed.jpg
 	Vector mainTextureST (1.0 1.0 0.0 0.0)
-	Texture g_normalMap textures/wood/polished_01_local.tga
+	Texture g_normalMap textures/wood/wood_rot_planks02_local.tga
+	Float specularPower 500
 }
 Tags {
 	RenderType Opaque

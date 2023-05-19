@@ -71,6 +71,11 @@ namespace Framework
 			{
 				return tex;
 			}
+			std::string fileExt = url.substr(url.length() - 4, 4);
+			if (fileExt == ".dds") 
+			{
+				return LoadDDSFromFile(url);
+			}
 			int width = 0;
 			int height = 0;
 			int colorChannels = 0;

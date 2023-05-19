@@ -1,10 +1,10 @@
-Name wood/polished_01_ed
+Name dirt/dry_earth_stones02_ed
 Shader effects/LitOpaqueNormal.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
-	Texture mainTexture textures/wood/polished_01_ed.jpg
+	Texture mainTexture textures/dirt/dry_earth_stones02_ed.dds
 	Vector mainTextureST (1.0 1.0 0.0 0.0)
-	Texture g_normalMap textures/wood/polished_01_local.tga
+	Texture g_normalMap textures/dirt/dry_earth_stones02_local.tga
 }
 Tags {
 	RenderType Opaque
