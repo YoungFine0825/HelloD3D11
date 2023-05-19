@@ -14,6 +14,8 @@ VertexOut_Common VS(VertexIn_Common vin)
 	vout.PosW = worldPos;
 	//
 	vout.NormalW = mul(float4(vin.NormalL, 0.0f), obj_MatNormalWorld).xyz;
+	//
+	vout.TangentW = float3(0,0,0);
     return vout;
 }
 

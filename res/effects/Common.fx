@@ -18,16 +18,9 @@ struct VertexOut_Common
 	float2 TexCoord : TEXCOORD0;
 	float3 PosW : TEXCOORD1;
 	float3 NormalW : TEXCOORD2;
-};
-
-struct VertexOut_NormalMapping
-{
-	float4 PosH  : SV_POSITION;
-	float2 TexCoord : TEXCOORD0;
-	float3 PosW : TEXCOORD1;
-	float3 NormalW : TEXCOORD2;
 	float3 TangentW : TEXCOORD3;
 };
+
 
 cbuffer cdPerFrame
 {
@@ -83,25 +76,9 @@ VertexOut_Common VertexShader_Common(VertexIn_Common vin)
 	vout.PosW = mul(float4(vin.PosL, 1.0f), obj_MatWorld).xyz;
 	//
 	vout.NormalW = mul(float4(vin.NormalL, 0.0f), obj_MatNormalWorld).xyz;
-    return vout;
-}
-
-//NormalMapping顶点着色器
-VertexOut_NormalMapping VertexShader_NormalMapping(VertexIn_Common vin)
-{
-	VertexOut_NormalMapping vout;
-	// Transform to homogeneous clip space.
-	vout.PosH = mul(float4(vin.PosL, 1.0f), obj_MatMVP);
-    //
-	vout.TexCoord = vin.Tex.xy * obj_Material.DiffuseMapST.xy + obj_Material.DiffuseMapST.zw;
 	//
-	vout.PosW = mul(float4(vin.PosL, 1.0f), obj_MatWorld).xyz;
-	//
-	vout.NormalW = mul(float4(vin.NormalL, 0.0f), obj_MatNormalWorld).xyz;
-	//
-	float3 tangentL = vin.TangentL.xyz * vin.TangentL.w;
-	vout.TangentW = mul(float4(tangentL, 1.0f), obj_MatWorld).xyz;
-	//
+	float3 tangentL = vin.TangentL.xyz * vin.TangentL.w;//得到带朝向得法线
+	vout.TangentW = mul(float4(tangentL, 1.0f), obj_MatWorld).xyz;//得到世界空间切线
     return vout;
 }
 
@@ -171,11 +148,11 @@ float3 CalcuLinearFog(float3 posW,float3 inputColor)
 //将法线从切换空间转换到世界空间
 float3 NormalTangent2WorldSpace(float3 normalSample,float3 unitNormalW,float3 tangentW)
 {
-	float3 normalT = 2.0f * normalSample - 1.0f;
+	float3 normalT = normalize(2.0f * normalSample - 1.0f);//将法线贴图采样结果从[0,1]转换到[-1,1]
 	float3 N = unitNormalW;
-	float3 T = normalize(tangentW - dot(tangentW,N) * N);
-	float3 B = cross(N,T);
+	float3 T = normalize(tangentW - dot(tangentW,N) * N);//做一个Reject操作，确保切线垂直于法线
+	float3 B = normalize(cross(N,T));//计算世界空间下得副切线
 	float3x3 TBN = float3x3(T,B,N);
-	float3 normalW = mul(normalT,TBN);
+	float3 normalW = normalize(mul(normalT,TBN));//得到世界空间下得切线向量
 	return normalW;
 }

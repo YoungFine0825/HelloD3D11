@@ -34,7 +34,6 @@ float LambertDiffuse(float3 lightDirW,float3 normalW)
 }
 
 
-
 void CalcuDiffuseSpeacularColor(float3 lightColor,Material mat,float3 L,float3 normalW,float3 viewDir,
 	out float3 diffuseColor,
 	out float3 specularColor
@@ -43,7 +42,8 @@ void CalcuDiffuseSpeacularColor(float3 lightColor,Material mat,float3 L,float3 n
 	diffuseColor = LambertDiffuse(L,normalW) * mat.Diffuse.rgb * lightColor;
 	//
 	float3 reflect = normalW * max(0,dot(normalW,L)) * 2 - L;
-	float specularFactor = pow( max(0,dot(reflect,viewDir)) , mat.Specular.w) * step(0,dot(L,normalW));
+	float isSpecularVisible = step(0,dot(L,normalW));
+	float specularFactor = pow( max(0,dot(reflect,viewDir)) , mat.Specular.w) * isSpecularVisible;
 	specularColor = specularFactor * mat.Specular.rgb * lightColor;
 }
 
