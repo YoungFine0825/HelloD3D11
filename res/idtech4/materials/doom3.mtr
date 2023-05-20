@@ -2,16 +2,19 @@ materials/base_wall/lfwall13f3
 {
 	qer_editorimage		../textures/base_wall/lfwall13f3.tga
 	diffusemap ../textures/base_wall/lfwall13f3.tga
+	bumpmap ../textures/base_wall/lfwall13f_local.tga
 }
 
 materials/base_wall/lfwall27b
 {		
 	qer_editorimage		../textures/base_wall/lfwall27b.tga
 	diffusemap ../textures/base_wall/lfwall27b.tga
+	bumpmap ../textures/base_wall/lfwall27b_local.tga
 }
 
 materials/base_wall/lfwall27d
 {		
 	qer_editorimage		../textures/base_wall/lfwall27d.tga
 	diffusemap ../textures/base_wall/lfwall27d.tga
+	bumpmap ../textures/base_wall/lfwall27d_local.tga
 }

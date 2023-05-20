@@ -1,9 +1,10 @@
 Name base_wall/lfwall13f3
-Shader effects/LitOpaque.fx
+Shader effects/LitOpaqueNormal.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
 	Texture mainTexture textures\base_wall\lfwall13f3.tga
 	Vector mainTextureST (1.0 1.0 0.0 0.0)
+	Texture g_normalMap textures\base_wall\lfwall13f_local.tga
 }
 Tags {
 	RenderType Opaque
