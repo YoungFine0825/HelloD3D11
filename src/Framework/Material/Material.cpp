@@ -197,6 +197,17 @@ namespace Framework
 		return this;
 	}
 
+	Material* Material::EnableLighting(bool enable) 
+	{
+		m_enableLighting = enable;
+		return this;
+	}
+
+	bool Material::IsEnableLighting() 
+	{
+		return m_enableLighting;
+	}
+
 	Material* Material::EnableCastShadow(bool enable) 
 	{
 		m_castShadow = enable;

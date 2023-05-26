@@ -38,6 +38,13 @@ namespace Framework
 				return nullptr;
 			}
 
+			Mesh* mesh = FindWithUrl(url);
+			if (mesh == nullptr)
+			{
+				mesh = new Mesh();
+				m_meshResMap[url] = mesh;
+			}
+
 			UINT vcount = 0;
 			UINT tcount = 0;
 			std::string ignore;
@@ -46,25 +53,37 @@ namespace Framework
 			fin >> ignore >> tcount;
 			fin >> ignore >> ignore >> ignore >> ignore;
 
-			XMFLOAT4 defaulColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-			XMFLOAT3* vertices = new XMFLOAT3[vcount]();
-			XMFLOAT4* colors = new XMFLOAT4[vcount]();
-			XMFLOAT3* normals = new XMFLOAT3[vcount]();
+			XMFLOAT3 vertex;
+			XMFLOAT3 normal;
 			XMFLOAT3 bboxMax = { NAGETIVE_INFINITY,NAGETIVE_INFINITY,NAGETIVE_INFINITY };
 			XMFLOAT3 bboxMin = { POSITIVE_INFINITY,POSITIVE_INFINITY,POSITIVE_INFINITY };
+
+			mesh->ClearVertices();
+			mesh->ReserveVertices(vcount);
+
 			for (UINT i = 0; i < vcount; ++i)
 			{
-				fin >> vertices[i].x >> vertices[i].y >> vertices[i].z;
-				fin >> normals[i].x >> normals[i].y >> normals[i].z;
-				colors[i] = defaulColor;
+				fin >> vertex.x >> vertex.y >> vertex.z;
+				fin >> normal.x >> normal.y >> normal.z;
 				//
-				bboxMax.x = vertices[i].x > bboxMax.x ? vertices[i].x : bboxMax.x;
-				bboxMax.y = vertices[i].y > bboxMax.y ? vertices[i].y : bboxMax.y;
-				bboxMax.z = vertices[i].z > bboxMax.z ? vertices[i].z : bboxMax.z;
-				bboxMin.x = vertices[i].x < bboxMin.x ? vertices[i].x : bboxMin.x;
-				bboxMin.y = vertices[i].y < bboxMin.y ? vertices[i].y : bboxMin.y;
-				bboxMin.z = vertices[i].z < bboxMin.z ? vertices[i].z : bboxMin.z;
+				bboxMax.x = vertex.x > bboxMax.x ? vertex.x : bboxMax.x;
+				bboxMax.y = vertex.y > bboxMax.y ? vertex.y : bboxMax.y;
+				bboxMax.z = vertex.z > bboxMax.z ? vertex.z : bboxMax.z;
+				bboxMin.x = vertex.x < bboxMin.x ? vertex.x : bboxMin.x;
+				bboxMin.y = vertex.y < bboxMin.y ? vertex.y : bboxMin.y;
+				bboxMin.z = vertex.z < bboxMin.z ? vertex.z : bboxMin.z;
+				//
+				MeshVertexDataPtr vertexData = mesh->CreateVertex();
+				vertexData->x = vertex.x;
+				vertexData->y = vertex.y;
+				vertexData->z = vertex.z;
+				vertexData->nx = normal.x;
+				vertexData->ny = normal.y;
+				vertexData->nz = normal.z;
+				vertexData->r = 1.0f;
+				vertexData->g = 1.0f;
+				vertexData->b = 1.0f;
+				vertexData->a = 1.0f;
 			}
 
 			fin >> ignore;
@@ -72,24 +91,19 @@ namespace Framework
 			fin >> ignore;
 
 			UINT indicesNum = 3 * tcount;
-			UINT* indices = new UINT[indicesNum];
+			mesh->ClearVertexIndices();
+			mesh->ReserveVertexIndices(indicesNum);
+			MeshVertexIndex index0, index1, index2 = 0;
 			for (UINT i = 0; i < tcount; ++i)
 			{
-				fin >> indices[i * 3 + 0] >> indices[i * 3 + 1] >> indices[i * 3 + 2];
+				fin >> index0 >> index1 >> index2;
+				mesh->AddVertexIndex(index0);
+				mesh->AddVertexIndex(index1);
+				mesh->AddVertexIndex(index2);
 			}
 
 			fin.close();
 
-			Mesh* mesh = FindWithUrl(url);
-			if (mesh == nullptr)
-			{
-				mesh = new Mesh();
-				m_meshResMap[url] = mesh;
-			}
-			mesh->SetVertexData(vcount, vertices);
-			mesh->SetIndexData(indicesNum, indices);
-			mesh->SetNormalData(normals);
-			mesh->SetColorData(colors);
 			mesh->UpLoad();
 			//
 			XNA::AxisAlignedBox aabb;
@@ -121,10 +135,18 @@ namespace Framework
 			}
 			UINT vcount = indicesNum;
 			//
-			XMFLOAT3* vertices = new XMFLOAT3[vcount]();
-			XMFLOAT3* normals = new XMFLOAT3[vcount]();
-			XMFLOAT2* texCoord = new XMFLOAT2[vcount]();
-			UINT* indices = new UINT[indicesNum];
+						//
+			Mesh* mesh = FindWithUrl(url);
+			if (mesh == nullptr)
+			{
+				mesh = new Mesh();
+				m_meshResMap[url] = mesh;
+			}
+			mesh->ClearVertices();
+			mesh->ClearVertexIndices();
+			mesh->ReserveVertices(vcount);
+			mesh->ReserveVertexIndices(indicesNum);
+			//
 			XMFLOAT3 bboxMax = { NAGETIVE_INFINITY,NAGETIVE_INFINITY,NAGETIVE_INFINITY };
 			XMFLOAT3 bboxMin = { POSITIVE_INFINITY,POSITIVE_INFINITY,POSITIVE_INFINITY };
 			//
@@ -142,12 +164,16 @@ namespace Framework
 						// access to vertex
 						tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 						//
-						indices[curIndicesIdx] = curVertexIdx;
-						//
 						float vx = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 0]);
 						float vy = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 1]);
 						float vz = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 2]);
-						vertices[curVertexIdx] = { vx,vy,vz };
+						//
+						MeshVertexDataPtr vertexData = mesh->CreateVertex();
+						vertexData->x = vx;
+						vertexData->y = vy;
+						vertexData->z = vz;
+						//
+						mesh->AddVertexIndex(curVertexIdx);
 						//
 						bboxMax.x = vx > bboxMax.x ? vx : bboxMax.x;
 						bboxMax.y = vy > bboxMax.y ? vy : bboxMax.y;
@@ -160,9 +186,9 @@ namespace Framework
 							auto nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
 							auto ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
 							auto nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
-							normals[curVertexIdx].x = static_cast<float>(nx);
-							normals[curVertexIdx].y = static_cast<float>(ny);
-							normals[curVertexIdx].z = static_cast<float>(nz);
+							vertexData->nx = static_cast<float>(nx);
+							vertexData->ny = static_cast<float>(ny);
+							vertexData->nz = static_cast<float>(nz);
 							hasNormal = true;
 						}
 						// Check if `texcoord_index` is zero or positive. negative = no texcoord data
@@ -170,13 +196,13 @@ namespace Framework
 						{
 							auto tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
 							auto ty = 1 - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
-							texCoord[curVertexIdx].x = static_cast<float>(tx);
-							texCoord[curVertexIdx].y = static_cast<float>(ty);
+							vertexData->u = static_cast<float>(tx);
+							vertexData->v = static_cast<float>(ty);
 						}
 						else 
 						{
-							texCoord[curVertexIdx].x = 0.5f;
-							texCoord[curVertexIdx].y = 0.5f;
+							vertexData->u = 0.5f;
+							vertexData->v = 0.5f;
 						}
 						//
 						curIndicesIdx++;
@@ -189,21 +215,8 @@ namespace Framework
 					index_offset += fv;
 				}
 			}
-			//
-			Mesh* mesh = FindWithUrl(url);
-			if (mesh == nullptr)
-			{
-				mesh = new Mesh();
-				m_meshResMap[url] = mesh;
-			}
-			mesh->SetVertexData(vcount, vertices);
-			mesh->SetIndexData(indicesNum, indices);
-			mesh->SetNormalData(normals);
-			mesh->SetUVData(texCoord);
 			//¼ÆËãÇÐÏß
-			XMFLOAT4* tangents = new XMFLOAT4[vcount]();
-			Framework::MeshUtil::ComputeTangents(tangents, vertices, normals, texCoord, vcount, indices, indicesNum);
-			mesh->SetTangentData(tangents);
+			Framework::MeshUtil::ComputeMeshTangents(mesh,vcount,indicesNum);
 			//
 			mesh->UpLoad();
 			//
@@ -242,38 +255,20 @@ namespace Framework
 				return mesh;
 			}
 			float halfSize = 1;
-			XMFLOAT3* vertices = new XMFLOAT3[4]{
-				{halfSize * -1,halfSize,0},
-				{halfSize ,halfSize,0},
-				{halfSize * -1,halfSize* -1,0},
-				{halfSize ,halfSize * -1,0}
-			};
-			XMFLOAT3* normals = new XMFLOAT3[4]{
-				{0,0,-1},{0,0,-1},
-				{0,0,-1},{0,0,-1}
-			};
-			UINT* indices = new UINT[6]{
-				0,1,2,
-				2,1,3
-			};
-			XMFLOAT4* colors = new XMFLOAT4[4]{
-				{1.0f,1.0f,1.0f,1.0f},
-				{1.0f,1.0f,1.0f,1.0f},
-				{1.0f,1.0f,1.0f,1.0f},
-				{1.0f,1.0f,1.0f,1.0f}
-			};
-			XMFLOAT2* uvs = new XMFLOAT2[4]{
-				{0,0},
-				{1 ,0},
-				{0,1},
-				{1 ,1}
-			};
 			mesh = new Mesh();
-			mesh->SetVertexData(4, vertices);
-			mesh->SetIndexData(6, indices);
-			mesh->SetNormalData(normals);
-			mesh->SetColorData(colors);
-			mesh->SetUVData(uvs);
+			//
+			mesh->AddVertex({ halfSize * -1,halfSize,0,			0,0,-1,	0,0 })
+				->AddVertex({ halfSize ,halfSize,0,				0,0,-1,	1,0 })
+				->AddVertex({ halfSize * -1,halfSize * -1,0 ,	0,0,-1,	0,1 })
+				->AddVertex({ halfSize ,halfSize * -1,0 ,		0,0,-1,	1 ,1 })
+				;
+			mesh->AddVertexIndex(0)
+				->AddVertexIndex(1)
+				->AddVertexIndex(2)
+				->AddVertexIndex(2)
+				->AddVertexIndex(1)
+				->AddVertexIndex(3)
+				;
 			mesh->UpLoad();
 			//
 			XNA::AxisAlignedBox aabb;
@@ -293,32 +288,16 @@ namespace Framework
 			{
 				return mesh;
 			}
-			XMFLOAT3* vertices = new XMFLOAT3[3]{
-				{0,0,0},{2 ,0,0},
-				{0,-2,0}
-			};
-			XMFLOAT3* normals = new XMFLOAT3[3]{
-				{0,0,0},{0,0,0},
-				{0,0,0}
-			};
-			UINT* indices = new UINT[3]{
-				0,1,2
-			};
-			XMFLOAT4* colors = new XMFLOAT4[3]{
-				{1.0f,1.0f,1.0f,1.0f},
-				{1.0f,1.0f,1.0f,1.0f},
-				{1.0f,1.0f,1.0f,1.0f}
-			};
-			XMFLOAT2* uvs = new XMFLOAT2[3]{
-				{0,0},{2 ,0},
-				{0,2}
-			};
 			mesh = new Mesh();
-			mesh->SetVertexData(3, vertices);
-			mesh->SetIndexData(3, indices);
-			mesh->SetNormalData(normals);
-			mesh->SetColorData(colors);
-			mesh->SetUVData(uvs);
+			//
+			mesh->AddVertex({ 0,0,0,	0,0,1,	0,0 })
+				->AddVertex({ 2 ,0,0,	0,0,1,	2,0 })
+				->AddVertex({ 0,-2,0 ,	0,0,1,	0,2 })
+				;
+			mesh->AddVertexIndex(0)
+				->AddVertexIndex(1)
+				->AddVertexIndex(2)
+				;
 			mesh->UpLoad();
 			m_meshResMap[url] = mesh;
 			return mesh;

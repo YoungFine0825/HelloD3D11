@@ -1,5 +1,5 @@
 Name wood/wood_rot_planks02_ed
-Shader effects/LitOpaqueNormal.fx
+Shader shaders/StandardOpaque.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
 	Texture mainTexture textures/wood/wood_rot_planks02_ed.jpg

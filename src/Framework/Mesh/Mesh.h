@@ -1,5 +1,5 @@
 #pragma once
-
+#include <vector>
 #include "d3d/d3dGraphic.h"
 #include "../Resource.h"
 #include "../../math/MathLib.h"
@@ -13,6 +13,22 @@ namespace Framework
 		Mesh_ErrCode_Invalid_Vertex_Data = 1,
 		Mesh_ErrCode_Invalid_Index_Data = 2,
 	};
+
+	struct MeshVertexData 
+	{
+		float x, y, z = 0;
+		float nx, ny, nz = 0;
+		float u, v = 0;
+		float tx = 0, ty = 0, tz = 0, tw = 0 ;
+		float r = 1.0f,g = 1.0f, b = 1.0f, a = 1.0f;
+	};
+
+	typedef UINT MeshVertexIndex;
+	typedef std::vector<MeshVertexIndex> MeshIndicesDataVec;
+
+	typedef MeshVertexData* MeshVertexDataPtr;
+	typedef std::vector<MeshVertexData> MeshVerticesDataVec;
+
 	class Mesh : public Resource::IResource
 	{
 	public:
@@ -21,16 +37,10 @@ namespace Framework
 		//
 		void Release() override;
 		//
-		Mesh* SetVertexData(UINT verticesNum, XMFLOAT3* vertexData);
-		Mesh* SetIndexData(UINT indicesNum, UINT* indexData);
-		Mesh* SetUVData(XMFLOAT2* uvData);
-		Mesh* SetNormalData(XMFLOAT3* normalData);
-		Mesh* SetColorData(XMFLOAT4* colorData);
-		Mesh* SetTangentData(XMFLOAT4* tangentData);
 		Mesh* SetBoundingShape(XNA::AxisAlignedBox aabb);
 		//
-		UINT GetVerticesNumber() { return m_verticesNumber; }
-		UINT GetIndicesNumber() { return m_indicesNumber; }
+		UINT GetVerticesNumber();
+		UINT GetIndicesNumber();
 		//
 		Mesh_ErrCode UpLoad();
 		ID3D11Buffer* GetVertexBuffer() { return m_pVertexBuffer; }
@@ -39,17 +49,26 @@ namespace Framework
 		//
 		bool EnabledCPUReadWrite() { return m_isEnableCPUReadWrite; }
 		XNA::AxisAlignedBox GetAxisAlignedBox();
+		//
+		Mesh* ClearVertices();
+		Mesh* ReserveVertices(UINT verticesNum);
+		MeshVertexDataPtr GetVertex(UINT index);
+		MeshVertexDataPtr CreateVertex();
+		Mesh* AddVertex(MeshVertexData vertex);
+		//
+		Mesh* ClearVertexIndices();
+		Mesh* ReserveVertexIndices(UINT indicesNum);
+		Mesh* SetVertexIndicesValue(UINT index, MeshVertexIndex value);
+		MeshVertexIndex GetVertexIndicesValue(UINT index);
+		Mesh* AddVertexIndex(MeshVertexIndex idx);
 	private:
-		UINT m_verticesNumber = 0;
-		UINT m_indicesNumber = 0;
+
 		UINT m_inputLayoutIndex = 0;
 		//
-		XMFLOAT3* m_vertices;
-		UINT* m_indices;
-		XMFLOAT2* m_uvs;
-		XMFLOAT3* m_normals;
-		XMFLOAT4* m_colors;
-		XMFLOAT4* m_tangents;
+		MeshVerticesDataVec m_verticesData;
+		MeshIndicesDataVec m_indicesData;
+		UINT m_numVertices;
+		UINT m_numIndices;
 		//
 		bool m_isDataDirty;
 		void SetDataDirty();

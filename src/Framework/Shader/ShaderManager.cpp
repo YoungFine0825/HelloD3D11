@@ -52,6 +52,7 @@ namespace Framework
 			if (shader == nullptr)
 			{
 				shader = new Shader();
+				shader->SetUrl(url);
 				if (!shader->CreateFromBlob(compiledShader)) 
 				{
 					delete shader;

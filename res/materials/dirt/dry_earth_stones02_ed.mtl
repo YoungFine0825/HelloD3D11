@@ -1,5 +1,5 @@
 Name dirt/dry_earth_stones02_ed
-Shader effects/LitOpaqueNormal.fx
+Shader shaders/StandardOpaque.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
 	Texture mainTexture textures/dirt/dry_earth_stones02_ed.dds

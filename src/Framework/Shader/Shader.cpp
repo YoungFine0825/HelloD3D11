@@ -1,14 +1,13 @@
-
+#include "Shader.h"
 #include "../../Global.h"
 #include "../../d3d/d3dGraphic.h"
-#include "Shader.h"
 #include "../Texture/Texture.h"
 
 namespace Framework 
 {
 	Shader::Shader() :IResource() 
 	{
-		m_enabledTechName = "Default";
+		m_enabledTechName = "None";
 	}
 
 	Shader::~Shader() 
@@ -19,7 +18,11 @@ namespace Framework
 	void Shader::Release() 
 	{
 		m_pTech = nullptr;
-		ReleaseCOM(m_pInputLayout);
+		for (UINT p = 0; p < m_passCount; ++p)
+		{
+			ReleaseCOM(m_pInputLayouts[p]);
+		}
+		ReleaseArrayPointer(m_pInputLayouts);
 		ReleaseCOM(m_pEffect);
 	}
 
@@ -38,37 +41,9 @@ namespace Framework
 			return false;
 		}
 		//
-		ID3DX11EffectTechnique* newTech;
-		newTech = newEffect->GetTechniqueByName(m_enabledTechName.c_str());
-		if (newTech == nullptr)
-		{
-			ReleaseCOM(newEffect);
-			return false;
-		}
-		//
-		ID3DX11EffectPass* pass = newTech->GetPassByIndex(0);
-		if (pass == nullptr) 
-		{
-			ReleaseCOM(newEffect);
-			return false;
-		}
-		//
-		ID3D11InputLayout* newLayout;
-		if(!d3dGraphic::CreateInputLayout(pass, D3D_INPUT_DESC_COMMON, &newLayout))
-		{
-			ReleaseCOM(newEffect);
-			return false;
-		}
-		//
-		m_pTech = nullptr;
-		ReleaseCOM(m_pInputLayout);
-		ReleaseCOM(m_pEffect);
-		//
 		m_pEffect = newEffect;
-		m_pTech = newTech;
-		m_pInputLayout = newLayout;
 		//
-		return true;
+		return SetEnabledTechnique("Default");
 	}
 
 	bool Shader::SetEnabledTechnique(std::string techName)
@@ -87,25 +62,57 @@ namespace Framework
 			return false;
 		}
 		//
-		ID3DX11EffectPass* pass = tech->GetPassByIndex(0);
-		//
-		if (pass == nullptr)
+		D3DX11_TECHNIQUE_DESC techDesc;
+		ZeroMemory(&techDesc, sizeof(techDesc));
+		tech->GetDesc(&techDesc);
+		UINT passCount = techDesc.Passes;
+		if (passCount <= 0) 
 		{
 			return false;
 		}
 		//
-		ID3D11InputLayout* newLayout;
-		if (!d3dGraphic::CreateInputLayout(pass, D3D_INPUT_DESC_COMMON, &newLayout))
+		for (UINT p = 0; p < m_passCount; ++p) 
 		{
-			return false;
+			ReleaseCOM(m_pInputLayouts[p]);
+		}
+		ReleaseArrayPointer(m_pInputLayouts);
+		m_pInputLayouts = new ID3D11InputLayout*[passCount];
+		for (UINT p = 0; p < passCount; ++p) 
+		{
+			ID3DX11EffectPass* pass = tech->GetPassByIndex(p);
+			if (pass != nullptr)
+			{
+				if (d3dGraphic::CreateInputLayout(pass, D3D_INPUT_DESC_COMMON, &m_pInputLayouts[p]))
+				{
+				}
+			}
 		}
 		//
-		ReleaseCOM(m_pInputLayout);
-		//
-		m_pInputLayout = newLayout;
 		m_pTech = tech;
 		m_enabledTechName = techName;
+		m_passCount = passCount;
 		//
+		return true;
+	}
+
+	bool Shader::hasTechnique(const std::string& techName) 
+	{
+		if (m_pEffect == nullptr)
+		{
+			return false;
+		}
+		ID3DX11EffectTechnique* tech = m_pEffect->GetTechniqueByName(techName.c_str());
+		if (tech == nullptr)
+		{
+			return false;
+		}
+		D3DX11_TECHNIQUE_DESC techDesc;
+		ZeroMemory(&techDesc, sizeof(techDesc));
+		tech->GetDesc(&techDesc);
+		if (techDesc.Passes <= 0) 
+		{
+			return false;
+		}
 		return true;
 	}
 
@@ -115,9 +122,16 @@ namespace Framework
 		{
 			return 0;
 		}
-		D3DX11_TECHNIQUE_DESC techDesc;
-		m_pTech->GetDesc(&techDesc);
-		return techDesc.Passes;
+		return m_passCount;
+	}
+
+	ID3D11InputLayout* Shader::GetInputLayout(UINT passIndex)
+	{
+		if (passIndex >= m_passCount) 
+		{
+			return nullptr;
+		}
+		return m_pInputLayouts[passIndex];
 	}
 
 	bool Shader::ApplyPass(UINT passIndex, ID3D11DeviceContext* context)
@@ -297,21 +311,27 @@ namespace Framework
 			return this;
 		}
 		//
-		ID3DX11EffectPass* pass = m_pTech->GetPassByIndex(0);
-		//
-		if (pass == nullptr)
+		if (m_passCount <= 0)
 		{
 			return this;
 		}
 		//
-		ID3D11InputLayout* newLayout;
-		if (!d3dGraphic::CreateInputLayout(pass, layoutIndex, &newLayout))
+		for (UINT p = 0; p < m_passCount; ++p)
 		{
-			return this;
+			ReleaseCOM(m_pInputLayouts[p]);
 		}
-		//
-		ReleaseCOM(m_pInputLayout);
-		m_pInputLayout = newLayout;
+		ReleaseArrayPointer(m_pInputLayouts);
+		m_pInputLayouts = new ID3D11InputLayout * [m_passCount];
+		for (UINT p = 0; p < m_passCount; ++p)
+		{
+			ID3DX11EffectPass* pass = m_pTech->GetPassByIndex(p);
+			if (pass != nullptr)
+			{
+				if (d3dGraphic::CreateInputLayout(pass, layoutIndex, &m_pInputLayouts[p]))
+				{
+				}
+			}
+		}
 		return this;
 	}
 }

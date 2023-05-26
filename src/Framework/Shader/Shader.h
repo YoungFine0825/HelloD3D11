@@ -22,11 +22,12 @@ namespace Framework
 		//
 		bool SetEnabledTechnique(std::string techName);
 		std::string GetEnabledTechniqueName() { return m_enabledTechName; }
+		bool hasTechnique(const std::string& techName);
 		//
 		UINT GetPassCount();
 		bool ApplyPass(UINT passIndex, ID3D11DeviceContext* context);
 		//
-		ID3D11InputLayout* GetInputLayout() { return m_pInputLayout; }
+		ID3D11InputLayout* GetInputLayout(UINT passIndex);
 		//
 		Shader* SetMatrix4x4(const char* propName, XMMATRIX matrix);
 		Shader* SetFloat(const char* propName, float value);
@@ -42,8 +43,9 @@ namespace Framework
 	private:
 		ID3DX11Effect* m_pEffect;
 		ID3DX11EffectTechnique* m_pTech;
-		ID3D11InputLayout* m_pInputLayout;
+		ID3D11InputLayout** m_pInputLayouts;
 		//
 		std::string m_enabledTechName;
+		UINT m_passCount{0};
 	};
 }

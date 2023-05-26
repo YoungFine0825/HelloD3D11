@@ -1,5 +1,5 @@
 Name wood/polished_01_ed
-Shader effects/LitOpaqueNormal.fx
+Shader shaders/StandardOpaque.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
 	Texture mainTexture textures/wood/polished_01_ed.jpg

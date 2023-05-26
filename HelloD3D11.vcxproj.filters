@@ -62,6 +62,9 @@
     <Filter Include="src\IdTech4">
       <UniqueIdentifier>{7ed49320-aab4-4b4c-bb5e-0325bbd451fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Framework\RenderPipeline\DeferredShading">
+      <UniqueIdentifier>{57d72c8e-6427-48bc-a47b-1973c4f09537}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -259,6 +262,27 @@
     <ClCompile Include="src\Framework\Mesh\MeshUtil.cpp">
       <Filter>src\Framework\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\RenderPipelineResources.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\RenderPass.cpp">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\DeferredRenderPipeline.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingResources.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\ParallelShadowPass.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingPass.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\GBufferPass.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -431,6 +455,27 @@
     </ClInclude>
     <ClInclude Include="src\Framework\Mesh\MeshUtil.h">
       <Filter>src\Framework\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\RenderPipelineResources.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\RenderPass.h">
+      <Filter>src\Framework\RenderPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\DeferredRenderPipeline.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingResources.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\ParallelShadowPass.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingPass.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\GBufferPass.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

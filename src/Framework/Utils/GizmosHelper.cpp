@@ -80,7 +80,7 @@ namespace Framework
 			context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			context->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 			context->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-			context->IASetInputLayout(m_gizmosShader->GetInputLayout());
+			context->IASetInputLayout(m_gizmosShader->GetInputLayout(0));
 			m_gizmosShader->ApplyPass(0, context);
 			context->DrawIndexed(24, 0, 0);
 		}
@@ -164,7 +164,7 @@ namespace Framework
 			context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			context->IASetVertexBuffers(0, 1, &m_pFrustumVertexBuffer, &stride, &offset);
 			context->IASetIndexBuffer(0, DXGI_FORMAT_R32_UINT, 0);
-			context->IASetInputLayout(m_gizmosShader->GetInputLayout());
+			context->IASetInputLayout(m_gizmosShader->GetInputLayout(0));
 			m_gizmosShader->ApplyPass(0, context);
 			context->Draw(24, 0);
 		}

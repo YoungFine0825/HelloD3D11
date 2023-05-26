@@ -28,8 +28,6 @@ Camera* mainCamera;
 
 FlyingCameraEntity* flyCameraEnt;
 
-ForwardRenderPipeline* forwardRenderPipeline;
-
 void DrawImGUI(Camera* renderingCamera);
 void DrawGizmos(Camera* renderingCamera);
 
@@ -46,16 +44,9 @@ bool App_Init()
 	{
 		return false;
 	}
-	//创建渲染管线
-	forwardRenderPipeline = new ForwardRenderPipeline();
-	forwardRenderPipeline->SetDrawGUICallBack(DrawImGUI);
-	forwardRenderPipeline->SetDrawGizmosCallBack(DrawGizmos);
 	//
-	ParallelLightShadowMap*  parallelLightSM = forwardRenderPipeline->GetParallelLightShadowMap();
-	parallelLightSM->SetSize(2048);
-	parallelLightSM->SetNearestShadowDistance(500);
-	//
-	Framework::RenderSystem::SetRenderPipeline(forwardRenderPipeline);
+	Framework::RenderSystem::SetDrawGUICallBack(DrawImGUI);
+	Framework::RenderSystem::SetDrawGizmosCallBack(DrawGizmos);
 	//
 	CreateSceneFromIdTech4MapFile("res/idtech4/maps/test_scene.proc");
 	//
@@ -130,7 +121,6 @@ void App_Draw()
 
 void App_Cleanup()
 {
-	ReleasePointer(forwardRenderPipeline);
 	Framework::Root::Shutdown();
 }
 

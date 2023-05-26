@@ -3,6 +3,7 @@
 #include "ModelManager.h"
 #include "Model.h"
 #include "tiny_obj_loader.h"
+#include "../Mesh/MeshUtil.h"
 
 namespace Framework 
 {
@@ -49,14 +50,13 @@ namespace Framework
 			for (size_t s = 0; s < shapes.size(); s++) {
 				//±È¿˙ploygon
 				size_t index_offset = 0;
-				Mesh* newMesh = newModel->CreateMesh();
+				
 				UINT indicesNum = shapes[s].mesh.indices.size();
 				UINT vcount = indicesNum;
 				//
-				XMFLOAT3* vertices = new XMFLOAT3[vcount]();
-				XMFLOAT3* normals = new XMFLOAT3[vcount]();
-				XMFLOAT2* texCoord = new XMFLOAT2[vcount]();
-				UINT* indices = new UINT[indicesNum];
+				Mesh* newMesh = newModel->CreateMesh();
+				newMesh->ReserveVertices(vcount);
+				newMesh->ReserveVertexIndices(indicesNum);
 				XMFLOAT3 bboxMax = { NAGETIVE_INFINITY,NAGETIVE_INFINITY,NAGETIVE_INFINITY };
 				XMFLOAT3 bboxMin = { POSITIVE_INFINITY,POSITIVE_INFINITY,POSITIVE_INFINITY };
 				UINT curIndicesIdx = 0;
@@ -71,12 +71,15 @@ namespace Framework
 						// access to vertex
 						tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 						//
-						indices[curIndicesIdx] = curVertexIdx;
-						//
 						float vx = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 0]);
 						float vy = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 1]);
 						float vz = static_cast<float>(attrib.vertices[3 * size_t(idx.vertex_index) + 2]);
-						vertices[curVertexIdx] = { vx,vy,vz };
+						MeshVertexDataPtr vertex = newMesh->CreateVertex();
+						vertex->x = vx;
+						vertex->y = vy;
+						vertex->z = vz;
+						//
+						newMesh->AddVertexIndex(curVertexIdx);
 						//
 						bboxMax.x = vx > bboxMax.x ? vx : bboxMax.x;
 						bboxMax.y = vy > bboxMax.y ? vy : bboxMax.y;
@@ -89,7 +92,10 @@ namespace Framework
 							auto nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
 							auto ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
 							auto nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
-							normals[curVertexIdx] = XMVectorNormalize({ static_cast<float>(nx) ,static_cast<float>(ny),static_cast<float>(nz) });
+							XMFLOAT3 normal = XMVectorNormalize({ static_cast<float>(nx) ,static_cast<float>(ny),static_cast<float>(nz) });
+							vertex->nx = normal.x;
+							vertex->ny = normal.y;
+							vertex->nz = normal.z;
 							hasNormal = true;
 						}
 						// Check if `texcoord_index` is zero or positive. negative = no texcoord data
@@ -97,13 +103,13 @@ namespace Framework
 						{
 							auto tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
 							auto ty = 1 - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
-							texCoord[curVertexIdx].x = static_cast<float>(tx);
-							texCoord[curVertexIdx].y = static_cast<float>(ty);
+							vertex->u = static_cast<float>(tx);
+							vertex->v = static_cast<float>(ty);
 						}
 						else
 						{
-							texCoord[curVertexIdx].x = 0.5f;
-							texCoord[curVertexIdx].y = 0.5f;
+							vertex->u = 0.5f;
+							vertex->v = 0.5f;
 						}
 						//
 						curIndicesIdx++;
@@ -112,26 +118,25 @@ namespace Framework
 					if (!hasNormal)
 					{
 						UINT startVIdx = curVertexIdx - 3;
-						XMFLOAT3 v0 = vertices[startVIdx + 1] - vertices[startVIdx];
-						XMFLOAT3 v1 = vertices[startVIdx + 2] - vertices[startVIdx + 1];
+						MeshVertexDataPtr vertex0 = newMesh->GetVertex(startVIdx);
+						MeshVertexDataPtr vertex1 = newMesh->GetVertex(startVIdx + 1);
+						MeshVertexDataPtr vertex2 = newMesh->GetVertex(startVIdx + 2);
+						XMFLOAT3 v0 = XMFLOAT3{	vertex1->x,vertex1->y,vertex1->z } - XMFLOAT3{ vertex0->x, vertex0->y, vertex0->z };
+						XMFLOAT3 v1 = XMFLOAT3{ vertex2->x,vertex2->y,vertex2->z } - XMFLOAT3{ vertex1->x, vertex1->y, vertex1->z };
 						XMFLOAT3 n = XMVectorNormalize(XMVectorCross(v0, v1));
-						normals[startVIdx] = n;
-						normals[startVIdx + 1] = n;
-						normals[startVIdx + 2] = n;
+						vertex0->nx = n.x; vertex0->ny = n.y; vertex0->nz = n.z;
+						vertex1->nx = n.x; vertex1->ny = n.y; vertex1->nz = n.z;
+						vertex2->nx = n.x; vertex2->ny = n.y; vertex2->nz = n.z;
 					}
 					index_offset += fv;
 				}
-				//
-				newMesh->SetVertexData(vcount, vertices);
-				newMesh->SetIndexData(indicesNum, indices);
-				newMesh->SetNormalData(normals);
-				newMesh->SetUVData(texCoord);
 				//
 				XNA::AxisAlignedBox aabb;
 				aabb.Extents = (bboxMax - bboxMin) * 0.5f;
 				aabb.Center = bboxMin + aabb.Extents;
 				newMesh->SetBoundingShape(aabb);
-				//
+				//º∆À„«–œﬂ
+				Framework::MeshUtil::ComputeMeshTangents(newMesh, vcount, indicesNum);
 			}
 			//
 			shapes.clear();

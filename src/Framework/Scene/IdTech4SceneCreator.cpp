@@ -38,46 +38,41 @@ namespace Framework
 				Renderer* renderer = ent->CreateRenderer();
 				renderer->SetMaterialInstance(MaterialManager::CreateMaterialInstance(materialUrl));
 				//
-				XMFLOAT3* meshVertices = new XMFLOAT3[numVertices]();
-				XMFLOAT3* meshNormals = new XMFLOAT3[numVertices]();
-				XMFLOAT2* meshTexUV = new XMFLOAT2[numVertices]();
-				UINT* meshIndices = new UINT[numIndices];
+				Mesh* mesh = MeshManager::CreateMeshInstance();
+				mesh->ReserveVertices(numVertices);
+				mesh->ReserveVertexIndices(numIndices);
 				XMFLOAT3 bboxMax = { NAGETIVE_INFINITY,NAGETIVE_INFINITY,NAGETIVE_INFINITY };
 				XMFLOAT3 bboxMin = { POSITIVE_INFINITY,POSITIVE_INFINITY,POSITIVE_INFINITY };
 				for (size_t v = 0; v < numVertices; ++v)
 				{
 					IdTech4::MapModelSurfaceVertex vertex = (*vertices)[v];
-					XMFLOAT3 pos = { vertex.x,vertex.z,vertex.y };
-					XMFLOAT3 normal = { vertex.nx,vertex.nz,vertex.ny };
-					XMFLOAT2 uv = { vertex.u,vertex.v };
-					bboxMax.x = pos.x > bboxMax.x ? pos.x : bboxMax.x;
-					bboxMax.y = pos.y > bboxMax.y ? pos.y : bboxMax.y;
-					bboxMax.z = pos.z > bboxMax.z ? pos.z : bboxMax.z;
-					bboxMin.x = pos.x < bboxMin.x ? pos.x : bboxMin.x;
-					bboxMin.y = pos.y < bboxMin.y ? pos.y : bboxMin.y;
-					bboxMin.z = pos.z < bboxMin.z ? pos.z : bboxMin.z;
-					meshVertices[v] = pos;
-					meshNormals[v] = normal;
-					meshTexUV[v] = uv;
+					bboxMax.x = vertex.x > bboxMax.x ? vertex.x : bboxMax.x;
+					bboxMax.y = vertex.z > bboxMax.y ? vertex.z : bboxMax.y;
+					bboxMax.z = vertex.y > bboxMax.z ? vertex.y : bboxMax.z;
+					bboxMin.x = vertex.x < bboxMin.x ? vertex.x : bboxMin.x;
+					bboxMin.y = vertex.z < bboxMin.y ? vertex.z : bboxMin.y;
+					bboxMin.z = vertex.y < bboxMin.z ? vertex.y : bboxMin.z;
+					MeshVertexDataPtr vertexData = mesh->CreateVertex();
+					vertexData->x = vertex.x;
+					vertexData->y = vertex.z;
+					vertexData->z = vertex.y;
+					vertexData->nx = vertex.nx;
+					vertexData->ny = vertex.nz;
+					vertexData->nz = vertex.ny;
+					vertexData->u = vertex.u;
+					vertexData->v = vertex.v;
 				}
 				for (size_t i = 0; i < numIndices; ++i)
 				{
-					meshIndices[i] = (*indices)[i];
+					mesh->AddVertexIndex((*indices)[i]);
 				}
 				XNA::AxisAlignedBox aabb;
 				aabb.Extents = (bboxMax - bboxMin) * 0.5f;
 				aabb.Center = bboxMin + aabb.Extents;
 				//
-				Mesh* mesh = MeshManager::CreateMeshInstance();
-				mesh->SetVertexData(numVertices, meshVertices);
-				mesh->SetIndexData(numIndices, meshIndices);
-				mesh->SetNormalData(meshNormals);
-				mesh->SetUVData(meshTexUV);
 				mesh->SetBoundingShape(aabb);
 				//¼ÆËãÇÐÏß
-				XMFLOAT4* tangents = new XMFLOAT4[numVertices]();
-				Framework::MeshUtil::ComputeTangents(tangents, meshVertices, meshNormals, meshTexUV, numVertices, meshIndices, numIndices);
-				mesh->SetTangentData(tangents);
+				Framework::MeshUtil::ComputeMeshTangents(mesh,numVertices,numIndices);
 				//
 				mesh->UpLoad();
 				renderer->SetMeshInstance(mesh);

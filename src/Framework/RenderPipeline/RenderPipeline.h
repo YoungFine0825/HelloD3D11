@@ -14,7 +14,7 @@ namespace Framework
 	{
 	public:
 		RenderPipeline();
-		~RenderPipeline();
+		virtual ~RenderPipeline();
 		//
 		void DoRender(FrameData* frameData);
 		void SetDrawGUICallBack(RenderPipelineDrawGUICallback cb);

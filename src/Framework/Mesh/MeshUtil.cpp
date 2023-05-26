@@ -1,15 +1,12 @@
 #include <vector>
-
+#include "Mesh.h"
 #include "MeshUtil.h"
 
 namespace Framework
 {
 	namespace MeshUtil
 	{
-		void ComputeTangents(XMFLOAT4* outTangents,
-			XMFLOAT3* vertices, XMFLOAT3* normals, XMFLOAT2* texCoord, UINT numVertices,
-			UINT* indices, UINT numIndices
-		)
+		void ComputeMeshTangents(Mesh* mesh, UINT numVertices, UINT numIndices)
 		{
 			UINT numTri = numIndices / 3;
 			std::vector<XMFLOAT3 > tangents(numVertices);
@@ -22,16 +19,19 @@ namespace Framework
 			//
 			for (UINT t = 0; t < numTri; ++t)
 			{
-				UINT i0 = indices[t * 3 + 0];
-				UINT i1 = indices[t * 3 + 1];
-				UINT i2 = indices[t * 3 + 2];
+				UINT i0 = mesh->GetVertexIndicesValue(t * 3 + 0);
+				UINT i1 = mesh->GetVertexIndicesValue(t * 3 + 1);
+				UINT i2 = mesh->GetVertexIndicesValue(t * 3 + 2);
+				MeshVertexDataPtr vertex0 = mesh->GetVertex(i0);
+				MeshVertexDataPtr vertex1 = mesh->GetVertex(i1);
+				MeshVertexDataPtr vertex2 = mesh->GetVertex(i2);
 				//拿到三角形三个顶点坐标和UV坐标
-				XMFLOAT3 v0 = vertices[i0];
-				XMFLOAT3 v1 = vertices[i1];
-				XMFLOAT3 v2 = vertices[i2];
-				XMFLOAT2 uv0 = texCoord[i0];
-				XMFLOAT2 uv1 = texCoord[i1];
-				XMFLOAT2 uv2 = texCoord[i2];
+				XMFLOAT3 v0 = { vertex0->x,vertex0->y,vertex0->z };
+				XMFLOAT3 v1 = { vertex1->x,vertex1->y,vertex1->z };
+				XMFLOAT3 v2 = { vertex2->x,vertex2->y,vertex2->z };
+				XMFLOAT2 uv0 = { vertex0->u,vertex0->v };
+				XMFLOAT2 uv1 = { vertex1->u,vertex1->v };
+				XMFLOAT2 uv2 = { vertex2->u,vertex2->v };
 				//计算三角形平面上（object space）切线、副切线的算法具体参考：
 				// 1、《Introduction to 3D Game Programming with DirectX 11》 Section 18.3
 				// 2、《Foundations of Game Engine Development Volume 2 Rendering》Section 7.5 Lists 7.4
@@ -58,15 +58,16 @@ namespace Framework
 			//对顶点上累计的切线做正交归一化（orthonormalized）
 			for (UINT i = 0; i < numVertices; ++i)
 			{
+				MeshVertexDataPtr vertex = mesh->GetVertex(i);
 				XMFLOAT3 t = tangents[i];
 				XMFLOAT3 b = bitangents[i];
-				XMFLOAT3 n = normals[i];
+				XMFLOAT3 n = { vertex->nx,vertex->ny,vertex->nz };
 				XMFLOAT3 tangetWithoutHanded = XMVectorNormalize(XMVectorReject(t, n));//做一次Reject操作，确保切线垂直与法线，并且不关心朝向。
 				float tangentDir = XMVectorDot(XMVectorCross(t, b), n) > 0.0f ? 1.0f : -1.0f;//判断切线朝向
-				outTangents[i].x = tangetWithoutHanded.x;
-				outTangents[i].y = tangetWithoutHanded.y;
-				outTangents[i].z = tangetWithoutHanded.z;
-				outTangents[i].w = tangentDir;//最后一位，我们用来保存切线的朝向
+				vertex->tx = tangetWithoutHanded.x;
+				vertex->ty = tangetWithoutHanded.y;
+				vertex->tz = tangetWithoutHanded.z;
+				vertex->tw = tangentDir;//最后一位，我们用来保存切线的朝向
 			}
 		}
 	}

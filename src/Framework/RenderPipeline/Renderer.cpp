@@ -2,7 +2,14 @@
 
 namespace Framework 
 {
-	Renderer::Renderer(Entity* ent) 
+	RendererInstanceId g_rendererInstanceId = 0;
+
+	Renderer::Renderer() : m_id(g_rendererInstanceId++)
+	{
+
+	}
+
+	Renderer::Renderer(Entity* ent) : m_id(g_rendererInstanceId++)
 	{
 		m_ent = ent;
 	}
@@ -46,6 +53,15 @@ namespace Framework
 		}
 		m_material = inst;
 		return this;
+	}
+
+	bool Renderer::IsTransparent() 
+	{
+		if (!m_material) 
+		{
+			return false;
+		}
+		return m_material->GetRenderQueue() >= RENDER_QUEUE_TRANSPARENT;
 	}
 
 	Mesh* Renderer::GetMeshInstance() 

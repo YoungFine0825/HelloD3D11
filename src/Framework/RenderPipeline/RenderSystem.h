@@ -15,6 +15,8 @@ namespace Framework
 	{
 		RenderSystemErrorCode Init();
 		void Cleanup();
+		void SetDrawGUICallBack(RenderPipelineDrawGUICallback cb);
+		void SetDrawGizmosCallBack(RenderPipelineDrawGizmosCallback cb);
 		void SetRenderPipeline(RenderPipeline* pipline);
 		RenderSystemErrorCode RenderFrame();
 		RenderSystemErrorCode RenderCamera(Camera* camera);

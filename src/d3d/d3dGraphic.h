@@ -28,7 +28,6 @@
 namespace d3dGraphic
 {
 	#define DEFAULT_COLOR_BUFFER_FORMAT DXGI_FORMAT_R8G8B8A8_UNORM
-	#define DEFAULT_DS_BUFFER_FORMAT DXGI_FORMAT_D24_UNORM_S8_UINT
 
 	#define D3D_INPUT_DESC_BASE 0
 	#define D3D_INPUT_DESC_COLOR 1
@@ -91,4 +90,6 @@ namespace d3dGraphic
 	//
 	bool SetShadingMode(D3D_SHADING_MODE mode);
 	void EnableBackCulling(bool enable);
+	UINT GetMsaaSampleCount();
+	UINT GetMsaaQuality();
 }

@@ -23,6 +23,7 @@
 #define MATERIAL_TAGS_RENDER_TYPE "RenderType"
 #define MATERIAL_TAGS_CAST_SHADOW "CastShadow"
 #define MATERIAL_TAGS_RECEIVE_SHADOW "ReceiveShadow"
+#define MATERIAL_TAGS_LIGHTING "Lighting"
 
 #define MATERIAL_RENDER_TYPE_BACKGROUND "Background"
 #define MATERIAL_RENDER_TYPE_OPAQUE "Background"
@@ -184,6 +185,11 @@ namespace Framework
 				{
 					fs >> token;
 					material->EnableReceiveShadow(std::stoi(token) == 1);
+				}
+				else if (token == MATERIAL_TAGS_LIGHTING)
+				{
+					fs >> token;
+					material->EnableLighting(std::stoi(token) == 1);
 				}
 			}
 		}

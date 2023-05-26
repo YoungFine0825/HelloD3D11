@@ -2,8 +2,11 @@
 #include "Graphic.h"
 #include "../Window.h"
 #include "../math/MathLib.h"
-
+#include "Texture/Texture.h"
+#include "RenderTexture/RenderTexture.h"
+#include "Mesh/Mesh.h"
 #include "Mesh/MeshManager.h"
+#include "Shader/Shader.h"
 #include "Shader/ShaderManager.h"
 
 namespace Framework 
@@ -25,6 +28,18 @@ namespace Framework
 		void ClearDepthStencil(UINT clearFlag)
 		{
 			d3dGraphic::ClearDepthStencil(m_activedDepthStencilView, clearFlag);
+		}
+
+		void ClearRenderTexture(Framework::RenderTexture* rt, const RGBA32 bgColor, UINT clearFlag) 
+		{
+			if (rt->GetRTV()) 
+			{
+				d3dGraphic::ClearRenderTarget((const float*)&bgColor, rt->GetRTV());
+			}
+			if (rt->GetDSV()) 
+			{
+				d3dGraphic::ClearDepthStencil(rt->GetDSV(), clearFlag);
+			}
 		}
 
 		void Present() 
@@ -51,7 +66,27 @@ namespace Framework
 			d3dGraphic::SetRenderTarget(rtv, dsv);
 		}
 
-		void DrawMesh(Mesh* mesh, Shader* shader) 
+		void SetDepthStencil(Framework::RenderTexture* depthStencil)
+		{
+			if (depthStencil == nullptr || depthStencil->GetDSV() == nullptr)
+			{
+				if (m_activedRenderTexture) 
+				{
+					m_activedDepthStencilView = m_activedRenderTexture->GetDSV();
+				}
+				else 
+				{
+					m_activedDepthStencilView = nullptr;
+				}
+			}
+			else 
+			{
+				m_activedDepthStencilView = depthStencil->GetDSV();
+			}
+			d3dGraphic::SetRenderTarget(m_activedRenderTargetView, m_activedDepthStencilView);
+		}
+
+		void DrawMesh(Mesh* mesh, Shader* shader,int pass) 
 		{
 			if (mesh == nullptr || shader == nullptr)
 			{
@@ -74,12 +109,20 @@ namespace Framework
 			context->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
 			context->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 			//
-			context->IASetInputLayout(shader->GetInputLayout());
-			//
 			UINT passCount = shader->GetPassCount();
-			for (UINT p = 0; p < passCount; ++p)
+			if (pass < 0 || pass >= passCount) 
 			{
-				shader->ApplyPass(p, context);
+				for (UINT p = 0; p < passCount; ++p)
+				{
+					context->IASetInputLayout(shader->GetInputLayout(p));
+					shader->ApplyPass(p, context);
+					context->DrawIndexed(mesh->GetIndicesNumber(), 0, 0);
+				}
+			}
+			else 
+			{
+				context->IASetInputLayout(shader->GetInputLayout(pass));
+				shader->ApplyPass(pass, context);
 				context->DrawIndexed(mesh->GetIndicesNumber(), 0, 0);
 			}
 		}

@@ -66,7 +66,7 @@ namespace Framework
 			{
 				rtDesc->msaaCount = min(rtDesc->msaaCount, 8);
 				texDesc.SampleDesc.Count = rtDesc->msaaCount;
-				texDesc.SampleDesc.Quality = rtDesc->msaaCount - 1;
+				texDesc.SampleDesc.Quality = d3dGraphic::GetMsaaQuality() - 1;
 			}
 			else// No MSAA
 			{
@@ -178,6 +178,10 @@ namespace Framework
 
 		void ReleaseRenderTexture(RenderTexture* rt) 
 		{
+			if (!rt) 
+			{
+				return;
+			}
 			ReleaseRenderTexture(rt->GetId());
 		}
 	}

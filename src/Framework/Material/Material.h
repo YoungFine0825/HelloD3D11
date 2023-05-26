@@ -62,7 +62,8 @@ namespace Framework
 		Material* SetMatrix(std::string key, XMMATRIX value);
 		Material* SetTexture(std::string key, Texture* value);
 		Material* Apply();
-
+		Material* EnableLighting(bool enable);
+		bool IsEnableLighting();
 		Material* EnableCastShadow(bool enable);
 		bool IsCastShadow();
 		Material* EnableReceiveShadow(bool enable);
@@ -91,6 +92,7 @@ namespace Framework
 		typedef std::unordered_map<std::string, Texture*> TextureMap;
 		TextureMap m_paramTex;
 
+		bool m_enableLighting{ true };
 		bool m_castShadow{ false };
 		bool m_receiveShadow{ false };
 	};

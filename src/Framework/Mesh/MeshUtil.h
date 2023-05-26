@@ -3,8 +3,9 @@
 
 namespace Framework 
 {
+	class Mesh;
 	namespace MeshUtil 
 	{
-		void ComputeTangents(XMFLOAT4* outTangents, XMFLOAT3* vertices, XMFLOAT3* normals, XMFLOAT2* texCoord, UINT numVertices, UINT* indices, UINT numIndices);
+		void ComputeMeshTangents(Mesh* mesh,UINT numVertices,UINT numIndices);
 	}
 }

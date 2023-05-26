@@ -217,10 +217,10 @@ namespace d3dGraphic
 		dsTexDesc.Height = win_GetHeight();
 		dsTexDesc.MipLevels = 1;
 		dsTexDesc.ArraySize = 1;
-		dsTexDesc.Format = DEFAULT_DS_BUFFER_FORMAT;
+		dsTexDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		if (m_enable4xMsaa)// Use 4X MSAA? --must match swap chain MSAA values.
 		{
-			dsTexDesc.SampleDesc.Count = 4;
+			dsTexDesc.SampleDesc.Count = m_multiSampleCount;
 			dsTexDesc.SampleDesc.Quality = m_4xMsaaQuality - 1;
 		}
 		else// No MSAA
@@ -329,8 +329,15 @@ namespace d3dGraphic
 		if (renderTargetVIew != nullptr) 
 		{
 			m_pSetRenderTargetView = renderTargetVIew;
-			m_pSetDepthStencilView = depthStencilView;
-			m_pd3dImmediateContext->OMSetRenderTargets(1, &m_pSetRenderTargetView, m_pSetDepthStencilView);
+			if (depthStencilView) 
+			{
+				m_pSetDepthStencilView = depthStencilView;
+				m_pd3dImmediateContext->OMSetRenderTargets(1, &m_pSetRenderTargetView, m_pSetDepthStencilView);
+			}
+			else 
+			{
+				m_pd3dImmediateContext->OMSetRenderTargets(1, &m_pSetRenderTargetView, m_pDefDepthStencilView);
+			}
 		}
 		else 
 		{
@@ -504,5 +511,22 @@ namespace d3dGraphic
 		{
 			m_pd3dImmediateContext->RSSetState(m_rsNoCulling);
 		}
+	}
+
+	UINT GetMsaaSampleCount()
+	{
+		if (m_enable4xMsaa) 
+		{
+			return 1;
+		}
+		else 
+		{
+			return m_multiSampleCount;
+		}
+	}
+
+	UINT GetMsaaQuality() 
+	{
+		return m_4xMsaaQuality;
 	}
 }
