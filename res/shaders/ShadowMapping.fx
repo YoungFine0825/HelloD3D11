@@ -22,7 +22,7 @@ SamplerComparisonState samShadow
 };
 
 
-float2 ndcxy_to_uv(float2 ndcxy) 
+float2 NDCXY2UV(float2 ndcxy) 
 { 
 	float2 uv = ndcxy * float2(0.5, -0.5) + float2(0.5, 0.5);
 	return uv;
@@ -58,7 +58,7 @@ float CalcShadowFactor_CSM(float3 posW)
 		posH.xyz /= posH.w;
 		if(is_in_ndc_space(posH.xyz))
 		{
-			uv = ndcxy_to_uv(posH.xy);
+			uv = NDCXY2UV(posH.xy);
 			level = m;
 			depth = posH.z;
 		}

@@ -18,6 +18,8 @@ namespace Framework
 
 	ParallelLightShadowMap::~ParallelLightShadowMap() 
 	{
+		ReleaseCOM(m_depthMapDSV);
+		ReleaseCOM(m_depthMapSRV);
 		ReleaseArrayPointer(m_cascadeParts);
 		ShadowMap::~ShadowMap();
 	}
@@ -159,6 +161,8 @@ namespace Framework
 
 	void ParallelLightShadowMap::PreRender(FrameData* frameData) 
 	{
+		ShadowMap::PreRender(frameData);
+		//
 		RendererVector* renderers = &frameData->renderers;
 		size_t rendererCnt = renderers->size();
 		if (rendererCnt <= 0) 
@@ -200,11 +204,6 @@ namespace Framework
 		//
 		BuildViewProjectMartrix(litRotationW, &m_wholeSceneAABBW,camera);
 		//
-		Shader* shader = ShaderManager::FindWithUrl("res/effects/GenShadowMap.fx");
-		if (!shader)
-		{
-			shader = ShaderManager::LoadFromFxFile("res/effects/GenShadowMap.fx");
-		}
 		//set render target with native api
 		ID3D11DeviceContext* dc = d3dGraphic::GetDeviceContext();
 		ID3D11RenderTargetView* renderTargets[1] = { 0 };
@@ -220,12 +219,7 @@ namespace Framework
 				Renderer* renderer = (*allRenderers)[r];
 				if (renderer->GetMaterialInstance()->IsCastShadow())
 				{
-					Entity* ent = renderer->GetEntity();
-					Transform* trans = ent->GetTransform();
-					XMMATRIX worldMat = trans->GetWorldMatrix();
-					XMMATRIX mvp = worldMat * m_cascadeParts[i].m_viewProjectMatrix;
-					shader->SetMatrix4x4("obj_MatMVP", mvp);
-					Graphics::DrawMesh(renderer->GetMeshInstance(), shader);
+					DrawRenderer(renderer, m_cascadeParts[i].m_viewProjectMatrix);
 				}
 			}
 		}
@@ -235,6 +229,6 @@ namespace Framework
 
 	void ParallelLightShadowMap::PostRender() 
 	{
-
+		ShadowMap::PostRender();
 	}
 }

@@ -12,8 +12,6 @@
 //
 #include "Framework/Utils/FlyingCameraEntity.h"
 //
-#include "Framework/RenderPipeline/ForwardRenderPipeline.h"
-#include "Framework/RenderPipeline/ParallelLightShadowMap.h"
 #include "Framework/Scene/IdTech4SceneCreator.h"
 
 using namespace Framework;
@@ -40,13 +38,13 @@ void App_PreCreateWindow()
 
 bool App_Init()
 {
-	if (!Framework::Root::Init())
+	if (!Root::Init())
 	{
 		return false;
 	}
 	//
-	Framework::RenderSystem::SetDrawGUICallBack(DrawImGUI);
-	Framework::RenderSystem::SetDrawGizmosCallBack(DrawGizmos);
+	RenderSystem::SetDrawGUICallBack(DrawImGUI);
+	RenderSystem::SetDrawGizmosCallBack(DrawGizmos);
 	//
 	CreateSceneFromIdTech4MapFile("res/idtech4/maps/test_scene.proc");
 	//

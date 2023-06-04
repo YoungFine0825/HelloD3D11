@@ -329,15 +329,8 @@ namespace d3dGraphic
 		if (renderTargetVIew != nullptr) 
 		{
 			m_pSetRenderTargetView = renderTargetVIew;
-			if (depthStencilView) 
-			{
-				m_pSetDepthStencilView = depthStencilView;
-				m_pd3dImmediateContext->OMSetRenderTargets(1, &m_pSetRenderTargetView, m_pSetDepthStencilView);
-			}
-			else 
-			{
-				m_pd3dImmediateContext->OMSetRenderTargets(1, &m_pSetRenderTargetView, m_pDefDepthStencilView);
-			}
+			m_pSetDepthStencilView = depthStencilView;
+			m_pd3dImmediateContext->OMSetRenderTargets(1, &m_pSetRenderTargetView, m_pSetDepthStencilView);
 		}
 		else 
 		{

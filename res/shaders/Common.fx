@@ -9,9 +9,6 @@ struct Material
 	float4 DiffuseMapST;
 };
 
-#include "LightHelper.fx"
-#include "ShadowMapping.fx"
-
 struct VertexIn_Common
 {
 	float3 PosL  : POSITION;
@@ -33,10 +30,6 @@ struct VertexOut_Common
 cbuffer cdPerFrame
 {
 	float3 g_CameraPosW;
-	//ParallelLight
-	ParallelLight g_ParallelLight;
-	PointLight g_PointLights[6];
-	SpotLight g_SpotLights[6];
 	//Fog
 	float4 g_linearFogColor;
 	float g_linearFogStart;
@@ -93,59 +86,11 @@ VertexOut_Common VertexShader_Common(VertexIn_Common vin)
     return vout;
 }
 
-
-
 //通用纹理采样
 float4 tex2D(Texture2D map,float2 uv)
 {
 	return map.Sample(samCommon, uv);
 }
-
-
-//通用世界空间下，BlinnPhong光照计算
-void BlinnPhongLightingInWorldSpace(float3 normalW,float3 posW,Material mat,bool useParallelShadowMap,
-	out float3 ambientColor,
-	out float3 diffuseColor,
-	out float3 specularColor
-	)
-{
-	float3 N = normalize(normalW);
-	float3 viewDir = normalize(g_CameraPosW - posW);
-
-	float3 A,D,S = float3(0,0,0);
-	ambientColor = float3(0,0,0);
-	diffuseColor = float3(0,0,0);
-	specularColor = float3(0,0,0);
-	//
-	float shadowFactor = 0;
-	if(useParallelShadowMap && g_ParallelLight.intensity > 0)
-	{
-		shadowFactor = CalcShadowFactor_CSM(posW) / g_ParallelLight.intensity;
-	}
-	//计算平行光
-	CalcuParallelLight(g_ParallelLight,mat,N,viewDir,A,D,S);
-	ambientColor += A;
-	diffuseColor += lerp(D * 0.5f,D,shadowFactor);
-	specularColor += lerp(S * 0.0f,S,shadowFactor);
-	//计算点光源
-	int lightIdx = 0;
-	for(lightIdx = 0;lightIdx < 6;++lightIdx)
-	{
-		CalcuPointLight(g_PointLights[lightIdx],mat,N,viewDir,posW,A,D,S);
-		ambientColor += A;
-		diffuseColor += D;
-		specularColor += S;
-	}
-	//计算聚光灯
-	for(lightIdx = 0;lightIdx < 6;++lightIdx)
-	{
-		CalcuSpotLight(g_SpotLights[lightIdx],mat,N,viewDir,posW,A,D,S);
-		ambientColor += A;
-		diffuseColor += D;
-		specularColor += S;
-	}
-}
-
 
 //计算线性雾
 float3 CalcuLinearFog(float3 posW,float3 inputColor)
@@ -166,4 +111,10 @@ float3 NormalTangent2WorldSpace(float3 normalSample,float3 unitNormalW,float3 ta
 	float3x3 TBN = float3x3(T,B,N);
 	float3 normalW = normalize(mul(normalT,TBN));//得到世界空间下得切线向量
 	return normalW;
+}
+
+float2 ndc_xy_to_uv(float2 ndcxy) 
+{ 
+	float2 uv = ndcxy * float2(0.5, -0.5) + float2(0.5, 0.5);
+	return uv;
 }

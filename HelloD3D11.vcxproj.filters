@@ -274,13 +274,19 @@
     <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingResources.cpp">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClCompile>
-    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\ParallelShadowPass.cpp">
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\ShadowPass.cpp">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClCompile>
     <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingPass.cpp">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClCompile>
     <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\GBufferPass.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\LightingPass.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\UnlightPass.cpp">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClCompile>
   </ItemGroup>
@@ -468,13 +474,22 @@
     <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingResources.h">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClInclude>
-    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\ParallelShadowPass.h">
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\ShadowPass.h">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClInclude>
     <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingPass.h">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClInclude>
     <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\GBufferPass.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\LightingPass.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\UnlightPass.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\BackgroundPass.h">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClInclude>
   </ItemGroup>

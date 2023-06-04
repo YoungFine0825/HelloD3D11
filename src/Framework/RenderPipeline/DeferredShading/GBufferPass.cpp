@@ -10,14 +10,14 @@ namespace Framework
 {
 	namespace DeferredShading 
 	{
-		GBufferPass::GBufferPass() 
+		GBufferPass::GBufferPass() : DeferredShadingPass()
 		{
 
 		}
 
 		GBufferPass::~GBufferPass() 
 		{
-
+			DeferredShadingPass::~DeferredShadingPass();
 		}
 
 		void GBufferPass::Init(DeferredRenderPipeline* rp, DeferredShadingResources* rps) 
@@ -38,40 +38,29 @@ namespace Framework
 				Framework::Graphics::ClearRenderTexture(m_resouces->GBuffer(g),Colors::Black);
 			}
 			//
-			Camera* renderingCamera = m_renderPipeline->GetCurRenderingCamera();
-			XMMATRIX viewMat = renderingCamera->GetViewMatrix();
-			XMMATRIX projMat = renderingCamera->GetProjectMatrix();
+			RenderingCameraInfo* cameraInfo = m_resouces->GetRenderingCameraInfo();
 			//
 			for (UINT g = 0; g < gbufferCnt; ++g)
 			{
-				DrawGBuffer(g, nullptr, viewMat, projMat);
+				DrawGBuffer(g, cameraInfo->viewMatrix, cameraInfo->projMatrix);
 			}
 			//
 			Graphics::SetRenderTarget(nullptr);
-			Graphics::Blit(m_resouces->GBuffer(1), nullptr);
 		}
 
-		void GBufferPass::DrawGBuffer(UINT index, Shader* shader, XMMATRIX viewMatrix, XMMATRIX projMatrix)
+		void GBufferPass::DrawGBuffer(UINT index, XMMATRIX viewMatrix, XMMATRIX projMatrix)
 		{
 			Graphics::SetRenderTarget(m_resouces->GBuffer(index));
 			Graphics::SetDepthStencil(m_resouces->GetCameraDepthTexture());
 			Graphics::ClearDepthStencil();
 			//
-			RendererVector* renderers = m_resouces->GetVisibleOpaqueRenderes();
+			RendererVector* renderers = m_resouces->GetOpaqueRenderes();
 			size_t rendererCnt = renderers->size();
 			for (size_t r = 0; r < rendererCnt; ++r) 
 			{
 				Renderer* renderer = (*renderers)[r];
 				Material* materialInst = renderer->GetMaterialInstance();
-				if (!materialInst->IsEnableLighting()) 
-				{
-					continue;
-				}
 				Shader* shader = materialInst->GetShader();
-				if (!shader->hasTechnique("GBuffer")) 
-				{
-					continue;
-				}
 				shader->SetEnabledTechnique("GBuffer");
 				m_renderPipeline->DrawRenderer(renderer, shader, viewMatrix, projMatrix,index);
 			}

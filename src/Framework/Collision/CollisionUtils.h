@@ -5,6 +5,7 @@
 
 namespace Framework 
 {
+	class Light;
 	namespace CollisionUtils 
 	{
 		int IntersectAxisAlignedBoxFrustum(const AxisAlignedBox* pVolumeA, const Frustum* pVolumeB);
@@ -17,5 +18,8 @@ namespace Framework
 		void ComputeWorldSpaceFrustumFromProj(Frustum* pOut, XMMATRIX proj,XMMATRIX worldMatrix);
 		void ComputeFrustumVertices(XMFLOAT3 array[8], float fov, float aspect, float nearDistance, float farDistance);
 		void TransformAABB(const AxisAlignedBox* aabbIn, const XMMATRIX transform, AxisAlignedBox* aabbOut);
+		//
+
+		bool IntersectLightFrustum(Light* lit, const Frustum* frustum);
 	}
 }

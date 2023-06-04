@@ -10,6 +10,7 @@ struct ID3D11InputLayout;
 namespace Framework 
 {
 	class Texture;
+	class RenderTexture;
 
 	class Shader : public Resource::IResource 
 	{
@@ -26,6 +27,7 @@ namespace Framework
 		//
 		UINT GetPassCount();
 		bool ApplyPass(UINT passIndex, ID3D11DeviceContext* context);
+		bool hasPass(const std::string passName);
 		//
 		ID3D11InputLayout* GetInputLayout(UINT passIndex);
 		//
@@ -37,6 +39,7 @@ namespace Framework
 		Shader* SetStruct(const char* propName, void* pData,UINT Count,UINT Offset = 0);
 		Shader* SetShaderResourceView(const char* propName, ID3D11ShaderResourceView* srv);
 		Shader* SetTexture(const char* propName, Texture* tex);
+		Shader* SetRenderTexture(const char* propName, RenderTexture* rt);
 		Shader* SetUnorderredAccessView(const char* propName, ID3D11UnorderedAccessView* uav);
 		Shader* SetInputLayout(unsigned int layoutIndex);
 		Shader* SetArray(const char* propName, void* pData, UINT Count, UINT Offset = 0);

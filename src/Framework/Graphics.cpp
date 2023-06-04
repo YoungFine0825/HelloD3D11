@@ -127,19 +127,24 @@ namespace Framework
 			}
 		}
 
-		void Blit(ID3D11ShaderResourceView* srv, Framework::RenderTexture* dst) 
+		void Blit(ID3D11ShaderResourceView* srv, Framework::RenderTexture* dst,Shader* customShader,UINT pass) 
 		{
 			if (srv == nullptr)
 			{
 				return;
 			}
-			if (m_blitShader == nullptr)
+			Shader* shader = customShader;
+			if (shader == nullptr) 
 			{
-				m_blitShader = ShaderManager::LoadFromFxFile("res/effects/BlitCopy.fx");
 				if (m_blitShader == nullptr)
 				{
-					return;
+					m_blitShader = ShaderManager::LoadFromFxFile("res/shaders/BlitCopy.fx");
+					if (m_blitShader == nullptr)
+					{
+						return;
+					}
 				}
+				shader = m_blitShader;
 			}
 			//
 			unsigned int dstWid = 0;
@@ -161,37 +166,37 @@ namespace Framework
 			XMMATRIX scaling = XMMatrixScaling(aspectRadtio, 1, 1);
 			XMMATRIX triangleWorldMat = scaling * translate;
 			XMMATRIX proj = XMMatrixOrthographicLH(aspectRadtio, 1, 1, 3);
-			m_blitShader->SetMatrix4x4("obj_MatMVP", triangleWorldMat * proj);
-			m_blitShader->SetShaderResourceView("g_diffuseMap", srv);
+			shader->SetMatrix4x4("obj_MatMVP", triangleWorldMat * proj);
+			shader->SetShaderResourceView("g_diffuseMap", srv);
 			bool hasDepth = dst == nullptr || dst->GetDSV() != nullptr;
 			//
 			SetRenderTarget(dst);
-			ClearBackground(Colors::Black);
+			//ClearBackground(Colors::Black);
 			if (hasDepth)
 			{
 				ClearDepthStencil();
 			}
-			DrawMesh(triangle, m_blitShader);
+			DrawMesh(triangle, shader,pass);
 			//
 			SetRenderTarget(nullptr);
 		}
 
-		void Blit(RenderTexture* src, RenderTexture* dst) 
+		void Blit(RenderTexture* src, RenderTexture* dst,Shader* customShader,UINT pass) 
 		{
 			if (src->GetColorTextureSRV() == nullptr) 
 			{
 				return;
 			}
-			Blit(src->GetColorTextureSRV(), dst);
+			Blit(src->GetColorTextureSRV(), dst,customShader,pass);
 		}
 
-		void Blit(Framework::Texture* texture, Framework::RenderTexture* dst) 
+		void Blit(Framework::Texture* texture, Framework::RenderTexture* dst, Shader* customShader, UINT pass)
 		{
 			if (texture->GetShaderResourceView() == nullptr) 
 			{
 				return;
 			}
-			Blit(texture->GetShaderResourceView(), dst);
+			Blit(texture->GetShaderResourceView(), dst, customShader, pass);
 		}
 	}
 }

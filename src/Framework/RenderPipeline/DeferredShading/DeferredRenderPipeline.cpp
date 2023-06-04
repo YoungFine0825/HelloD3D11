@@ -3,6 +3,7 @@
 #include "../../Scene/Entity.h"
 #include "../../Material/Material.h"
 #include "../../Shader/Shader.h"
+#include "../../Collision/CollisionUtils.h"
 #include "../../Graphic.h"
 #include "../FrameData.h"
 #include "../Renderer.h"
@@ -10,8 +11,10 @@
 #include "DeferredShadingResources.h"
 //Passes
 #include "DeferredShadingPass.h"
-#include "ParallelShadowPass.h"
+#include "ShadowPass.h"
 #include "GBufferPass.h"
+#include "LightingPass.h"
+#include "UnlightPass.h"
 
 namespace Framework
 {
@@ -35,11 +38,15 @@ namespace Framework
 
 		void DeferredRenderPipeline::InitPasses()
 		{
-			m_parallelShadowPass = std::make_shared<DeferredShading::ParallelShadowPass>();
-			m_gbufferPass = std::make_shared<DeferredShading::GBufferPass>();
+			m_shadowPass = std::make_shared<ShadowPass>();
+			m_gbufferPass = std::make_shared<GBufferPass>();
+			m_lightingPass = std::make_shared<LightingPass>();
+			m_unlightPass = std::make_shared<UnlightPass>();
 			//
-			m_parallelShadowPass->Init(this, this->m_resources);
+			m_shadowPass->Init(this, this->m_resources);
 			m_gbufferPass->Init(this, this->m_resources);
+			m_lightingPass->Init(this, this->m_resources);
+			m_unlightPass->Init(this, this->m_resources);
 		}
 
 		FrameData* DeferredRenderPipeline::GetFrameData() 
@@ -73,12 +80,14 @@ namespace Framework
 
 		void DeferredRenderPipeline::OnFrameStart() 
 		{
-			m_parallelShadowPass->OnFrameStart();
+			m_shadowPass->OnFrameStart();
 			m_gbufferPass->OnFrameStart();
 		}
 
 		void DeferredRenderPipeline::RenderCamera(Camera* camera)
 		{
+			SetupCamera(camera);
+			//
 			RendererVector visibleRenderers;
 			CollectVisibleRenderers(camera, &visibleRenderers);
 			//
@@ -91,25 +100,48 @@ namespace Framework
 			SortVisibleRenderers(camera, &visibleRenderers);
 			//
 			m_resources->m_visibleOpaqueRenderers.clear();
+			m_resources->m_unlightOpaqueRenderers.clear();
 			m_resources->m_visibleTranparentRenderers.clear();
 			for (size_t r = 0; r < rendererCnt; ++r) 
 			{
-				if (visibleRenderers[r]->IsTransparent()) 
+				Renderer* renderer = visibleRenderers[r];
+				if (renderer->IsTransparent())
 				{
-					m_resources->m_visibleTranparentRenderers.push_back(visibleRenderers[r]);
+					m_resources->m_visibleTranparentRenderers.push_back(renderer);
 				}
 				else 
 				{
-					m_resources->m_visibleOpaqueRenderers.push_back(visibleRenderers[r]);
+					Material* materialInst = renderer->GetMaterialInstance();
+					Shader* shader = materialInst->GetShader();
+					if (!materialInst->IsEnableLighting() || !shader->hasTechnique("GBuffer"))
+					{
+						m_resources->m_unlightOpaqueRenderers.push_back(renderer);
+					}
+					else 
+					{
+						m_resources->m_visibleOpaqueRenderers.push_back(renderer);
+					}
 				}
 			}
 			//
-			m_curRenderingCamera = camera;
-			m_curRenderingCameraPosW = camera->GetTransform()->position;
+			m_resources->m_renderingCamera = camera;
+			m_resources->m_renderingCameraInfo.posW = camera->GetTransform()->position;
+			m_resources->m_renderingCameraInfo.projMatrix = camera->GetProjectMatrix();
+			m_resources->m_renderingCameraInfo.viewMatrix = camera->GetViewMatrix();
 			//
-			//static_cast<ParallelShadowPass*>(m_parallelShadowPass.get())->Invoke();
+			FindParallelLight();
+			CollectVisiblePuntcualLights(camera);
+			//
+			static_cast<ShadowPass*>(m_shadowPass.get())->Invoke();
 			//
 			static_cast<GBufferPass*>(m_gbufferPass.get())->Invoke();
+			//
+			static_cast<LightingPass*>(m_lightingPass.get())->Invoke();
+			//
+			static_cast<UnlightPass*>(m_unlightPass.get())->Invoke();
+			//
+			Framework::RenderTexture* rt = camera->GetRenderTexture();
+			Graphics::Blit(m_resources->m_finalShadingRT, rt);
 		}
 
 		void DeferredRenderPipeline::DrawRenderer(Renderer* renderer, Shader* shader, XMMATRIX viewMatrix, XMMATRIX projectMatrix,int pass)
@@ -118,7 +150,7 @@ namespace Framework
 			Material* mat = renderer->GetMaterialInstance();
 			//Per Frame
 			shader->SetFloat("g_timeDelta", App_GetTimeDelta());
-			shader->SetVector3("g_CameraPosW", m_curRenderingCameraPosW);
+			shader->SetVector3("g_CameraPosW", m_resources->m_renderingCameraInfo.posW);
 			//ÉèÖÃTranform²ÎÊý
 			Transform* trans = ent->GetTransform();
 			XMMATRIX worldMat = trans->GetWorldMatrix();
@@ -135,9 +167,38 @@ namespace Framework
 			Graphics::DrawMesh(renderer->GetMeshInstance(), shader,pass);
 		}
 
-		Camera* DeferredRenderPipeline::GetCurRenderingCamera() 
+		void DeferredRenderPipeline::FindParallelLight() 
 		{
-			return m_curRenderingCamera;
+			LightVector* lights = &(m_frameData->lights);
+			size_t lightCnt = lights->size();
+			Light* maxIntensityParallelLit = nullptr;
+			float maxIntensity = 0.0f;
+			for (size_t l = 0; l < lightCnt; ++l)
+			{
+				if ((*lights)[l]->GetType() == LIGHT_TYPE_DIRECTIONAL && (*lights)[l]->GetIntensity() > maxIntensity)
+				{
+					maxIntensityParallelLit = (*lights)[l];
+				}
+			}
+			m_resources->m_parallelLit = maxIntensityParallelLit;
+		}
+
+		void DeferredRenderPipeline::CollectVisiblePuntcualLights(Camera* camera)
+		{
+			m_resources->m_visiblePunctualLight.clear();
+			Frustum cameraFrustum = camera->GetWorldSpaceFrustum();
+			LightVector* lights = &(m_frameData->lights);
+			size_t litCnt = lights->size();
+			for (size_t l = 0; l < litCnt; ++l) 
+			{
+				Light* lit = (*lights)[l];
+				LIGHT_TYPE type = lit->GetType();
+				if (type == LIGHT_TYPE_DIRECTIONAL) { continue; }
+				if (Framework::CollisionUtils::IntersectLightFrustum(lit, &cameraFrustum))
+				{
+					m_resources->m_visiblePunctualLight.push_back(lit);
+				}
+			}
 		}
 	}
 

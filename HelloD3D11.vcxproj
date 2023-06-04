@@ -180,7 +180,9 @@
     <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingPass.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingResources.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\GBufferPass.cpp" />
-    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\ParallelShadowPass.cpp" />
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\LightingPass.cpp" />
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\ShadowPass.cpp" />
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\UnlightPass.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\ForwardRenderPipeline.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\FrameData.cpp" />
     <ClCompile Include="src\Framework\RenderPipeline\ParallelLightShadowMap.cpp" />
@@ -240,11 +242,14 @@
     <ClInclude Include="src\Framework\Mesh\MeshUtil.h" />
     <ClInclude Include="src\Framework\Model\Model.h" />
     <ClInclude Include="src\Framework\Model\ModelManager.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\BackgroundPass.h" />
     <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\DeferredRenderPipeline.h" />
     <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingPass.h" />
     <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\DeferredShadingResources.h" />
     <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\GBufferPass.h" />
-    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\ParallelShadowPass.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\LightingPass.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\ShadowPass.h" />
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\UnlightPass.h" />
     <ClInclude Include="src\Framework\RenderPipeline\ForwardRenderPipeline.h" />
     <ClInclude Include="src\Framework\RenderPipeline\FrameData.h" />
     <ClInclude Include="src\Framework\RenderPipeline\ParallelLightShadowMap.h" />

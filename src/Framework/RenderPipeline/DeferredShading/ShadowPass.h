@@ -3,13 +3,14 @@
 
 namespace Framework 
 {
+	class ParallelLightShadowMap;
 	namespace DeferredShading 
 	{
-		class ParallelShadowPass : public DeferredShadingPass 
+		class ShadowPass : public DeferredShadingPass 
 		{
 		public:
-			ParallelShadowPass();
-			~ParallelShadowPass() override;
+			ShadowPass();
+			~ShadowPass() override;
 			//
 			void Init(DeferredRenderPipeline* rp, DeferredShadingResources* rps) override;
 		protected:

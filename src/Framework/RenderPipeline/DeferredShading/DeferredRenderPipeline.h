@@ -21,7 +21,6 @@ namespace Framework
 			//
 			FrameData* GetFrameData();
 			void DrawRenderer(Renderer* renderer, Shader* shader,XMMATRIX viewMatrix,XMMATRIX projectMatrix,int pass = -1);
-			Camera* GetCurRenderingCamera();
 		protected:
 			void OnRender() override;
 		private:
@@ -29,11 +28,14 @@ namespace Framework
 			void OnFrameStart();
 			void RenderCamera(Camera* camera);
 			//
+			void FindParallelLight();
+			void CollectVisiblePuntcualLights(Camera* camera);
+			//
 			DeferredShadingResources* m_resources;
-			std::shared_ptr<DeferredShadingPass> m_parallelShadowPass;
+			std::shared_ptr<DeferredShadingPass> m_shadowPass;
 			std::shared_ptr<DeferredShadingPass> m_gbufferPass;
-			Camera* m_curRenderingCamera;
-			XMFLOAT3 m_curRenderingCameraPosW;
+			std::shared_ptr<DeferredShadingPass> m_lightingPass;
+			std::shared_ptr<DeferredShadingPass> m_unlightPass;
 		};
 	}
 }

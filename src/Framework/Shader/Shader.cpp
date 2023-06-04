@@ -2,6 +2,7 @@
 #include "../../Global.h"
 #include "../../d3d/d3dGraphic.h"
 #include "../Texture/Texture.h"
+#include "../RenderTexture/RenderTexture.h"
 
 namespace Framework 
 {
@@ -148,6 +149,20 @@ namespace Framework
 		return false;
 	}
 
+	bool Shader::hasPass(const std::string passName)
+	{
+		if (!m_pTech) 
+		{
+			return false;
+		}
+		ID3DX11EffectPass* pass = m_pTech->GetPassByName(passName.c_str());
+		if (!pass || !pass->IsValid()) 
+		{
+			return false;
+		}
+		return true;
+	}
+
 
 	Shader* Shader::SetMatrix4x4(const char* propName, XMMATRIX matrix) 
 	{
@@ -286,6 +301,20 @@ namespace Framework
 		{
 			shaderResourceView->SetResource(nullptr);
 		}
+		return this;
+	}
+
+	Shader* Shader::SetRenderTexture(const char* propName, RenderTexture* rt)
+	{
+		if (rt == nullptr)
+		{
+			return this;
+		}
+		if (m_pEffect == nullptr)
+		{
+			return this;
+		}
+		SetShaderResourceView(propName, rt->GetColorTextureSRV());
 		return this;
 	}
 

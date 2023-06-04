@@ -40,6 +40,15 @@ DepthStencilState DSS
 {
 	DepthEnable = true;
 	DepthWriteMask = Zero;
+	StencilEnable = true;
+	StencilReadMask = 0;
+	StencilWriteMask = 0;
+	FrontFaceStencilFunc = EQUAL;
+	FrontFaceStencilPass = Keep;
+	FrontFaceStencilFail = Keep;
+	BackFaceStencilFunc = EQUAL;
+	BackFaceStencilPass = Keep;
+	BackFaceStencilFail = Keep;
 };
 
 technique11 Default

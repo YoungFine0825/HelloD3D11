@@ -1,5 +1,5 @@
 Name skies/cubeSky
-Shader effects/SkyBoxPlane.fx
+Shader shaders/SkyBoxPlane.fx
 Properties {
 	Color diffuseColor (1.0 1.0 1.0 1.0)
 	Texture mainTexture textures\skies\daysky_right.tga
@@ -9,4 +9,5 @@ Tags {
 	RenderType Background
 	CastShadow 0
 	ReceiveShadow 0
+	Lighting 0
 }

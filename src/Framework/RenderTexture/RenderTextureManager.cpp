@@ -97,7 +97,7 @@ namespace Framework
 			//
 			if (rtDesc->includeColor) 
 			{
-				texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				texDesc.Format = rtDesc->colorFormat;
 				texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 				if (rtDesc->createColorUAV)
 				{
@@ -106,12 +106,12 @@ namespace Framework
 				DXHR(device->CreateTexture2D(&texDesc, 0, &colorTex2D));
 				DXHR(device->CreateRenderTargetView(colorTex2D, 0, &colorBuffer));
 				//
-				srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				srvDesc.Format = rtDesc->colorFormat;
 				DXHR(device->CreateShaderResourceView(colorTex2D, &srvDesc, &colorSRV));
 				//
 				if (rtDesc->createColorUAV)
 				{
-					uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+					uavDesc.Format = rtDesc->colorFormat;
 					DXHR(device->CreateUnorderedAccessView(colorTex2D, &uavDesc, &colorUAV));
 				}
 			}

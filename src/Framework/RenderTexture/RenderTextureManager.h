@@ -13,6 +13,7 @@ namespace Framework
 		bool createColorUAV = false;
 		bool createDepthUAV = false;
 		unsigned int msaaCount = 1;
+		DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	};
 
 	namespace RenderTextureManager 
