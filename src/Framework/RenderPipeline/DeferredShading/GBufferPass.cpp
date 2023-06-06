@@ -39,22 +39,31 @@ namespace Framework
 			}
 			//
 			RenderingCameraInfo* cameraInfo = m_resouces->GetRenderingCameraInfo();
+			RendererVector* renderers = m_resouces->GetOpaqueRenderes();
 			//
 			for (UINT g = 0; g < gbufferCnt; ++g)
 			{
-				DrawGBuffer(g, cameraInfo->viewMatrix, cameraInfo->projMatrix);
+				DrawGBuffer(g, renderers,cameraInfo->viewMatrix, cameraInfo->projMatrix);
 			}
 			//
 			Graphics::SetRenderTarget(nullptr);
+			//
+			size_t rendererCnt = renderers->size();
+			for (size_t r = 0; r < rendererCnt; ++r)
+			{
+				Renderer* renderer = (*renderers)[r];
+				Material* materialInst = renderer->GetMaterialInstance();
+				Shader* shader = materialInst->GetShader();
+				shader->SetEnabledTechnique("Default");
+			}
 		}
 
-		void GBufferPass::DrawGBuffer(UINT index, XMMATRIX viewMatrix, XMMATRIX projMatrix)
+		void GBufferPass::DrawGBuffer(UINT index, RendererVector* renderers, XMMATRIX viewMatrix, XMMATRIX projMatrix)
 		{
 			Graphics::SetRenderTarget(m_resouces->GBuffer(index));
 			Graphics::SetDepthStencil(m_resouces->GetCameraDepthTexture());
 			Graphics::ClearDepthStencil();
 			//
-			RendererVector* renderers = m_resouces->GetOpaqueRenderes();
 			size_t rendererCnt = renderers->size();
 			for (size_t r = 0; r < rendererCnt; ++r) 
 			{

@@ -15,6 +15,25 @@ SamplerState samplerGBuffer
 	AddressV = BORDER;
 };
 
+DepthStencilState DSS_DrawBackgroundPass
+{
+	DepthEnable = true;
+	DepthWriteMask = Zero;
+	StencilEnable = true;
+	StencilReadMask = 0xff;
+	StencilWriteMask = 0xff;
+	FrontFaceStencilFunc = EQUAL;
+	FrontFaceStencilPass = Keep;
+	FrontFaceStencilFail = Keep;
+	BackFaceStencilFunc = EQUAL;
+	BackFaceStencilPass = Keep;
+	BackFaceStencilFail = Keep;
+};
+
+int g_StencilRefBackground = 0;
+int g_StencilRefOpaque = 1;
+int g_StencilRefAlphaTest = 2;
+
 float4 sampleGBuffer0(float2 uv)
 {
 	return g_GBufferTex0.Sample(samplerGBuffer, uv);

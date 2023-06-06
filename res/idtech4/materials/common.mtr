@@ -3,3 +3,9 @@ materials/common/grid/Prototype_Grid_Gray_04-512x512
     qer_editorimage ../textures/grid/Prototype_Grid_Gray_04-512x512.png
 	diffusemap ../textures/grid/Prototype_Grid_Gray_04-512x512.png
 }
+
+materials/WireFence
+{
+    qer_editorimage ../textures/WireFence.jpg
+	diffusemap ../textures/WireFence.jpg
+}

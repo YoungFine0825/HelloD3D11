@@ -26,14 +26,14 @@ float4 PS_GBuffer3(VertexOut_Common pin) : SV_Target
 DepthStencilState DSS_GBufferOpaque
 {
 	StencilEnable = true;
-	StencilReadMask = 0x00;
+	StencilReadMask = 0xff;
 	StencilWriteMask = 0xff;
 	FrontFaceStencilFunc = Always;
 	FrontFaceStencilPass = REPLACE;
-	FrontFaceStencilFail = REPLACE;
+	FrontFaceStencilFail = Keep;
 	BackFaceStencilFunc = Always;
 	BackFaceStencilPass = REPLACE;
-	BackFaceStencilFail = REPLACE;
+	BackFaceStencilFail = Keep;
 };
 
 technique11 GBuffer
@@ -41,7 +41,7 @@ technique11 GBuffer
 	pass GBufferPass0
 	{
 		SetRasterizerState(0);
-		SetDepthStencilState(DSS_GBufferOpaque, 0);
+		SetDepthStencilState(DSS_GBufferOpaque, g_StencilRefOpaque);
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
@@ -51,7 +51,7 @@ technique11 GBuffer
 	pass GBufferPass1
 	{
 		SetRasterizerState(0);
-		SetDepthStencilState(DSS_GBufferOpaque, 0);
+		SetDepthStencilState(DSS_GBufferOpaque, g_StencilRefOpaque);
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
@@ -61,7 +61,7 @@ technique11 GBuffer
 	pass GBufferPass2
 	{
 		SetRasterizerState(0);
-		SetDepthStencilState(DSS_GBufferOpaque, 0);
+		SetDepthStencilState(DSS_GBufferOpaque, g_StencilRefOpaque);
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );
@@ -71,7 +71,7 @@ technique11 GBuffer
 	pass GBufferPass3
 	{
 		SetRasterizerState(0);
-		SetDepthStencilState(DSS_GBufferOpaque, 0);
+		SetDepthStencilState(DSS_GBufferOpaque, g_StencilRefOpaque);
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );

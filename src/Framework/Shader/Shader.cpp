@@ -25,6 +25,7 @@ namespace Framework
 		}
 		ReleaseArrayPointer(m_pInputLayouts);
 		ReleaseCOM(m_pEffect);
+		IResource::Release();
 	}
 
 	bool Shader::CreateFromBlob(ID3D10Blob* compiledShader) 

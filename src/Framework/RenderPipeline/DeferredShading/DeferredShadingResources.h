@@ -33,6 +33,7 @@ namespace Framework
 			RenderTexture* GetCameraDepthTexture();
 			RenderTexture* GetShadingResultTexture();
 			RenderTexture* GBuffer(UINT index);
+			RendererVector* GetBackgroundRenderers();
 			RendererVector* GetOpaqueRenderes();
 			RendererVector* GetUnlightOpaqueRenderers();
 			RendererVector* GetTransparentRenderers();
@@ -47,6 +48,7 @@ namespace Framework
 			RenderTexture* m_cameraDepthRT;
 			RenderTexture* m_finalShadingRT;
 			std::vector<RenderTexture*> m_GBuffers;
+			RendererVector m_visibleBgRenderers;
 			RendererVector m_visibleOpaqueRenderers;
 			RendererVector m_unlightOpaqueRenderers;
 			RendererVector m_visibleTranparentRenderers;

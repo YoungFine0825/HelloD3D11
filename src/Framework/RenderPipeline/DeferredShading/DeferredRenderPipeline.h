@@ -35,6 +35,7 @@ namespace Framework
 			std::shared_ptr<DeferredShadingPass> m_shadowPass;
 			std::shared_ptr<DeferredShadingPass> m_gbufferPass;
 			std::shared_ptr<DeferredShadingPass> m_lightingPass;
+			std::shared_ptr<DeferredShadingPass> m_backgroundPass;
 			std::shared_ptr<DeferredShadingPass> m_unlightPass;
 		};
 	}

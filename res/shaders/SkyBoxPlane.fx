@@ -1,4 +1,5 @@
 #include "Common.fx"
+#include "Pipeline/DeferredShadingDefine.fx"
 
 VertexOut_Common VS(VertexIn_Common vin)
 {
@@ -36,27 +37,12 @@ float4 PS(VertexOut_Common pin) : SV_Target
     return finalColor;
 }
 
-DepthStencilState DSS
-{
-	DepthEnable = true;
-	DepthWriteMask = Zero;
-	StencilEnable = true;
-	StencilReadMask = 0;
-	StencilWriteMask = 0;
-	FrontFaceStencilFunc = EQUAL;
-	FrontFaceStencilPass = Keep;
-	FrontFaceStencilFail = Keep;
-	BackFaceStencilFunc = EQUAL;
-	BackFaceStencilPass = Keep;
-	BackFaceStencilFail = Keep;
-};
-
 technique11 Default
 {
     pass P0
     {
 		SetRasterizerState(0);
-		SetDepthStencilState(DSS, 0);
+		SetDepthStencilState(DSS_DrawBackgroundPass, g_StencilRefBackground);
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
         SetVertexShader( CompileShader( vs_5_0, VS() ) );
 		SetGeometryShader( NULL );

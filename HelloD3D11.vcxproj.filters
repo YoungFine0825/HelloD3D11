@@ -289,6 +289,9 @@
     <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\UnlightPass.cpp">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\BackgroundPass.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">

@@ -1,4 +1,5 @@
 #include "Common.fx"
+#include "Pipeline/DeferredShadingDefine.fx"
 
 VertexOut_Common VS(VertexIn_Common vin)
 {

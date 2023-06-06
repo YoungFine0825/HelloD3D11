@@ -4,6 +4,7 @@
 
 namespace Framework
 {
+	class Renderer;
 	namespace DeferredShading
 	{
 		class GBufferPass : public DeferredShadingPass
@@ -17,7 +18,7 @@ namespace Framework
 			void OnFrameStart() override;
 			void OnInvoke() override;
 		private:
-			void DrawGBuffer(UINT index, XMMATRIX viewMatrix,XMMATRIX projMatrix);
+			void DrawGBuffer(UINT index, std::vector<Renderer*>* renderers, XMMATRIX viewMatrix, XMMATRIX projMatrix);
 		};
 	}
 }

@@ -3,7 +3,6 @@
 
 namespace Framework
 {
-	class Shader;
 	namespace DeferredShading
 	{
 		class UnlightPass : public DeferredShadingPass

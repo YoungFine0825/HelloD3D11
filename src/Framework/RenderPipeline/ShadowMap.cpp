@@ -89,6 +89,7 @@ namespace Framework
 		if (shader->hasPass("ShadowCaster"))
 		{
 			shader->SetMatrix4x4("obj_MatMVP", mvp);
+			matInst->Apply();
 			Graphics::DrawMesh(renderer->GetMeshInstance(), shader);
 		}
 		else

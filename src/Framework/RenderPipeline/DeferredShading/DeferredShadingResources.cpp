@@ -28,6 +28,13 @@ namespace Framework
 				delete m_parallelSM;
 				m_parallelSM = nullptr;
 			}
+			m_visibleBgRenderers.clear();
+			m_visibleOpaqueRenderers.clear();
+			m_unlightOpaqueRenderers.clear();
+			m_visibleTranparentRenderers.clear();
+			m_visiblePunctualLight.clear();
+			m_renderingCamera = nullptr;
+			m_parallelLit = nullptr;
 			RenderPiplineResources::~RenderPiplineResources();
 		}
 
@@ -96,6 +103,11 @@ namespace Framework
 				return nullptr;
 			}
 			return m_GBuffers[index];
+		}
+
+		RendererVector* DeferredShadingResources::GetBackgroundRenderers() 
+		{
+			return &m_visibleBgRenderers;
 		}
 
 		RendererVector* DeferredShadingResources::GetOpaqueRenderes() 

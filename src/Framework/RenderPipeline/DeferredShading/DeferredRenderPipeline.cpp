@@ -14,6 +14,7 @@
 #include "ShadowPass.h"
 #include "GBufferPass.h"
 #include "LightingPass.h"
+#include "BackgroundPass.h"
 #include "UnlightPass.h"
 
 namespace Framework
@@ -33,6 +34,11 @@ namespace Framework
 				delete m_resources;
 				m_resources = nullptr;
 			}
+			m_shadowPass.reset();
+			m_gbufferPass.reset();
+			m_lightingPass.reset();
+			m_backgroundPass.reset();
+			m_unlightPass.reset();
 			RenderPipeline::~RenderPipeline();
 		}
 
@@ -41,11 +47,13 @@ namespace Framework
 			m_shadowPass = std::make_shared<ShadowPass>();
 			m_gbufferPass = std::make_shared<GBufferPass>();
 			m_lightingPass = std::make_shared<LightingPass>();
+			m_backgroundPass = std::make_shared<BackgroundPass>();
 			m_unlightPass = std::make_shared<UnlightPass>();
 			//
 			m_shadowPass->Init(this, this->m_resources);
 			m_gbufferPass->Init(this, this->m_resources);
 			m_lightingPass->Init(this, this->m_resources);
+			m_backgroundPass->Init(this, this->m_resources);
 			m_unlightPass->Init(this, this->m_resources);
 		}
 
@@ -99,27 +107,36 @@ namespace Framework
 			//
 			SortVisibleRenderers(camera, &visibleRenderers);
 			//
+			m_resources->m_visibleBgRenderers.clear();
 			m_resources->m_visibleOpaqueRenderers.clear();
 			m_resources->m_unlightOpaqueRenderers.clear();
 			m_resources->m_visibleTranparentRenderers.clear();
 			for (size_t r = 0; r < rendererCnt; ++r) 
 			{
 				Renderer* renderer = visibleRenderers[r];
-				if (renderer->IsTransparent())
+				MaterialRenderQueue queue = renderer->GetMaterialInstance()->GetRenderQueue();
+				if (queue > RENDER_QUEUE_ALPHA_TEST)
 				{
 					m_resources->m_visibleTranparentRenderers.push_back(renderer);
 				}
 				else 
 				{
-					Material* materialInst = renderer->GetMaterialInstance();
-					Shader* shader = materialInst->GetShader();
-					if (!materialInst->IsEnableLighting() || !shader->hasTechnique("GBuffer"))
+					if (queue >= RENDER_QUEUE_OPAQUE)
 					{
-						m_resources->m_unlightOpaqueRenderers.push_back(renderer);
+						Material* materialInst = renderer->GetMaterialInstance();
+						Shader* shader = materialInst->GetShader();
+						if (!materialInst->IsEnableLighting() || !shader->hasTechnique("GBuffer"))
+						{
+							m_resources->m_unlightOpaqueRenderers.push_back(renderer);
+						}
+						else
+						{
+							m_resources->m_visibleOpaqueRenderers.push_back(renderer);
+						}
 					}
 					else 
 					{
-						m_resources->m_visibleOpaqueRenderers.push_back(renderer);
+						m_resources->m_visibleBgRenderers.push_back(renderer);
 					}
 				}
 			}
@@ -137,6 +154,8 @@ namespace Framework
 			static_cast<GBufferPass*>(m_gbufferPass.get())->Invoke();
 			//
 			static_cast<LightingPass*>(m_lightingPass.get())->Invoke();
+			//
+			static_cast<BackgroundPass*>(m_backgroundPass.get())->Invoke();
 			//
 			static_cast<UnlightPass*>(m_unlightPass.get())->Invoke();
 			//

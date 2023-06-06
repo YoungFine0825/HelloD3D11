@@ -1,0 +1,14 @@
+Name WireFence
+Shader shaders/test/WireFence.fx
+Properties {
+	Color diffuseColor (1.0 1.0 1.0 1.0)
+	Texture mainTexture textures/WireFence.dds
+	Vector mainTextureST (1.0 1.0 0.0 0.0)
+	Float specularPower 500
+	Float obj_ClipOff 0.1
+}
+Tags {
+	RenderType Opaque
+	CastShadow 1
+	ReceiveShadow 1
+}
