@@ -71,6 +71,7 @@ namespace Framework
 		m_castShadow = mat.m_castShadow;
 		m_receiveShadow = mat.m_receiveShadow;
 		m_renderQueue = mat.m_renderQueue;
+		m_enableLighting = mat.m_enableLighting;
 		//
 		m_paramFloat = mat.m_paramFloat;
 		m_paramFloat2 = mat.m_paramFloat2;
@@ -193,6 +194,8 @@ namespace Framework
 		{
 			m_shader->SetTexture(it->first.c_str(), it->second);
 		}
+		//
+		m_shader->SetFloat("obj_ReceiveShadow", m_receiveShadow ? 1.0f : 0.0f);
 		//
 		return this;
 	}

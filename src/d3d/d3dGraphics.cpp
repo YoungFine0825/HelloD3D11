@@ -326,7 +326,7 @@ namespace d3dGraphic
 
 	void SetRenderTarget(ID3D11RenderTargetView* renderTargetVIew, ID3D11DepthStencilView* depthStencilView) 
 	{
-		if (renderTargetVIew != nullptr) 
+		if (renderTargetVIew != nullptr || depthStencilView != nullptr) 
 		{
 			m_pSetRenderTargetView = renderTargetVIew;
 			m_pSetDepthStencilView = depthStencilView;

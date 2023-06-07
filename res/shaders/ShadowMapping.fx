@@ -42,13 +42,13 @@ float CSM_Depth_Sample(float2 uv,float level,float depth)
 	// clampedUV.x = clamp(clampedUV.x,uvMin.x,uvMax.x);
 	// clampedUV.y = clamp(clampedUV.y,uvMin.y,uvMax.y);
 	float ret = g_parallelShadowMap.SampleCmpLevelZero(samShadow,clampedUV, depth).r;
-	return step(1.0f,ret);
+	return ret;
 }
 
-float CalcShadowFactor_CSM(float3 posW)
+float CalcParallelLightShadowFactor_CSM(float3 posW)
 {
 	float2 uv = float2(0,0);
-	float level = g_CSMLevels - 1;
+	float level = -1;//g_CSMLevels - 1;
 	float depth = 0;
 	const float4x4 vps[2] = {g_pCSMVP0,g_pCSMVP1};
 	[unroll]
@@ -63,21 +63,28 @@ float CalcShadowFactor_CSM(float3 posW)
 			depth = posH.z;
 		}
 	}
-	
-	const float dx = 1.0f / g_CSMSize;
-	const float dy = 1.0f / (g_CSMSize * g_CSMLevels);
-	float percentLit = 0.0f;
-	const float2 offsets[9] = 
+	float ret = 0;
+	if(level >= 0)
 	{
-		float2(-dx,  -dy), float2(0.0f,  -dy), float2(dx,  -dy),
-		float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
-		float2(-dx,  +dy), float2(0.0f,  +dy), float2(dx,  +dy)
-	};
-	[unroll]
-	for(int i = 0; i < 9; ++i)
-	{
-		percentLit += CSM_Depth_Sample(uv + offsets[i], level,depth);
+		const float dx = 1.0f / g_CSMSize;
+		const float dy = 1.0f / (g_CSMSize * g_CSMLevels);
+		float percentLit = 0.0f;
+		const float2 offsets[9] = 
+		{
+			float2(-dx,  -dy), float2(0.0f,  -dy), float2(dx,  -dy),
+			float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
+			float2(-dx,  +dy), float2(0.0f,  +dy), float2(dx,  +dy)
+		};
+		[unroll]
+		for(int i = 0; i < 9; ++i)
+		{
+			percentLit += CSM_Depth_Sample(uv + offsets[i], level,depth);
+		}
+		ret = percentLit / 9.0f;
 	}
-	float ret = percentLit / 9.0f;
+	else
+	{
+		ret = 1.0f;
+	}
 	return ret;
 }

@@ -1,5 +1,6 @@
 #include "../Common.fx"
 #include "../Pipeline/DeferredShadingDefine.fx"
+#include "../ShadowMapDefine.fx"
 
 VertexOut_Common VS(VertexIn_Common vin)
 {
@@ -12,28 +13,6 @@ float4 PS(VertexOut_Common pin) : SV_Target
 	float4 texColor = float4(1, 1, 1, 1);
 	texColor = tex2D(g_diffuseMap, pin.TexCoord);
     return texColor;
-}
-
-struct VertexOut_ShowCaster
-{
-	float4 PosH  : SV_POSITION;
-	float2 TexCoord : TEXCOORD0;
-};
-
-
-VertexOut_ShowCaster VS_ShadowCaster(VertexIn_Common vin)
-{
-	VertexOut_ShowCaster vout;
-	vout.PosH = mul(float4(vin.PosL, 1.0f), obj_MatMVP);
-	vout.TexCoord = vin.Tex.xy;
-    return vout;
-}
-
-float4 PS_ShadowCaster(VertexOut_ShowCaster pin) : SV_Target
-{
-	float4 texColor = tex2D(g_diffuseMap, pin.TexCoord);
-    clip(texColor.a - obj_ClipOff);
-    return float4(1, 1, 1, 1);
 }
 
 technique11 Default
@@ -50,12 +29,12 @@ technique11 Default
 
     pass ShadowCaster
     {
-		SetRasterizerState(0);
+		SetRasterizerState(RS_GenShadowMap);
 		SetDepthStencilState(0, 0);
 		SetBlendState(0, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xffffffff);
-        SetVertexShader( CompileShader( vs_5_0, VS_ShadowCaster() ) );
+        SetVertexShader( CompileShader( vs_5_0, VS_AlphaTestShadowCaster() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( CompileShader( ps_5_0, PS_ShadowCaster() ) );
+        SetPixelShader( CompileShader( ps_5_0, PS_AlphaTestShadowCaster() ) );
     }
 }
 

@@ -1,0 +1,15 @@
+Name foliage/branch1_autumn_ed
+Shader shaders/StandardAlphaTest.fx
+Properties {
+	Color diffuseColor (1.0 1.0 1.0 1.0)
+	Texture mainTexture textures/foliage/branch1_autumn_ed.png
+	Texture g_normalMap textures/foliage/branch1_local.tga
+	Vector mainTextureST (1.0 1.0 0.0 0.0)
+	Float specularPower 500
+	Float obj_ClipOff 0.1
+}
+Tags {
+	RenderType AlphaTest
+	CastShadow 1
+	ReceiveShadow 1
+}

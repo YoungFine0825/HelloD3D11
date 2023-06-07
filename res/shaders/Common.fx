@@ -48,6 +48,7 @@ cbuffer cbPerObject
 	//Material
 	Material obj_Material;
 	float obj_ClipOff;
+	float obj_ReceiveShadow;
 };
 
 // Nonnumeric values cannot be added to a cbuffer.

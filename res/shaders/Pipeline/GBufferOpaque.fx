@@ -10,7 +10,7 @@ float4 PS_GBuffer1(VertexOut_Common pin) : SV_Target
 	float3 tangentW = normalize(pin.TangentW);
 	float3 normalMapSample = g_normalMap.Sample(samLinear, pin.TexCoord).rgb;//采样得到切线空间得法线
 	float3 bumppedNormalW = NormalTangent2WorldSpace(normalMapSample,normalW,tangentW);
-    return float4(bumppedNormalW * 0.5f + 0.5f,1.0f);
+    return float4(bumppedNormalW * 0.5f + 0.5f,obj_ReceiveShadow);
 }
 
 float4 PS_GBuffer2(VertexOut_Common pin) : SV_Target

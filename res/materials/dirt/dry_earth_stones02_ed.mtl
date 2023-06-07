@@ -8,6 +8,6 @@ Properties {
 }
 Tags {
 	RenderType Opaque
-	CastShadow 1
+	CastShadow 0
 	ReceiveShadow 1
 }

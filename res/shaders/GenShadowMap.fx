@@ -1,10 +1,6 @@
 #include "Common.fx"
 #include "ShadowMapDefine.fx"
 
-float4 PS_ShadowMap(VertexOut_GenShadowMap pin) : SV_Target
-{
-    return float4(1,1,1,1);
-}
 
 technique11 Default
 {
@@ -14,6 +10,6 @@ technique11 Default
 		SetDepthStencilState(0, 0);
         SetVertexShader( CompileShader( vs_5_0, VS_GenShadowMap() ) );
 		SetGeometryShader( NULL );
-        SetPixelShader( NULL );
+        SetPixelShader( CompileShader( ps_5_0, PS_GenShadowMap() ) );
     }
 }

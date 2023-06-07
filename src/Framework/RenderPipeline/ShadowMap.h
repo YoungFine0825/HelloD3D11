@@ -6,12 +6,13 @@ namespace Framework
 {
 	class Shader;
 	class Renderer;
+	class RenderTexture;
 
 	class ShadowMap 
 	{
 	public:
 		ShadowMap();
-		~ShadowMap();
+		virtual ~ShadowMap();
 		//
 		ShadowMap* SetSize(unsigned int size);
 		//
@@ -19,6 +20,7 @@ namespace Framework
 		ID3D11ShaderResourceView* GetSRV();
 		unsigned int GetSize();
 		void Clear();
+		void EnableTransparentShadow(bool enable);
 		//
 		virtual void PreRender(FrameData* frameData);
 		virtual void PostRender();
@@ -29,9 +31,9 @@ namespace Framework
 		unsigned int m_width{0};
 		unsigned int m_height{0};
 		unsigned int m_size{ 0 };
-		ID3D11ShaderResourceView* m_depthMapSRV;
-		ID3D11DepthStencilView* m_depthMapDSV;
+		RenderTexture* m_renderTexture;
 		Shader* m_genShadowMapShader;
+		bool m_enableTransparentShadow{ false };
 	protected:
 		virtual void OnCreateShadowMap(unsigned int size);
 	};

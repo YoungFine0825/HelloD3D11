@@ -61,6 +61,7 @@ float4 PS_Pass_ParallelLit(VertexOut_BlitCopy pin) : SV_Target
 	float3 viewDir = normalize(g_CameraPosW - posW);
 	float3 normalW = normalize(2.0f * gbuffer1.xyz - 1.0f);
 	float specualrPower = gbuffer0.w;
+	float isReceiveShadow = gbuffer1.w;
 	//
 	float3 diffuseColor = float3(1.0f,1.0f,1.0f);
 	float3 D = float3(0.0f,0.0f,0.0f);
@@ -75,9 +76,11 @@ float4 PS_Pass_ParallelLit(VertexOut_BlitCopy pin) : SV_Target
 		D,
 		S
 	);
-	float shadowFactor = CalcShadowFactor_CSM(posW) / litIntensity;
-	D = lerp(D * 0.5f,D,shadowFactor) * litIntensity;
-	S = lerp(S * 0.0f,S,shadowFactor) * litIntensity;
+	float shadowFactor = CalcParallelLightShadowFactor_CSM(posW);
+	shadowFactor = 1.0f - shadowFactor / litIntensity;
+	shadowFactor *= isReceiveShadow;
+	D = lerp(D,D * 0.5f,shadowFactor) * litIntensity;
+	S = lerp(S,S * 0.0f,shadowFactor) * litIntensity;
 	//
 	float4 finalColor;
 	finalColor.rgb = albedo.rgb * D.rgb + S.rgb;

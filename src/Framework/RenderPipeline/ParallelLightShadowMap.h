@@ -15,7 +15,7 @@ namespace Framework
 	{
 	public:
 		ParallelLightShadowMap();
-		~ParallelLightShadowMap();
+		~ParallelLightShadowMap() override;
 		//
 		void Update(Camera* camera,RendererVector* visibleRenderers, RendererVector* allRenderers, XMFLOAT3 litRotationW);
 		void PreRender(FrameData* frameData) override;

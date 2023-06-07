@@ -35,7 +35,6 @@ namespace Framework
 			m_visiblePunctualLight.clear();
 			m_renderingCamera = nullptr;
 			m_parallelLit = nullptr;
-			RenderPiplineResources::~RenderPiplineResources();
 		}
 
 		void DeferredShadingResources::InitResources() 
@@ -73,6 +72,7 @@ namespace Framework
 			m_GBuffers.push_back(gbuffer);//GBuffer3
 			//
 			m_parallelSM = new ParallelLightShadowMap();
+			m_parallelSM->EnableTransparentShadow(true);
 			m_parallelSM->SetSize(2048);
 		}
 

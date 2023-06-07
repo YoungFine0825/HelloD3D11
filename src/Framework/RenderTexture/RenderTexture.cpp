@@ -56,4 +56,19 @@ namespace Framework
 	unsigned int RenderTexture::GetWidth() { return m_width; }
 	unsigned int RenderTexture::GetHeight() { return m_height; }
 	d3dGraphic::ViewPort* RenderTexture::GetViewPortPtr() { return m_viewPortPtr; }
+
+	RenderTexture* RenderTexture::SetViewport(d3dGraphic::ViewPort* viewPort) 
+	{
+		if (!viewPort || !m_viewPortPtr) 
+		{
+			return this;
+		}
+		m_viewPortPtr->TopLeftX = viewPort->TopLeftX;
+		m_viewPortPtr->TopLeftY = viewPort->TopLeftY;
+		m_viewPortPtr->Width = viewPort->Width;
+		m_viewPortPtr->Height = viewPort->Height;
+		m_viewPortPtr->MinDepth = viewPort->MinDepth;
+		m_viewPortPtr->MaxDepth = viewPort->MaxDepth;
+		return this;
+	}
 }

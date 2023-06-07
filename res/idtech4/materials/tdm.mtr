@@ -98,3 +98,10 @@ materials/skies/daysky_right
     qer_editorimage ../textures/skies/daysky_right.tga
 	diffusemap ../textures/skies/daysky_right.tga
 }
+
+materials/foliage/branch1_autumn_ed
+{
+    qer_editorimage ../textures/foliage/branch1_autumn_ed.png
+	diffusemap ../textures/foliage/branch1_autumn_ed.png
+    bumpmap         ../textures/foliage/branch1_local.tga
+}

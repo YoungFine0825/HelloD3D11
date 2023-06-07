@@ -39,6 +39,7 @@ namespace Framework
 		unsigned int GetWidth();
 		unsigned int GetHeight();
 		d3dGraphic::ViewPort* GetViewPortPtr();
+		RenderTexture* SetViewport(d3dGraphic::ViewPort* viewPort);
 	private:
 		RenderTextureId m_id;
 		unsigned int m_width;

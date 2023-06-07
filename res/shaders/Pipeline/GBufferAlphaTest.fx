@@ -1,25 +1,33 @@
 
 float4 PS_GBuffer0(VertexOut_Common pin) : SV_Target
 {
+	float4 texColor = tex2D(g_diffuseMap,pin.TexCoord);
+    clip(texColor.a - obj_ClipOff);
     return float4(pin.PosW,obj_Material.Specular.w);
 }
 
 float4 PS_GBuffer1(VertexOut_Common pin) : SV_Target
 {
+	float4 texColor = tex2D(g_diffuseMap,pin.TexCoord);
+    clip(texColor.a - obj_ClipOff);
 	float3 normalW = normalize(pin.NormalW);
 	float3 tangentW = normalize(pin.TangentW);
 	float3 normalMapSample = g_normalMap.Sample(samLinear, pin.TexCoord).rgb;//采样得到切线空间得法线
 	float3 bumppedNormalW = NormalTangent2WorldSpace(normalMapSample,normalW,tangentW);
-    return float4(bumppedNormalW * 0.5f + 0.5f,1.0f);
+    return float4(bumppedNormalW * 0.5f + 0.5f,obj_ReceiveShadow);
 }
 
 float4 PS_GBuffer2(VertexOut_Common pin) : SV_Target
 {
-    return tex2D(g_diffuseMap,pin.TexCoord);
+	float4 texColor = tex2D(g_diffuseMap,pin.TexCoord);
+    clip(texColor.a - obj_ClipOff);
+    return texColor;
 }
 
 float4 PS_GBuffer3(VertexOut_Common pin) : SV_Target
 {
+	float4 texColor = tex2D(g_diffuseMap,pin.TexCoord);
+    clip(texColor.a - obj_ClipOff);
     return float4(pin.PosW,1.0f);
 }
 

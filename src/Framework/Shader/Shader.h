@@ -1,5 +1,5 @@
 #pragma once
-
+#include <vector>
 #include "../Resource.h"
 #include "../../math/MathLib.h"
 
@@ -27,7 +27,7 @@ namespace Framework
 		//
 		UINT GetPassCount();
 		bool ApplyPass(UINT passIndex, ID3D11DeviceContext* context);
-		bool hasPass(const std::string passName);
+		int GetPassIndex(const std::string passName);
 		//
 		ID3D11InputLayout* GetInputLayout(UINT passIndex);
 		//
@@ -50,5 +50,6 @@ namespace Framework
 		//
 		std::string m_enabledTechName;
 		UINT m_passCount{0};
+		std::vector<std::string> m_passesName;
 	};
 }

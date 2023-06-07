@@ -94,6 +94,16 @@ namespace Framework
 		m_enabledTechName = techName;
 		m_passCount = passCount;
 		//
+		m_passesName.clear();
+		for (UINT p = 0; p < passCount; ++p)
+		{
+			ID3DX11EffectPass* pass = m_pTech->GetPassByIndex(p);
+			D3DX11_PASS_DESC passDesc;
+			ZeroMemory(&passDesc, sizeof(passDesc));
+			pass->GetDesc(&passDesc);
+			m_passesName.push_back(passDesc.Name);
+		}
+		//
 		return true;
 	}
 
@@ -150,18 +160,20 @@ namespace Framework
 		return false;
 	}
 
-	bool Shader::hasPass(const std::string passName)
+	int Shader::GetPassIndex(const std::string passName) 
 	{
-		if (!m_pTech) 
+		if (!m_pTech)
 		{
-			return false;
+			return -1;
 		}
-		ID3DX11EffectPass* pass = m_pTech->GetPassByName(passName.c_str());
-		if (!pass || !pass->IsValid()) 
+		for (UINT p = 0; p < m_passCount; ++p) 
 		{
-			return false;
+			if (m_passesName[p] == passName) 
+			{
+				return p;
+			}
 		}
-		return true;
+		return -1;
 	}
 
 

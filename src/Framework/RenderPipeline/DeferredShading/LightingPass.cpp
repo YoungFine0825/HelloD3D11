@@ -59,6 +59,11 @@ namespace Framework
 			{
 				return;
 			}
+			float intensity = parallelLit->GetIntensity();
+			if (intensity <= 0) 
+			{
+				return;
+			}
 			RenderingCameraInfo* cameraInfo = m_resouces->GetRenderingCameraInfo();
 			//
 			m_lightingShader
@@ -68,7 +73,7 @@ namespace Framework
 				->SetRenderTexture("g_GBufferTex3", m_resouces->GBuffer(3))
 				->SetVector4("litColor", parallelLit->GetColor())
 				->SetVector3("litDirectionW", parallelLit->GetTransform()->GetWorldSpaceForward())
-				->SetFloat("litIntensity", parallelLit->GetIntensity())
+				->SetFloat("litIntensity", intensity)
 				->SetVector3("g_CameraPosW", cameraInfo->posW)
 				;
 			//

@@ -6,6 +6,8 @@
 #include "../Scene/Camera.h"
 #include "../Shader/ShaderManager.h"
 #include "../Shader/Shader.h"
+#include "../RenderTexture/RenderTexture.h"
+#include "../RenderTexture/RenderTextureManager.h"
 #include "../Graphic.h"
 #include "ParallelLightShadowMap.h"
 
@@ -16,12 +18,10 @@ namespace Framework
 		m_cascadeParts = new CascadePart[m_cascadeCnt];
 	}
 
-	ParallelLightShadowMap::~ParallelLightShadowMap() 
+	ParallelLightShadowMap::~ParallelLightShadowMap()
 	{
-		ReleaseCOM(m_depthMapDSV);
-		ReleaseCOM(m_depthMapSRV);
 		ReleaseArrayPointer(m_cascadeParts);
-		ShadowMap::~ShadowMap();
+		m_cascadeParts = nullptr;
 	}
 
 	ParallelLightShadowMap* ParallelLightShadowMap::SetNearestShadowDistance(float distance) 
@@ -32,8 +32,8 @@ namespace Framework
 
 	void ParallelLightShadowMap::OnCreateShadowMap(unsigned int size) 
 	{
-		ReleaseCOM(m_depthMapDSV);
-		ReleaseCOM(m_depthMapSRV);
+		RenderTextureManager::ReleaseRenderTexture(m_renderTexture);
+		//
 		float mapWid = static_cast<float>(size);
 		float mapHei = static_cast<float>(size);
 		m_depthMapWidth = mapWid * m_cascadeCnt;
@@ -49,47 +49,32 @@ namespace Framework
 			m_cascadeParts[i].m_viewport.MaxDepth = 1.0f;
 		}
 
-		// Use typeless format because the DSV is going to interpret
-		// the bits as DXGI_FORMAT_D24_UNORM_S8_UINT, whereas the SRV is going to interpret
-		// the bits as DXGI_FORMAT_R24_UNORM_X8_TYPELESS.
-		D3D11_TEXTURE2D_DESC texDesc;
-		texDesc.Width = m_depthMapWidth;
-		texDesc.Height = m_depthMapHeight;
-		texDesc.MipLevels = 1;
-		texDesc.ArraySize = 1;
-		texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-		texDesc.SampleDesc.Count = 1;
-		texDesc.SampleDesc.Quality = 0;
-		texDesc.Usage = D3D11_USAGE_DEFAULT;
-		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-		texDesc.CPUAccessFlags = 0;
-		texDesc.MiscFlags = 0;
-
-		ID3D11Device* device = d3dGraphic::GetDevice();
-		ID3D11Texture2D* depthMap = 0;
-		DXHR(device->CreateTexture2D(&texDesc, 0, &depthMap));
-
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-		dsvDesc.Flags = 0;
-		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		dsvDesc.Texture2D.MipSlice = 0;
-		DXHR(device->CreateDepthStencilView(depthMap, &dsvDesc, &m_depthMapDSV));
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-		srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-		DXHR(device->CreateShaderResourceView(depthMap, &srvDesc, &m_depthMapSRV));
-
-		// View saves a reference to the texture so we can release our reference.
-		ReleaseCOM(depthMap);
+		RenderTextureDesc rtDesc = { 0 };
+		rtDesc.width = m_depthMapWidth;
+		rtDesc.height = m_depthMapHeight;
+		rtDesc.includeColor = false;
+		rtDesc.includeDepthStencil = true;
+		rtDesc.msaaCount = 0;
+		rtDesc.includeColor = m_enableTransparentShadow;
+		rtDesc.includeDepthStencil = true;
+		if (m_enableTransparentShadow) 
+		{
+			rtDesc.colorFormat = DXGI_FORMAT_R32_FLOAT;
+		}
+		m_renderTexture = RenderTextureManager::CreateRenderTexture(&rtDesc);
 	}
 
 	void ParallelLightShadowMap::SetShaderParamters(Shader* shader) 
 	{
-		shader->SetShaderResourceView("g_parallelShadowMap", m_depthMapSRV);
+		//if (m_enableTransparentShadow) 
+		//{
+		//	shader->SetShaderResourceView("g_parallelShadowMap", m_renderTexture->GetColorTextureSRV());
+		//}
+		//else 
+		//{
+		//	shader->SetShaderResourceView("g_parallelShadowMap", m_renderTexture->GetDepthTextureSRV());
+		//}
+		shader->SetShaderResourceView("g_parallelShadowMap", m_renderTexture->GetDepthTextureSRV());
 		shader->SetFloat("g_CSMSize", static_cast<float>(m_size));
 		shader->SetFloat("g_CSMLevels", static_cast<float>(m_cascadeCnt));
 		shader->SetMatrix4x4("g_pCSMVP0", m_cascadeParts[0].m_viewProjectMatrix);
@@ -205,13 +190,16 @@ namespace Framework
 		BuildViewProjectMartrix(litRotationW, &m_wholeSceneAABBW,camera);
 		//
 		//set render target with native api
-		ID3D11DeviceContext* dc = d3dGraphic::GetDeviceContext();
-		ID3D11RenderTargetView* renderTargets[1] = { 0 };
-		dc->OMSetRenderTargets(1, renderTargets, m_depthMapDSV);
-		dc->ClearDepthStencilView(m_depthMapDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		//ID3D11DeviceContext* dc = d3dGraphic::GetDeviceContext();
+		//ID3D11RenderTargetView* renderTargets[1] = { 0 };
+		//dc->OMSetRenderTargets(1, renderTargets, m_depthMapDSV);
+		//dc->ClearDepthStencilView(m_depthMapDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		Clear();
 		for (int i = 0; i < m_cascadeCnt; ++i) 
 		{
-			dc->RSSetViewports(1, &m_cascadeParts[i].m_viewport);
+			//dc->RSSetViewports(1, &m_cascadeParts[i].m_viewport);
+			m_renderTexture->SetViewport(&m_cascadeParts[i].m_viewport);
+			Graphics::SetRenderTarget(m_renderTexture);
 			//DrawScene
 			size_t rendererCnt = allRenderers->size();
 			for (size_t r = 0; r < rendererCnt; ++r)
