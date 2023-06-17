@@ -1,0 +1,16 @@
+Name glass/hammer_purple_ed
+Shader shaders/StandardTransparent.fx
+Properties {
+	Color diffuseColor (1.0 1.0 1.0 1.0)
+	Texture mainTexture textures/glass/hammer_purple_ed.jpg
+	Texture g_normalMap textures/glass/hammer_purple_local.tga
+	Vector mainTextureST (1.0 1.0 0.0 0.0)
+	Float specularPower 500
+	Float obj_Alpha 0.8
+}
+Tags {
+	RenderType Transparent
+	Lighting 1
+	CastShadow 0
+	ReceiveShadow 1
+}

@@ -46,7 +46,7 @@ bool App_Init()
 	RenderSystem::SetDrawGUICallBack(DrawImGUI);
 	RenderSystem::SetDrawGizmosCallBack(DrawGizmos);
 	//
-	CreateSceneFromIdTech4MapFile("res/idtech4/maps/test_scene.proc");
+	CreateSceneFromIdTech4MapFile("res/maps/test_scene.proc");
 	//
 	mainCamera = SceneManager::CreateDefaultMainCamera();
 	mainCamera->SetBackgroundColor(m_bgColor);

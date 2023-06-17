@@ -292,6 +292,9 @@
     <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\BackgroundPass.cpp">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClCompile>
+    <ClCompile Include="src\Framework\RenderPipeline\DeferredShading\TransparentPass.cpp">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Window.h">
@@ -493,6 +496,9 @@
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClInclude>
     <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\BackgroundPass.h">
+      <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Framework\RenderPipeline\DeferredShading\TransparentPass.h">
       <Filter>src\Framework\RenderPipeline\DeferredShading</Filter>
     </ClInclude>
   </ItemGroup>

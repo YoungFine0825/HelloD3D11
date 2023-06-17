@@ -48,6 +48,7 @@ cbuffer cbPerObject
 	//Material
 	Material obj_Material;
 	float obj_ClipOff;
+	float obj_Alpha;
 	float obj_ReceiveShadow;
 };
 
@@ -84,7 +85,7 @@ VertexOut_Common VertexShader_Common(VertexIn_Common vin)
 	vout.NormalW = mul(float4(vin.NormalL, 0.0f), obj_MatNormalWorld).xyz;
 	//
 	float3 tangentL = vin.TangentL.xyz * vin.TangentL.w;//得到带朝向得法线
-	vout.TangentW = mul(float4(tangentL, 1.0f), obj_MatWorld).xyz;//得到世界空间切线
+	vout.TangentW = mul(float4(tangentL, 1.0f), obj_MatNormalWorld).xyz;//得到世界空间切线
     return vout;
 }
 

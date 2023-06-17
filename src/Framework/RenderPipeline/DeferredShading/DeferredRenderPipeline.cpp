@@ -16,6 +16,7 @@
 #include "LightingPass.h"
 #include "BackgroundPass.h"
 #include "UnlightPass.h"
+#include "TransparentPass.h"
 
 namespace Framework
 {
@@ -49,12 +50,14 @@ namespace Framework
 			m_lightingPass = std::make_shared<LightingPass>();
 			m_backgroundPass = std::make_shared<BackgroundPass>();
 			m_unlightPass = std::make_shared<UnlightPass>();
+			m_transparentPass = std::make_shared<TransparentPass>();
 			//
 			m_shadowPass->Init(this, this->m_resources);
 			m_gbufferPass->Init(this, this->m_resources);
 			m_lightingPass->Init(this, this->m_resources);
 			m_backgroundPass->Init(this, this->m_resources);
 			m_unlightPass->Init(this, this->m_resources);
+			m_transparentPass->Init(this, this->m_resources);
 		}
 
 		FrameData* DeferredRenderPipeline::GetFrameData() 
@@ -159,6 +162,8 @@ namespace Framework
 			//
 			static_cast<UnlightPass*>(m_unlightPass.get())->Invoke();
 			//
+			static_cast<TransparentPass*>(m_transparentPass.get())->Invoke();
+			//
 			Framework::RenderTexture* rt = camera->GetRenderTexture();
 			Graphics::Blit(m_resources->m_finalShadingRT, rt);
 		}
@@ -166,7 +171,6 @@ namespace Framework
 		void DeferredRenderPipeline::DrawRenderer(Renderer* renderer, Shader* shader, XMMATRIX viewMatrix, XMMATRIX projectMatrix,int pass)
 		{
 			Entity* ent = renderer->GetEntity();
-			Material* mat = renderer->GetMaterialInstance();
 			//Per Frame
 			shader->SetFloat("g_timeDelta", App_GetTimeDelta());
 			shader->SetVector3("g_CameraPosW", m_resources->m_renderingCameraInfo.posW);
@@ -181,7 +185,7 @@ namespace Framework
 			shader->SetMatrix4x4("obj_MatView", viewMatrix);
 			shader->SetMatrix4x4("obj_MatProj", projectMatrix);
 			//
-			mat->Apply();
+			renderer->GetMaterialInstance()->Apply();
 			//»æÖÆ
 			Graphics::DrawMesh(renderer->GetMeshInstance(), shader,pass);
 		}
@@ -213,7 +217,7 @@ namespace Framework
 				Light* lit = (*lights)[l];
 				LIGHT_TYPE type = lit->GetType();
 				if (type == LIGHT_TYPE_DIRECTIONAL) { continue; }
-				if (Framework::CollisionUtils::IntersectLightFrustum(lit, &cameraFrustum))
+				if (lit->GetIntensity() > 0 && Framework::CollisionUtils::IntersectLightFrustum(lit, &cameraFrustum))
 				{
 					m_resources->m_visiblePunctualLight.push_back(lit);
 				}

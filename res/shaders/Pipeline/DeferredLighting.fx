@@ -1,6 +1,7 @@
 #include "../Common.fx"
 #include "DeferredShadingDefine.fx"
-#include "../ShadowMapping.fx"
+#include "PhongModel.fx"
+#include "ShadowMapping.fx"
 
 cbuffer cdDefeffedLighting
 {
@@ -11,27 +12,6 @@ cbuffer cdDefeffedLighting
 	float litRange;
 	float3 litDirectionW;
 	float litSpot;
-}
-
-float LambertDiffuse(float3 lightDirW,float3 normalW)
-{
-	float NdotL = dot(lightDirW,normalW) * 0.5f + 0.5f;//半兰伯特漫反射系数
-	//float NdotL = max(0,dot(lightDirW,normalW));//兰伯特漫反射系数
-	return NdotL;
-}
-
-
-void CalcuDiffuseSpeacularColor(float3 L,float3 normalW,float3 viewDir,float3 lightColor,float3 diffuseColor,float specualrPower,
-	out float3 outDiffuseColor,
-	out float3 outSpecularColor
-	)
-{
-	outDiffuseColor = LambertDiffuse(L,normalW) * diffuseColor.rgb * lightColor;
-	//
-	float3 reflect = normalW * max(0,dot(normalW,L)) * 2 - L;
-	float isSpecularVisible = step(0,dot(L,normalW));
-	float specularFactor = pow( max(0,dot(reflect,viewDir)) , specualrPower) * isSpecularVisible;
-	outSpecularColor = specularFactor * lightColor;
 }
 
 struct VertexOut_BlitCopy
@@ -64,14 +44,17 @@ float4 PS_Pass_ParallelLit(VertexOut_BlitCopy pin) : SV_Target
 	float isReceiveShadow = gbuffer1.w;
 	//
 	float3 diffuseColor = float3(1.0f,1.0f,1.0f);
+	float3 specularColor = float3(1.0f,1.0f,1.0f);
 	float3 D = float3(0.0f,0.0f,0.0f);
 	float3 S = float3(0.0f,0.0f,0.0f);
 	CalcuDiffuseSpeacularColor(
-		normalize(litDirectionW) * -1,
+		float3(0,0,0),
+		litDirectionW * -1,
 		normalW,
 		viewDir,
 		litColor.rgb,
 		diffuseColor,
+		specularColor,
 		specualrPower,
 		D,
 		S
@@ -102,19 +85,6 @@ RasterizerState RS_ParallelLightPass
 
 ////////////////////////////////////////
 
-float windownFunction(float r,float rMax)
-{
-	float ret = 1 - pow(r / rMax,4);
-	ret = clamp(ret,0,1);
-	return ret;
-}
-
-float distanceFallofFunction(float r,float rMax)
-{
-	float ret = 1 - pow(r / rMax,2);
-	ret = clamp(ret,0,1);
-	return ret;
-}
 
 struct VertexOut_PunctualLight
 {
@@ -144,31 +114,30 @@ float4 PS_Pass_PointLight(VertexOut_PunctualLight pin) : SV_Target
 	float specualrPower = gbuffer0.w;
 	//
 	float3 diffuseColor = float3(1.0f,1.0f,1.0f);
-	float3 A = float3(1.0f,1.0f,1.0f);
+	float3 specularColor = float3(1.0f,1.0f,1.0f);
+	float3 D = float3(1.0f,1.0f,1.0f);
 	float3 S = float3(0.0f,0.0f,0.0f);
 	//
-	float3 L = normalize(litPositionW - posW);
-	float d = length(posW - litPositionW) / max(litRange,0.01);
-	float3 att = litAttenuation;
-	float scale = 1 / (att.x + att.y * d + att.z * pow(d,2)) * windownFunction(d,1);
-	float3 lightColor = scale * litColor.rgb;
+	float3 lightColor = CalcuPointLightColor(posW,litPositionW,litColor.rgb,litRange,litAttenuation);
 	//
 	CalcuDiffuseSpeacularColor(
-		L,
+		posW,
+		litPositionW,
 		normalW,
 		viewDir,
 		lightColor,
 		diffuseColor,
+		specularColor,
 		specualrPower,
-		A,
+		D,
 		S
 	);
 	//
-	A *= litIntensity;
+	D *= litIntensity;
 	S *= litIntensity;
 	//
 	float4 finalColor;
-	finalColor.rgb = albedo.rgb * A.rgb + S.rgb;
+	finalColor.rgb = albedo.rgb * D.rgb + S.rgb;
 	finalColor.a = 1.0f;
     return finalColor;
 }
@@ -187,36 +156,30 @@ float4 PS_Pass_SpotLight(VertexOut_PunctualLight pin) : SV_Target
 	float specualrPower = gbuffer0.w;
 	//
 	float3 diffuseColor = float3(1.0f,1.0f,1.0f);
-	float3 A = float3(1.0f,1.0f,1.0f);
+	float3 specularColor = float3(1.0f,1.0f,1.0f);
+	float3 D = float3(1.0f,1.0f,1.0f);
 	float3 S = float3(0.0f,0.0f,0.0f);
 	//
-	float3 lit2Surface = normalize(posW - litPositionW);
-	float3 litOrient = normalize(litDirectionW);
-	float distance2Surface = length(posW - litPositionW) / max(litRange,0.01);
-	float umbra = max(litSpot,0.01);
-	float fi = acos(max(0,dot(litOrient,lit2Surface)));
-	float inDistance = distance2Surface <= 1.0f;//距离衰减
-	float3 att = litAttenuation;
-	float d = fi / umbra ;
-	float scale = 1 / (att.x + att.y * d + att.z * pow(d,2)) * windownFunction(d,1);
-	float3 lightColor = inDistance * scale * litColor.rgb;
+	float3 lightColor = CalcuSpotLightColor(posW,litPositionW,litColor.rgb,litRange,litAttenuation,litDirectionW,litSpot);
 	//
 	CalcuDiffuseSpeacularColor(
-		normalize(lit2Surface * -1),
+		posW,
+		litPositionW,
 		normalW,
 		viewDir,
 		lightColor,
 		diffuseColor,
+		specularColor,
 		specualrPower,
-		A,
+		D,
 		S
 	);
 	//
-	A *= litIntensity;
+	D *= litIntensity;
 	S *= litIntensity;
 	//
 	float4 finalColor;
-	finalColor.rgb = albedo.rgb * A.rgb + S.rgb;
+	finalColor.rgb = albedo.rgb * D.rgb + S.rgb;
 	finalColor.a = 1.0f;
     return finalColor;
 }

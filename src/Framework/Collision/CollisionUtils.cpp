@@ -196,5 +196,48 @@ namespace Framework
 			}
 			return false;
 		}
+
+		bool IntersectLightAxisAlignedBox(Light* lit, const AxisAlignedBox* aabbW) 
+		{
+			LIGHT_TYPE type = lit->GetType();
+			if (type == LIGHT_TYPE_DIRECTIONAL) { return true; }
+			Transform* litTransform = lit->GetTransform();
+			if (type == LIGHT_TYPE_POINT)
+			{
+				Sphere sphere;
+				sphere.Center = litTransform->position;
+				sphere.Radius = lit->GetRange();
+				if (XNA::IntersectSphereAxisAlignedBox(&sphere, aabbW) > 0)
+				{
+					return true;
+				}
+			}
+			else if (type == LIGHT_TYPE_SPOT)
+			{
+				float range = lit->GetRange();
+				float radin = Angle2Radin(lit->GetSpot());
+				float radius = tan(radin) * range;
+				//为SpotLight构建一个朝向包围盒（OBB）,用OBB与renderer的AABB判断两者是否发碰撞
+				OBB obbL;//先构建一个局部空间OBB
+				obbL.Center = { 0,0,range / 2.0f };
+				XMFLOAT3 endPoint = { 0,0,range };
+				XMFLOAT3 max = { radius,radius,range };
+				obbL.Extents = max - obbL.Center;
+				obbL.Orientation = { 0,0,0,1 };
+				//再应用光源的旋转和位移，将局部空间OBB转换到世界空间
+				OBB obbW;
+				XMVECTOR scale;
+				XMVECTOR rotQuat;
+				XMVECTOR translation;
+				XMMATRIX litWorldMatrix = litTransform->GetWorldMatrix();
+				XMMatrixDecompose(&scale, &rotQuat, &translation, litWorldMatrix);
+				XNA::TransformOrientedBox(&obbW, &obbL, 1, rotQuat, translation);
+				if (XNA::IntersectAxisAlignedBoxOrientedBox(aabbW,&obbW))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }
