@@ -224,12 +224,3 @@ brushDef3
 "noshadows" "1"
 "origin" "-37 677 196"
 }
-// entity 6
-{
-"classname" "func_static"
-"name" "func_static_3"
-"origin" "-222 -247 48"
-"model" "models/lr_nvz_01.FBX"
-"rotation" "1 0 0 0 1 0 0 0 1"
-"solid" "1"
-}
