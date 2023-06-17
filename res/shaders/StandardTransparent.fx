@@ -1,7 +1,5 @@
 #include "Common.fx"
-#include "Pipeline/PhongModel.fx"
-#include "Pipeline/ShadowMapping.fx"
-#include "Pipeline/ForwardLighting.fx"
+#include "TransparentLighting.fx"
 
 
 VertexOut_Common VS(VertexIn_Common vin)
