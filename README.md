@@ -1,5 +1,5 @@
 # HelloD3D11
-阅读《Introduction to 3D Game Programming with DirectX 11》做的一个渲染器，主要用于练习。
+从23年2月份开始，编学C++边阅读《Introduction to 3D Game Programming with DirectX 11》做的一个简易的渲染器，主要用于练习。
 
 <img src="readme/FInal.png">
 
